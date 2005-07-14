@@ -1,3 +1,16 @@
+2005-03-18  Tollef Fog Heen  <tfheen@debian.org>
+
+	* pkg.c (print_package_list): Ignore requires when just listing
+	the available packages.
+	(internal_get_package): Pass ignore_requires on.
+
+	* parse.h: update prototype for parse_package_file.
+
+	* parse.c (parse_line): Ignore Requires when told so.
+	(parse_package_file): Pass ingore_requires on to parse_line.
+
+	(Freedesktop #191, Debian #232719)
+
 2005-03-18  Tollef Fog Heen  <tfheen@err.no>
 
 	* glib-patches/pthread-config-fix.diff: Add patch to detect

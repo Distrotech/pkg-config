@@ -783,7 +783,7 @@ parse_url (Package *pkg, const char *str, const char *path)
 }
 
 static void
-parse_line (Package *pkg, const char *untrimmed, const char *path)
+parse_line (Package *pkg, const char *untrimmed, const char *path, gboolean ignore_requires)
 {
   char *str;
   char *p;
@@ -824,7 +824,12 @@ parse_line (Package *pkg, const char *untrimmed, const char *path)
       else if (strcmp (tag, "Version") == 0)
         parse_version (pkg, p, path);
       else if (strcmp (tag, "Requires") == 0)
-        parse_requires (pkg, p, path);
+	     {
+          if (ignore_requires == FALSE)
+              parse_requires (pkg, p, path);
+          else
+              return;
+        }
       else if (strcmp (tag, "Libs") == 0)
         parse_libs (pkg, p, path);
       else if (strcmp (tag, "Cflags") == 0 ||
@@ -925,7 +930,7 @@ parse_line (Package *pkg, const char *untrimmed, const char *path)
 }
 
 Package*
-parse_package_file (const char *path)
+parse_package_file (const char *path, gboolean ignore_requires)
 {
   FILE *f;
   Package *pkg;
@@ -962,7 +967,7 @@ parse_package_file (const char *path)
     {
       one_line = TRUE;
       
-      parse_line (pkg, str->str, path);
+      parse_line (pkg, str->str, path, ignore_requires);
 
       g_string_truncate (str, 0);
     }

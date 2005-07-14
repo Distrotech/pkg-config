@@ -22,7 +22,7 @@
 
 #include "pkg.h"
 
-Package *parse_package_file (const char *path);
+Package *parse_package_file (const char *path, gboolean ignore_requires);
 
 Package *get_compat_package (const char *name);
 

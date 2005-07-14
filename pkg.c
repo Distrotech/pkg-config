@@ -61,6 +61,7 @@ static GSList *search_dirs = NULL;
 static int scanned_dir_count = 0;
 
 gboolean disable_uninstalled = FALSE;
+gboolean ignore_requires = FALSE;
 
 void
 add_search_dir (const char *path)
@@ -311,7 +312,7 @@ internal_get_package (const char *name, gboolean warn, gboolean check_compat)
     }
 
   debug_spew ("Reading '%s' from file '%s'\n", name, location);
-  pkg = parse_package_file (location);
+  pkg = parse_package_file (location, ignore_requires);
   
   if (pkg == NULL)
     {
@@ -1436,6 +1437,8 @@ print_package_list (void)
 {
   int mlen = 0;
   
+  ignore_requires = TRUE;
+
   g_hash_table_foreach (locations, max_len_foreach, &mlen);
   g_hash_table_foreach (locations, packages_foreach, GINT_TO_POINTER (mlen + 1));
 }
