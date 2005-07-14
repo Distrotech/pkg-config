@@ -1,5 +1,9 @@
 2002-02-07  Havoc Pennington  <hp@redhat.com>
 
+	* configure.in: 0.11.0
+
+2002-02-07  Havoc Pennington  <hp@redhat.com>
+
 	* autogen.sh: patch gslist.c so that it has a stable sort
 	function, so we don't utterly mangle the order of the libraries on
 	the link line.
