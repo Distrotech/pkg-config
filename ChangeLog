@@ -1,3 +1,7 @@
+2005-03-26  Tollef Fog Heen  <tfheen@err.no>
+
+	* AUTHORS: Add myself.
+
 2005-03-18  Tollef Fog Heen  <tfheen@debian.org>
 
 	* pkg.c (print_package_list): Ignore requires when just listing
