@@ -183,6 +183,26 @@ scan_dir (const char *dirname)
     }
 }
 
+static Package *
+add_virtual_pkgconfig_package (void)
+{
+  Package *pkg = NULL;
+
+  pkg = g_new0 (Package, 1);
+
+  pkg->key = g_strdup ("pkg-config");
+  pkg->version = g_strdup (VERSION);
+  pkg->name = g_strdup ("pkg-config");
+  pkg->description = g_strdup ("pkg-config is a system for managing "
+			       "compile/link flags for libraries");
+  pkg->url = g_strdup ("http://www.freedesktop.org/software/pkgconfig/");
+
+  debug_spew ("Adding virtual 'pkg-config' package to list of known packages\n");
+  g_hash_table_insert (packages, pkg->key, pkg);
+
+  return pkg;
+}
+
 void
 package_init ()
 {
@@ -201,6 +221,8 @@ package_init ()
       locations = g_hash_table_new (g_str_hash, g_str_equal);
       path_positions = g_hash_table_new (g_str_hash, g_str_equal);
       
+      add_virtual_pkgconfig_package ();
+
       g_slist_foreach (search_dirs, (GFunc)scan_dir, NULL);
       scan_dir (pkglibdir);
     }

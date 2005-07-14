@@ -1,5 +1,10 @@
 2003-02-22  James Henstridge  <james@daa.com.au>
 
+	* pkg.c (add_virtual_pkgconfig_package): function to add a virtual
+	"pkg-config" package to the packages hash table.
+	(package_init): add the "pkg-config" package while initing the
+	hash table.
+
 	* pkg.h: add missing prototype.
 
 	* main.c (main): print the url if the package is too old, to match
