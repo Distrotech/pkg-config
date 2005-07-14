@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2001, 2002 Red Hat Inc.
+ * Copyright (C) 2001, 2002, 2005 Red Hat Inc.
  * 
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -970,7 +970,8 @@ parse_package_file (const char *path)
   if (!one_line)
     verbose_error ("Package file '%s' appears to be empty\n",
                    path);
-  
+
+  fclose(f);
   return pkg;
 }
 

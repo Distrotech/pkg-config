@@ -1,5 +1,10 @@
 2005-02-21  Tollef Fog Heen  <tfheen@err.no>
 
+	* parse.c (parse_package_file): Stop leaking file descriptors.
+	(Freedesktop #1006)
+
+2005-02-21  Tollef Fog Heen  <tfheen@err.no>
+
 	* pkg-config.1: Get rid of groff warnings when formatting
 	pkg-config(1) on an 80-column terminal.  Thanks to Colin Watson
 	and Ubuntu for the fix.  (Freedesktop #148)
