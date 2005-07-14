@@ -1,0 +1,10 @@
+--- glib-1.2.8/gstrfuncs.c	2000-04-17 17:05:16.000000000 +0200
++++ glib-1.2.8/gstrfuncs.c.new	2005-04-02 16:39:10.627002672 +0200
+@@ -671,7 +671,6 @@
+   char *msg;
+ 
+ #ifdef HAVE_STRSIGNAL
+-  extern char *strsignal (int sig);
+   return strsignal (signum);
+ #elif NO_SYS_SIGLIST
+   switch (signum)
