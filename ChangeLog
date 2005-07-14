@@ -1,5 +1,8 @@
 2005-06-26  Tollef Fog Heen  <tfheen@err.no>
 
+	* pkg.m4: Get rid of caching again.  This breaks too much stuff,
+	and pkg-config doesn't take much time to run.
+
 	* glib-patches/configure.in-fd_set.diff: Patch to grep for fd_set
 	rather than fd_mask.  Thanks to David Wolfe for the fix.  This
 	should make pkg-config happier on QNX.
