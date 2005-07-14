@@ -3,7 +3,7 @@ AC_INIT(pkg-config.1)
 
 AC_CONFIG_SUBDIRS(glib-1.2.8)
 
-AM_INIT_AUTOMAKE(pkgconfig, 0.7.0)
+AM_INIT_AUTOMAKE(pkgconfig, 0.8.0)
 
 AM_MAINTAINER_MODE
 

@@ -84,6 +84,8 @@ void define_global_variable (const char *varname,
 void debug_spew (const char *format, ...);
 void verbose_error (const char *format, ...);
 
+gboolean name_ends_in_uninstalled (const char *str);
+
 /* If TRUE, do not automatically prefer uninstalled versions */
 extern gboolean disable_uninstalled;
 

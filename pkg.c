@@ -52,10 +52,10 @@ ends_in_dotpc (const char *str)
 }
 
 /* strlen ("uninstalled") */
-#define UNINSTALLED_LEN 11 
+#define UNINSTALLED_LEN 11
 
-static gboolean
-ends_in_uninstalled (const char *str)
+gboolean
+name_ends_in_uninstalled (const char *str)
 {
   int len = strlen (str);
   
@@ -183,7 +183,7 @@ internal_get_package (const char *name, gboolean warn, gboolean check_compat)
     {
       /* See if we should auto-prefer the uninstalled version */
       if (!disable_uninstalled &&
-          !ends_in_uninstalled (name))
+          !name_ends_in_uninstalled (name))
         {
           char *un;
 
@@ -201,7 +201,6 @@ internal_get_package (const char *name, gboolean warn, gboolean check_compat)
         }
       
       location = g_hash_table_lookup (locations, name);
-      debug_spew ("Reading '%s' from file '%s'\n", name, location);
     }
   
   if (location == NULL && check_compat)
@@ -227,7 +226,8 @@ internal_get_package (const char *name, gboolean warn, gboolean check_compat)
 
       return NULL;
     }
-  
+
+  debug_spew ("Reading '%s' from file '%s'\n", name, location);
   pkg = parse_package_file (location);
   
   if (pkg == NULL)

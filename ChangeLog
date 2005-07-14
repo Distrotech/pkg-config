@@ -1,3 +1,11 @@
+2001-07-11  Havoc Pennington  <hp@pobox.com>
+
+	* parse.c (parse_cflags): fix failure to put space between cflags,
+	reported by Chema
+	(parse_line): allow spelling Cflags as CFlags, pointed out by Tim
+	(get_compat_package): support legacy script gnome-vfs-config for
+	package name "libgnomevfs"
+
 2001-06-18  Havoc Pennington  <hp@pobox.com>
 
 	* pkg.m4: print the error, not the name of the variable containing

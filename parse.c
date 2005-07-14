@@ -742,6 +742,8 @@ parse_cflags (Package *pkg, const char *str, const char *path)
         }
       else
         {
+          if (other->len > 0)
+            g_string_append (other, " ");
           g_string_append (other, arg);
         }
 
@@ -805,7 +807,8 @@ parse_line (Package *pkg, const char *untrimmed, const char *path)
         parse_requires (pkg, p, path);
       else if (strcmp (tag, "Libs") == 0)
         parse_libs (pkg, p, path);
-      else if (strcmp (tag, "Cflags") == 0)
+      else if (strcmp (tag, "Cflags") == 0 ||
+               strcmp (tag, "CFlags") == 0)
         parse_cflags (pkg, p, path);
       else if (strcmp (tag, "Conflicts") == 0)
         parse_conflicts (pkg, p, path);
@@ -949,7 +952,10 @@ get_compat_package (const char *name)
 {
   Package *pkg;
 
-  debug_spew ("Looking for '%s' using old-style -config scripts\n", name);
+  if (name_ends_in_uninstalled (name))
+    debug_spew ("Suspiciously looking for compat package for -uninstalled: %s\n", name);
+  
+  debug_spew ("Looking for '%s' using legacy -config scripts\n", name);
   
   pkg = g_new0 (Package, 1);
   
@@ -1003,6 +1009,33 @@ get_compat_package (const char *name)
 
       output = backticks ("gtk-config --cflags");
       parse_cflags (pkg, output, "gtk-config");
+      g_free (output);
+
+      return pkg;
+    }
+  else if (strcmp (name, "libgnomevfs") == 0)
+    {
+      char *output;
+
+      debug_spew ("Calling gnome-vfs-config\n");
+      
+      pkg->version = backticks ("gnome-vfs-config --version");
+      if (pkg->version == NULL)
+        {
+          g_free (pkg);
+          return NULL;
+        }
+      
+      pkg->name = g_strdup ("GNOME VFS");
+      pkg->key = g_strdup ("libgnomevfs");
+      pkg->description = g_strdup ("GNOME Virtual File System");
+
+      output = backticks ("gnome-vfs-config --libs");
+      parse_libs (pkg, output, "gnome-vfs-config");
+      g_free (output);
+
+      output = backticks ("gnome-vfs-config --cflags");
+      parse_cflags (pkg, output, "gnome-vfs-config");
       g_free (output);
 
       return pkg;

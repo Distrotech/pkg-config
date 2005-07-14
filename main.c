@@ -71,6 +71,8 @@ popt_callback (poptContext con,
                const struct poptOption * opt,
                const char * arg, void * data)
 {
+  debug_spew ("Option --%s seen\n", opt->longName);
+  
   if (opt->val == DEFINE_VARIABLE)
     {
       char *varname;
@@ -214,6 +216,7 @@ main (int argc, char **argv)
       want_debug_spew = TRUE;
       want_verbose_errors = TRUE;
       want_silence_errors = FALSE;
+      debug_spew ("PKG_CONFIG_DEBUG_SPEW variable enabling debug spew\n");
     }
   
   search_path = getenv ("PKG_CONFIG_PATH");
@@ -284,6 +287,8 @@ main (int argc, char **argv)
       want_I_cflags ||
       want_list)
     {
+      debug_spew ("Error printing enabled by default due to use of --version, --libs, --cflags, --libs-only-l, --libs-only-L, --cflags-only-I, or --list. Value of --silence-errors: %d\n", want_silence_errors);
+
       if (want_silence_errors && getenv ("PKG_CONFIG_DEBUG_SPEW") == NULL)
         want_verbose_errors = FALSE;
       else
@@ -291,8 +296,16 @@ main (int argc, char **argv)
     }
   else
     {
+      debug_spew ("Error printing disabled by default, value of --print-errors: %d\n",
+                  want_verbose_errors);
+
       /* Leave want_verbose_errors unchanged, reflecting --print-errors */
-    }  
+    }
+  
+  if (want_verbose_errors)
+    debug_spew ("Error printing enabled\n");
+  else
+    debug_spew ("Error printing disabled\n");
   
   if (want_my_version)
     {
