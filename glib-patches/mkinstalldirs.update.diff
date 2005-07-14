@@ -1,9 +1,5 @@
-#
-# Update to mkinstalldirs from automake 1.7
-#
-
---- glib-1.2.8/mkinstalldirs	2000-03-11 10:25:38.000000000 +0100
-+++ glib-1.2.8/mkinstalldirs	2004-06-20 10:56:22.000000000 +0200
+--- glib-1.2.8/mkinstalldirs.old	2005-04-01 23:54:11.908326540 +0200
++++ glib-1.2.8/mkinstalldirs	2005-04-01 23:54:26.425962180 +0200
 @@ -4,37 +4,108 @@
  # Created: 1993-05-16
  # Public domain

@@ -1,3 +1,9 @@
+2005-04-02  Tollef Fog Heen  <tfheen@err.no>
+
+	* glib-patches/mkinstalldirs.update.diff: cvs admin -ko to avoid
+	having the Id CVS keyword being expanded, which broke the
+	application of the patch.
+
 2005-04-01  Tollef Fog Heen  <tfheen@err.no>
 
 	Patches provided by Steve Langasek <vorlon@debian.org>
