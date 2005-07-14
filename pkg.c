@@ -519,24 +519,29 @@ recursive_fill_list (Package *pkg, GetListFunc func, GSList **listp)
 }
 
 static void
-fill_list_in_path_order_single_package (Package *pkg, GetListFunc func,
-                                        GSList **listp)
+fill_list_single_package (Package *pkg, GetListFunc func,
+                          GSList **listp, gboolean in_path_order)
 {
   /* First we get the list in natural/recursive order, then
    * stable sort by path position
    */
   GSList *packages;
   GSList *tmp;
-  
+
+  /* Get list of packages */
   packages = g_slist_append (packages, pkg);
   recursive_fill_list (pkg, get_requires, &packages);
-
-  spew_package_list ("original", packages);
   
-  packages = packages_sort_by_path_position (packages);
-
-  spew_package_list ("sorted", packages);
+  if (in_path_order)
+    {
+      spew_package_list ("original", packages);
+      
+      packages = packages_sort_by_path_position (packages);
+      
+      spew_package_list ("sorted", packages);
+    }
   
+  /* Convert package list to string list */
   tmp = packages;
   while (tmp != NULL)
     {
@@ -549,8 +554,8 @@ fill_list_in_path_order_single_package (Package *pkg, GetListFunc func,
 }
 
 static void
-fill_list_in_path_order (GSList *packages, GetListFunc func,
-                         GSList **listp)
+fill_list (GSList *packages, GetListFunc func,
+           GSList **listp, gboolean in_path_order)
 {
   GSList *tmp;
   GSList *expanded;
@@ -565,11 +570,14 @@ fill_list_in_path_order (GSList *packages, GetListFunc func,
       tmp = tmp->next;
     }
 
-  spew_package_list ("original", expanded);
-  
-  expanded = packages_sort_by_path_position (expanded);
-
-  spew_package_list ("sorted", expanded);
+  if (in_path_order)
+    {
+      spew_package_list ("original", expanded);
+      
+      expanded = packages_sort_by_path_position (expanded);
+      
+      spew_package_list ("sorted", expanded);
+    }
   
   tmp = expanded;
   while (tmp != NULL)
@@ -771,13 +779,13 @@ verify_package (Package *pkg)
 }
 
 static char*
-get_merged (Package *pkg, GetListFunc func)
+get_merged (Package *pkg, GetListFunc func, gboolean in_path_order)
 {
   GSList *list;
   GSList *dups_list = NULL;
   char *retval;
   
-  fill_list_in_path_order_single_package (pkg, func, &dups_list);
+  fill_list_single_package (pkg, func, &dups_list, in_path_order);
   
   list = string_list_strip_duplicates (dups_list);
 
@@ -791,13 +799,13 @@ get_merged (Package *pkg, GetListFunc func)
 }
 
 static char*
-get_merged_from_back (Package *pkg, GetListFunc func)
+get_merged_from_back (Package *pkg, GetListFunc func, gboolean in_path_order)
 {
   GSList *list;
   GSList *dups_list = NULL;
   char *retval;
   
-  fill_list_in_path_order_single_package (pkg, func, &dups_list);
+  fill_list_single_package (pkg, func, &dups_list, in_path_order);
   
   list = string_list_strip_duplicates_from_back (dups_list);
 
@@ -811,14 +819,14 @@ get_merged_from_back (Package *pkg, GetListFunc func)
 }
 
 static char*
-get_multi_merged (GSList *pkgs, GetListFunc func)
+get_multi_merged (GSList *pkgs, GetListFunc func, gboolean in_path_order)
 {
   GSList *tmp;
   GSList *dups_list = NULL;
   GSList *list;
   char *retval;
 
-  fill_list_in_path_order (pkgs, func, &dups_list);
+  fill_list (pkgs, func, &dups_list, in_path_order);
   
   list = string_list_strip_duplicates (dups_list);
 
@@ -832,14 +840,14 @@ get_multi_merged (GSList *pkgs, GetListFunc func)
 }
 
 static char*
-get_multi_merged_from_back (GSList *pkgs, GetListFunc func)
+get_multi_merged_from_back (GSList *pkgs, GetListFunc func, gboolean in_path_order)
 {
   GSList *tmp;
   GSList *dups_list = NULL;
   GSList *list;
   char *retval;
 
-  fill_list_in_path_order (pkgs, func, &dups_list);
+  fill_list (pkgs, func, &dups_list, in_path_order);
   
   list = string_list_strip_duplicates_from_back (dups_list);
 
@@ -855,8 +863,11 @@ get_multi_merged_from_back (GSList *pkgs, GetListFunc func)
 char *
 package_get_l_libs (Package *pkg)
 {
+  /* We don't want these in search path order, rather in dependency
+   * order, so static linking works.
+   */
   if (pkg->l_libs_merged == NULL)
-    pkg->l_libs_merged = get_merged_from_back (pkg, get_l_libs);
+    pkg->l_libs_merged = get_merged_from_back (pkg, get_l_libs, FALSE);
 
   return pkg->l_libs_merged;
 }
@@ -864,14 +875,15 @@ package_get_l_libs (Package *pkg)
 char *
 packages_get_l_libs (GSList     *pkgs)
 {
-  return get_multi_merged_from_back (pkgs, get_l_libs);
+  return get_multi_merged_from_back (pkgs, get_l_libs, FALSE);
 }
 
 char *
 package_get_L_libs (Package *pkg)
 {
+  /* We want these in search path order so the -L flags don't override PKG_CONFIG_PATH */
   if (pkg->L_libs_merged == NULL)
-    pkg->L_libs_merged = get_merged (pkg, get_L_libs);
+    pkg->L_libs_merged = get_merged (pkg, get_L_libs, TRUE);
 
   return pkg->L_libs_merged;
 }
@@ -879,7 +891,7 @@ package_get_L_libs (Package *pkg)
 char *
 packages_get_L_libs (GSList     *pkgs)
 {
-  return get_multi_merged (pkgs, get_L_libs);
+  return get_multi_merged (pkgs, get_L_libs, TRUE);
 }
 
 char *
@@ -955,8 +967,9 @@ packages_get_all_libs (GSList *pkgs)
 char *
 package_get_I_cflags (Package *pkg)
 {
+  /* sort by path position so PKG_CONFIG_PATH affects -I flag order */
   if (pkg->I_cflags_merged == NULL)
-    pkg->I_cflags_merged = get_merged (pkg, get_I_cflags);
+    pkg->I_cflags_merged = get_merged (pkg, get_I_cflags, TRUE);
 
   return pkg->I_cflags_merged;
 }
@@ -964,7 +977,8 @@ package_get_I_cflags (Package *pkg)
 char *
 packages_get_I_cflags (GSList     *pkgs)
 {
-  return get_multi_merged (pkgs, get_I_cflags);
+  /* sort by path position so PKG_CONFIG_PATH affects -I flag order */
+  return get_multi_merged (pkgs, get_I_cflags, TRUE);
 }
 
 char *

@@ -82,6 +82,8 @@ autoconf
 
 cd $ORIGDIR
 
+export AUTOMAKE
+export ACLOCAL
 $srcdir/configure --enable-maintainer-mode --disable-shared --disable-threads "$@"
 
 echo 
