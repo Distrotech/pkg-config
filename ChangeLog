@@ -1,0 +1,310 @@
+2001-05-20  Havoc Pennington  <hp@pobox.com>
+
+	* configure.in: revert package name change, just screwing things up.
+
+2001-05-18  Havoc Pennington  <hp@redhat.com>
+
+	* main.c (main): Change default to print errors on --cflags,
+	--libs, etc., just not on the predicate-style args
+
+2001-05-18  Havoc Pennington  <hp@pobox.com>
+
+	* pkg.m4: always AC_SUBST the cflags/libs
+
+	* pkg-config.1: updates
+
+	* configure.in: call the package 'pkg-config' instead of
+	pkgconfig, for consistency	
+
+	* popt.c: conditionalize on HAVE_SETRESUID, HAVE_SETREUID 
+	maybe this will help with windows, and improves the #ifdef __hpux
+	test in any case.
+
+	* parse.c: use HAVE_FLOCKFILE to try for windows portability
+
+	* configure.in: check for flockfile
+
+2001-05-17  Havoc Pennington  <hp@pobox.com>
+
+	* pkg.m4: change to print errors only if no custom not-found
+	action is specified
+
+	* main.c (main): add PKG_CONFIG_DEBUG_SPEW environment variable
+	(main): implement --print-errors where errors are printed, and
+	otherwise don't print errors related to packages, just usage
+	errors; pointed out by Raja
+	(main): rename pcbuilddir to pc_top_builddir
+
+2001-05-17  Havoc Pennington  <hp@redhat.com>
+
+	Changes to support building against uninstalled packages.
+
+        * ${pcfiledir} variable used to locate builddir by locating
+	the .pc file
+
+	* ${pcbuilddir} variable set by the PKG_CONFIG_BUILD_DIR variable,
+	used for the name of the build directory where the cflags/libs
+	will be used, defaults to '$(top_builddir)'
+
+	* "uninstalled" feature looks for foo-uninstalled.pc before
+	foo.pc, unless PKG_CONFIG_DISABLE_UNINSTALLED is set
+
+	* --uninstalled option used to see if foo-uninstalled.pc is in use
+
+	* --define-variable option added, but turned out to be unused for
+	this
+	
+2001-05-09  Havoc Pennington  <hp@redhat.com>
+
+	* main.c, findme.c, parse.c, pkg.c, poptconfig.c, popthelp.c,
+	poptparse.c: portability fixes from Tomas Ogren
+
+2001-05-09  Havoc Pennington  <hp@redhat.com>
+
+	* Makefile.am (EXTRA_DIST): put the m4 files in the distribution
+
+2001-05-09  Havoc Pennington  <hp@redhat.com>
+
+	* pkg.m4: switch to double quotes for module list, so you can use 
+	a variable there.
+
+2001-05-09  Havoc Pennington  <hp@redhat.com>
+
+	* pkg.c (verify_package): fix error message on missing Name field, 
+	so that it doesn't try to use the name field to report which
+	package was broken
+
+	* parse.c (parse_package_file): change a debug spew to an actual
+	error message
+
+2001-04-13  Havoc Pennington  <hp@redhat.com>
+
+	* pkg.m4: fixed this up
+
+	* main.c (main): remove --check-requires, instead allow version
+	predicates in the module list.
+
+2001-04-12  Havoc Pennington  <hp@pobox.com>
+
+	* main.c (main): Implement --check-requires='gtk+-2.0 = 1.3.4' 
+	option
+
+2001-01-24  Havoc Pennington  <hp@redhat.com>
+
+        Implement --debug spew option.
+	
+	* main.c: add debug_spew function and an option --debug	
+
+2001-01-06  Havoc Pennington  <hp@pobox.com>
+
+	* pkg.c (scan_dir): fail silently if we can't open a directory in
+	the PKG_CONFIG_PATH
+
+2001-01-02  Havoc Pennington  <hp@redhat.com>
+
+	* configure.in: bump version
+
+2001-01-02  Havoc Pennington  <hp@redhat.com>
+
+	* parse.c (parse_package_file): return NULL instead of exiting
+	if we can't open the file.
+
+	* main.c (main): Add options to check the version of pkg-config
+	itself, and to list all known packages
+
+	* parse.c (split_module_list): fix to work properly
+	(parse_module_list): pass variable-substituted string to
+	split_module_list(), silly typo
+
+	* pkg.c (get_package): Add ability to pass a filename instead of a
+	package name, if you want to use a specific pkg-config file (used
+	for configure.in in GTK+ for example, where you can build against
+	an uninstalled copy of GLib).
+
+2000-11-29  Havoc Pennington  <hp@redhat.com>
+
+	* parse.c (parse_module_list): Allow commas before/after the
+	module list, and allow spaces instead of commas to be used as
+	separators. This leniency makes it a lot easier to conditionally
+	build the module list according to configure.in checks.
+
+2000-11-29  Havoc Pennington  <hp@pobox.com>
+
+	* pkg.c (packages_get_other_libs): put a space after the
+	other_libs
+	(packages_get_other_cflags): put a space after the other_cflags
+
+2000-11-27  Havoc Pennington  <hp@redhat.com>
+
+	* main.c (main): don't print space after variable values
+
+	* pkg.c (packages_get_var): don't add space after last variable
+
+2000-11-22  Martijn van Beers  <martijn@earthling.net>
+
+	* main.c: added a --version option for martin
+	* parse.c: added jamesh's patch
+
+	release 0.4.1
+
+2000-10-17  Martijn van Beers  <martijn@earthling.net>
+
+	* configure.in:
+	* Makefile.am: Change to use C version only.
+
+	release 0.4.0
+
+2000-09-15  Havoc Pennington  <hp@redhat.com>
+
+	* configure.in: AM_PROG_LIBTOOL
+
+	* Makefile.am (experimental_pkg_config_LDADD): Link with .la, not
+	.a
+
+2000-08-10  Havoc Pennington  <hp@redhat.com>
+
+	* pkg.c (verify_package): Bugfix from Anders
+
+2000-07-24  Havoc Pennington  <hp@redhat.com>
+
+	* parse.c (get_compat_package): Add support 
+	for imlib-config and orbit-config
+
+2000-07-22  Havoc Pennington  <hp@pobox.com>
+
+	* parse.c (get_compat_package): Make it work with any 
+	gnome-config package name.
+
+2000-07-22  Havoc Pennington  <hp@pobox.com>
+
+	* parse.c, pkg.c, pkg.h: Add Conflicts: keyword, and do 
+	version-checking for Requires: line. Untested.
+
+2000-07-21  Havoc Pennington  <hp@redhat.com>
+
+	* parse.c (get_compat_package): Add some compat stuff (execs
+	gnome-config, gtk-config, etc.). We don't yet support all 
+	the modules we might want to support.
+
+2000-07-20  Havoc Pennington  <hp@redhat.com>
+
+	* pkg.c (get_package): fix error message formatting
+
+2000-07-20  Havoc Pennington  <hp@redhat.com>
+
+	* pkg.c (recursive_fill_list): append rather than prepend the 
+	current libs to the required libs.
+
+	* parse.c (trim_and_sub): Make variables use ${} instead of %{} so
+	we can accept "shell variables" subbed by configure
+
+2000-07-20  Havoc Pennington  <hp@redhat.com>
+
+	* autogen.sh: Run perl on the Makefile.am in the glib tarball to
+	keep it from doing anything in 'make install'
+
+	* pkg.c (scan_dir): Revert to .pc extension
+
+2000-07-20  Havoc Pennington  <hp@redhat.com>
+
+	* glib-1.2.8.tar.gz: Decided it was easier to just stick 
+	in a copy of the tarball instead of hacking up glib;
+	this way we get bugfixes. If distribution size is a problem, 
+	we can hack on it later. Rerun autogen.sh to get the 
+	tarball unpacked and configured.
+	
+	* configure.in: AC_CONFIG_SUBDIRS(glib-1.2.8)
+
+	* main.c: Add version-comparison 
+
+	* Makefile.am: use new glib tarball
+	
+2000-07-18  Havoc Pennington  <hp@redhat.com>
+
+	* pkg.c: When removing -l duplicates, keep the last not the first
+	-l
+
+	* main.c (main): Added --variable and --module-exists options.
+
+	* Wrote an experimental version of pkg-config in C. For 
+	now, glib is required, until I get a cut-and-pasted subset
+	of glib up and running.
+
+	C version is not finished, don't release a tarball yet. ;-)
+	
+	* configure.in, Makefile.am: stuff to build the C version 
+	of pkg-config
+
+2000-07-10  Martijn van Beers  <martijn@earthling.net>
+
+	* pkg-config.in: remove -I/usr/include and -L/usr/lib from
+	  the flags we output
+	* pkg.m4: add a PKG_ACLOCALFLAGS macro
+	          add a _DEPENDS output variable
+
+2000-07-01  Martijn van Beers  <martijn@earthling.net>
+
+	* data/gnomeconfig.pce: make output of --modversion be like
+	  the output of .pc files
+
+2000-07-01  Martijn van Beers  <martijn@earthling.net>
+
+	* pkg.m4: clean up PKG_CHECK_CFLAG
+   
+2000-06-27  Martijn van Beers  <martijn@earthling.net>
+
+	* data/gnomeconfig.pce: check for existance with --cflags
+				instead of --libs
+	* pkg.m4: remove stray debug echo command
+		  add PKG_CHECK_CFLAGS macro
+
+2000-06-23  Martijn van Beers  <martijn@earthling.net>
+
+	* data/gnomeconfig.pce,
+	* pkg-config.in:
+	  - add checks to see if we're properly installed
+	  - bug fixes for sh on Tru64
+
+Wed Jun 21 2000  Martijn van Beers  <martijn@earthling.net>
+
+	* added support for extension modules that will be called
+	  if a module doesn't have a .pc file
+	* added a gnomeconfig.pce extension module to allow for
+	  old gnome-libs stuff to be used (at the request of hp)
+	* made CFLAGS be like the LIBS_* variables in that you
+	  need to do the adding in the .pc file
+
+Thu Jun 15 2000  Martijn van Beers  <martijn@earthling.net>
+
+	* add a --print-pc-dir that prints the default search dir
+	* only use the default search dir when nothing else is
+	  specified
+
+Sat Jun 10 2000  Martijn van Beers  <martijn@earthling.net>
+
+	* made the duplication removing code in a function
+	* fix the duplication code so that it checks $* correctly
+	  while we have IFS=":$IFS"
+	* splitted up --libs into --libs-only-L, --libs-only-l-self
+	  and --libs-only-l-system, as suggested by Tim Janik
+
+Thu Jun  8 2000  Martijn van Beers  <martijn@earthling.net>
+
+	* made it use autoconf/automake
+	* pkg-config: removed in favour of a .in equivalent which generates
+	              pkg-config from configure
+	* pkg-config.in: new file, mostly a copy from pkg-config
+	* pkg-config.in: get the prefix for the default pc_path from configure
+
+Wed Jun  7 2000  Martijn van Beers  <martijn@earthling.net>
+
+	* pkg.m4: new file, contains a macro that checks for packages and
+	          whether they're the right version
+	* pkg-config: added a --modversion flag to get the version of the
+	              module (needs a VERSION var in the .pc files)
+
+Tue Jun  6 2000  Martijn van Beers  <martijn@earthling.net>
+
+	* pkg-config: removed the pc_name_pkg functionality
+	* pkg-config: show help and error out when there are no arguments
+	* pkg-config: get the version from configure

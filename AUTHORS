@@ -1,0 +1,8 @@
+Original authors
+----------------
+James Henstridge  <james@daa.com.au>    original pkg-config
+Tim Janik  <timj@gtk.org>               the PKG_CHECK_VERSION macro
+
+Maintainer
+----------
+Martijn van Beers  <martijn@eekeek.org>
