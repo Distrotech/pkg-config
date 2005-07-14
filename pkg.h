@@ -54,6 +54,7 @@ struct _Package
   char *name; /* human-readable name */
   char *version;
   char *description;
+  char *url;
   char *pcfiledir; /* directory it was loaded from */
   GSList *requires;
   GSList *l_libs;

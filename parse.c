@@ -768,7 +768,20 @@ parse_cflags (Package *pkg, const char *str, const char *path)
   pkg->I_cflags = g_slist_reverse (pkg->I_cflags);
   pkg->other_cflags = g_slist_reverse (pkg->other_cflags);
 }
-     
+
+static void
+parse_url (Package *pkg, const char *str, const char *path)
+{
+  if (pkg->url != NULL)
+    {
+      verbose_error ("URL field occurs twice in '%s'\n", path);
+
+      exit (1);
+    }
+
+  pkg->url = trim_and_sub (pkg, str, path);
+}
+
 static void
 parse_line (Package *pkg, const char *untrimmed, const char *path)
 {
@@ -819,6 +832,8 @@ parse_line (Package *pkg, const char *untrimmed, const char *path)
         parse_cflags (pkg, p, path);
       else if (strcmp (tag, "Conflicts") == 0)
         parse_conflicts (pkg, p, path);
+      else if (strcmp (tag, "URL") == 0)
+        parse_url (pkg, p, path);
       else
         {
           verbose_error ("Unknown keyword '%s' in '%s'\n",

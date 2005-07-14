@@ -1,3 +1,14 @@
+2003-02-15  Havoc Pennington  <hp@pobox.com>
+
+	Fixes suggested by Werner Trobin
+	
+	* main.c (verbose_error): honor --errors-to-stdout and flush 
+	the same stream we write to
+
+	* parse.c (parse_url): support an "url" field so if someone 
+	has a .pc file they can figure out where to go for newer 
+	versions and such
+
 2003-01-16  Havoc Pennington  <hp@redhat.com>
 
 	* configure.in: 0.15

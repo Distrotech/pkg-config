@@ -730,6 +730,9 @@ verify_package (Package *pkg)
                              ver->version,
                              req->name,
                              req->version);
+              if (req->url)
+                verbose_error ("You may find new versions of %s at %s\n",
+                               req->name, req->url);
 
               exit (1);
             }

@@ -72,7 +72,8 @@ verbose_error (const char *format, ...)
 {
   va_list args;
   gchar *str;
-
+  FILE* stream;
+  
   g_return_if_fail (format != NULL);
 
   if (!want_verbose_errors)
@@ -82,8 +83,13 @@ verbose_error (const char *format, ...)
   str = g_strdup_vprintf (format, args);
   va_end (args);
 
-  fputs (str, stderr);
-  fflush (stdout);
+  if (want_stdout_errors)
+    stream = stdout;
+  else
+    stream = stderr;
+  
+  fputs (str, stream);
+  fflush (stream);
 
   g_free (str);
 }
