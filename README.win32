@@ -14,8 +14,8 @@ usable both for MSVC users and gcc ("mingw") users.
 There should be no compile-time paths built into the executable of
 pkg-config. Likewise, not in the libraries it describes either.
 
-We use one optional entry in the Registry: The path to the pkgconfig
-installation prefix. (This can be either user-specific (in
+pkg-config uses one optional entry in the Registry: The path to the
+pkgconfig installation prefix. (This can be either user-specific (in
 HKEY_CURRENT_USER) or for the whole machine (in HKEY_LOCAL_MACHINE).)
 If pkg-config.exe is invoked from the "bin" subdirectory of a
 directory with a lib/pkgconfig subdirectory, no Registry entry is even
@@ -23,10 +23,16 @@ needed, as pkgconfig (actually, the
 g_win32_get_package_installation_directory() function in GLib) figures
 out the directory by itself.
 
-The intention is that a developer package for some library being
-desribed by a .pc file is installed using some simple installer, that
-edits the user-selected installation directory into the .pc file
-before storing the .pc file where pkg-config can find it.
+When pkg-config is invoked on Windows, it sets the "prefix" variable
+to pkg-config's own installation prefix. (I.e. the same installation
+prefix that it uses when determining where to find the pkgconfig
+directory.) Thus, if an end-user (developer) installs a "developer"
+package (headers, import libraries, .pc file) for some software in the
+same directory tree where pkg-config is installed, everything should
+just work, even if the .pc file for that software of course doesn't
+know where the software actually is installed. This works as long as
+the .pc file uses the variable name "prefix" for its installation
+prefix. At least GLib, ATK, Pango and GTK does this.
 
 On Unix, pkg-config is built using its own copy of GLib 1.2.8. On
 Windows, we use the normal GLib available for Windows (1.3.9

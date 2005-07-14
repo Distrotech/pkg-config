@@ -1,10 +1,14 @@
 2001-10-21  Tor Lillqvist  <tml@iki.fi>
 
+	* Makefile.am (EXTRA_DIST): Distribute README.win32.
+
 	* main.c (main): (Win32): Add option --prefix-variable in case the
 	variable used in a .pc file as "prefix" isn't called
 	"prefix".
 
 	* pkg-config.1: Document it.
+
+	* README.win32: Describe the behaviour in more detail.
 
 2001-10-19  Tor Lillqvist  <tml@iki.fi>
 

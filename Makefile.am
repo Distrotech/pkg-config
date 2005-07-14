@@ -11,7 +11,7 @@ m4dir = $(datadir)/aclocal
 m4_DATA = pkg.m4
 
 man_MANS = pkg-config.1
-EXTRA_DIST = $(m4_DATA) $(man_MANS)
+EXTRA_DIST = $(m4_DATA) $(man_MANS) README.win32
 
 bin_PROGRAMS = pkg-config
 
