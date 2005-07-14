@@ -1,3 +1,24 @@
+2005-04-01  Tollef Fog Heen  <tfheen@err.no>
+
+	* configure.in: Try to detect whether this architecture supports
+	inter-library dependencies.  If so, we default to assuming that
+	this support is used and link to the minimal set of libraries
+	rather than traversing the full depends set.
+
+	* main.c (main): Only recurse if we want a static library list or
+	if this architecture doesn't support inter-library dependencies.
+	This will probably expose bugs for libraries which declare
+	dependencies in their .pc files but don't actually link against
+	each other.
+
+	* pkg.c (packages_get_all_libs): Add recurse option
+	(packages_get_L_libs): Add recurse option
+	(package_get_L_libs): Add recurse option
+	(packages_get_l_libs): Add recurse option
+	(package_get_l_libs): Add recurse option
+
+	* pkg.h: Update prototypes to handle the recurse option.
+
 2005-03-29  Tollef Fog Heen  <tfheen@err.no>
 
 	* check/check-cflags, check/check-define-variable,

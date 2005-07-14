@@ -182,6 +182,7 @@ main (int argc, char **argv)
   int want_I_cflags = 0;
   int want_other_cflags = 0;
   int want_list = 0;
+  int want_static_lib_list = ENABLE_INDIRECT_DEPS;
   int result;
   int want_uninstalled = 0;
   char *variable_name = NULL;
@@ -215,6 +216,8 @@ main (int argc, char **argv)
       "require given version of pkg-config", "VERSION" },
     { "libs", 0, POPT_ARG_NONE, &want_libs, 0,
       "output all linker flags" },
+    { "static", 0, POPT_ARG_NONE, &want_static_lib_list, 0,
+      "output linker flags for static linking" },
     { "libs-only-l", 0, POPT_ARG_NONE, &want_l_libs, 0,
       "output -l flags" },
     { "libs-only-other", 0, POPT_ARG_NONE, &want_other_libs, 0,
@@ -591,14 +594,14 @@ main (int argc, char **argv)
 
   if (want_l_libs)
     {
-      char *str = packages_get_l_libs (packages);
+      char *str = packages_get_l_libs (packages, want_static_lib_list);
       printf ("%s ", str);
       g_free (str);
       need_newline = TRUE;
     }
   else if (want_L_libs)
     {
-      char *str = packages_get_L_libs (packages);
+      char *str = packages_get_L_libs (packages, want_static_lib_list);
       printf ("%s ", str);
       g_free (str);
       need_newline = TRUE;
@@ -612,7 +615,7 @@ main (int argc, char **argv)
     }
   else if (want_libs)
     {
-      char *str = packages_get_all_libs (packages);
+      char *str = packages_get_all_libs (packages, want_static_lib_list);
       printf ("%s ", str);
       g_free (str);
       need_newline = TRUE;

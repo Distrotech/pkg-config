@@ -998,8 +998,10 @@ get_multi_merged_from_back (GSList *pkgs, GetListFunc func, gboolean in_path_ord
 }
 
 char *
-package_get_l_libs (Package *pkg)
+package_get_l_libs (Package *pkg, gboolean recurse)
 {
+  if (!recurse)
+    return string_list_to_string (get_l_libs(pkg));
   /* We don't want these in search path order, rather in dependency
    * order, so static linking works.
    */
@@ -1010,14 +1012,41 @@ package_get_l_libs (Package *pkg)
 }
 
 char *
-packages_get_l_libs (GSList     *pkgs)
+packages_get_l_libs (GSList     *pkgs, gboolean recurse)
 {
+  if (!recurse) {
+    GSList *tmp;
+    GSList *list;
+    GSList *dups_list = NULL;
+    char *retval;
+
+    tmp = pkgs;
+    while (tmp != NULL)
+    {
+      dups_list = g_slist_concat (dups_list, get_l_libs(tmp->data));
+      tmp = tmp->next;
+    }
+
+    list = string_list_strip_duplicates_from_back (dups_list);
+    g_slist_free (dups_list);
+  
+    retval = string_list_to_string (list);
+
+    g_slist_free (list);
+  
+    return retval;
+
+  }
+
   return get_multi_merged_from_back (pkgs, get_l_libs, FALSE);
 }
 
 char *
-package_get_L_libs (Package *pkg)
+package_get_L_libs (Package *pkg, gboolean recurse)
 {
+  if (!recurse)
+    return string_list_to_string (get_L_libs(pkg));
+
   /* We want these in search path order so the -L flags don't override PKG_CONFIG_PATH */
   if (pkg->L_libs_merged == NULL)
     pkg->L_libs_merged = get_merged (pkg, get_L_libs, TRUE);
@@ -1026,8 +1055,31 @@ package_get_L_libs (Package *pkg)
 }
 
 char *
-packages_get_L_libs (GSList     *pkgs)
+packages_get_L_libs (GSList     *pkgs, gboolean recurse)
 {
+  if (!recurse) {
+    GSList *tmp;
+    GSList *list;
+    GSList *dups_list = NULL;
+    char *retval;
+
+    tmp = pkgs;
+    while (tmp != NULL)
+    {
+      dups_list = g_slist_concat (dups_list, get_L_libs(tmp->data));
+      tmp = tmp->next;
+    }
+
+    list = string_list_strip_duplicates_from_back (dups_list);
+    g_slist_free (dups_list);
+  
+    retval = string_list_to_string (list);
+
+    g_slist_free (list);
+  
+    return retval;
+  }
+
   return get_multi_merged (pkgs, get_L_libs, TRUE);
 }
 
@@ -1047,7 +1099,7 @@ packages_get_other_libs (GSList   *pkgs)
 }
 
 char *
-packages_get_all_libs (GSList *pkgs)
+packages_get_all_libs (GSList *pkgs, gboolean recurse)
 {
   char *l_libs;
   char *L_libs;
@@ -1058,8 +1110,8 @@ packages_get_all_libs (GSList *pkgs)
   str = g_string_new ("");  
 
   other_libs = packages_get_other_libs (pkgs);
-  L_libs = packages_get_L_libs (pkgs);
-  l_libs = packages_get_l_libs (pkgs);
+  L_libs = packages_get_L_libs (pkgs, recurse);
+  l_libs = packages_get_l_libs (pkgs, recurse);
 
   if (other_libs)
     g_string_append (str, other_libs);
