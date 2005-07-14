@@ -1,3 +1,14 @@
+2005-03-28  Tollef Fog Heen  <tfheen@err.no>
+
+	* autogen.sh: Extra paranoia -- fail if running auto* fails or if
+	patching fails.
+
+	* glib-patches/mkinstalldirs.update.diff: Update patch so it
+	applies cleanly
+
+	* glib-patches/pthread-config-fix.diff: adjust offsets so patch is
+	quiet again
+
 2005-03-26  Tollef Fog Heen  <tfheen@err.no>
 
 	* configure.in: Bump to 0.16

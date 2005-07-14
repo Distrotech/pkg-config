@@ -75,9 +75,9 @@ perl -p -w -i.bak -e 's/if \(compare_func\(l1->data,l2->data\) < 0\)/if \(compar
 # Update random auto* files to actually have something which have a snowball's
 # chance in a hot place of working with modern auto* tools.
 
-(cd glib-1.2.8 && for p in ../glib-patches/*.diff; do echo $p; patch -p1 < $p; done )
+(cd glib-1.2.8 && for p in ../glib-patches/*.diff; do echo $p; patch -p1 < $p || exit 1; done ) || exit 1
 
-(cd glib-1.2.8 && libtoolize --copy --force && $ACLOCAL $ACLOCAL_FLAGS && $AUTOMAKE && $AUTOCONF)
+(cd glib-1.2.8 && libtoolize --copy --force && $ACLOCAL $ACLOCAL_FLAGS && $AUTOMAKE && $AUTOCONF) || exit 1
 
 if test -z "$*"; then
 	echo "I am going to run ./configure with no arguments - if you wish "
