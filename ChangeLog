@@ -1,3 +1,21 @@
+2001-10-19  Tor Lillqvist  <tml@iki.fi>
+
+	* main.c: (Win32): Add option --dont-define-prefix on Windows. The
+	option prevents pkg-config from automatically defining an
+	overriding value for the "prefix" variable.
+
+	Unless this option is used, set "prefix" to pkg-config's
+	installation directory, i.e. assume that the packages whose
+	configuration files are found in the same tree where
+	pkg-config.exe itself is, also have been configured to use the
+	same prefix. This means that a typical "developer package"
+	containg a subtree of headers, libraries, etc, including .pc
+	files, can be installed in any random location. As long as
+	pkg-config.exe is installed the same tree, things just should
+	work.
+
+	* pkg-config.1: Document it.
+
 2001-09-30  Tor Lillqvist  <tml@iki.fi>
 
 	Changes for "pure" Win32 (without Cygwin or similar) support. The

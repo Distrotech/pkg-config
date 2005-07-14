@@ -14,6 +14,7 @@
 static int want_debug_spew = 0;
 static int want_verbose_errors = 0;
 static int want_stdout_errors = 0;
+static int dont_define_prefix = 0;
 
 void
 debug_spew (const char *format, ...)
@@ -204,6 +205,10 @@ main (int argc, char **argv)
       "show verbose information about missing or conflicting packages" },
     { "errors-to-stdout", 0, POPT_ARG_NONE, &want_stdout_errors, 0,
       "print errors from --print-errors to stdout not stderr" },
+#ifdef G_OS_WIN32
+    { "dont-define-prefix", 0, POPT_ARG_NONE, &dont_define_prefix, 0,
+      "don't set the value of prefix based on where pkg-config.exe is installed" },
+#endif
     POPT_AUTOHELP
     { NULL, 0, 0, NULL, 0 }
   };
@@ -321,6 +326,25 @@ main (int argc, char **argv)
         return 1;
     }
   
+#ifdef G_OS_WIN32
+  if (!dont_define_prefix)
+    {
+      gchar *prefix = g_win32_get_package_installation_directory (PACKAGE " " VERSION, NULL);
+      gchar *p = prefix;
+
+      /* Turn backslashes into slashes or poptParseArgvString() will eat
+       * them when ${prefix} has been expanded in parse_libs().
+       */
+      while (*p)
+	{
+	  if (*p == '\\')
+	    *p = '/';
+	  p++;
+	}
+      define_global_variable ("prefix", prefix);
+    }
+#endif
+
   package_init ();
 
   if (want_list)

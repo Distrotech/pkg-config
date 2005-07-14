@@ -167,6 +167,15 @@ constraint after each package name, for example:
 .fi
 Remember to use \-\-print-errors if you want error messages.
 
+.TP
+.I "--dont-define-prefix"
+This option is available only on Windows and prevents \fIpkg-config\fP
+from automatically setting the variable "prefix" as the same directory
+where \fIpkg-config\fP was installed. (This directory is determined by
+asking the system where \fIpkg-config.exe\fP is located, and if that
+directory is called \fIbin\fP or \fIlib\fP, using its parent
+directory, otherwise itself.)
+
 .SH ENVIRONMENT VARIABLES
 
 .TP
