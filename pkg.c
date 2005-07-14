@@ -1023,7 +1023,7 @@ packages_get_l_libs (GSList     *pkgs, gboolean recurse)
     tmp = pkgs;
     while (tmp != NULL)
     {
-      dups_list = g_slist_concat (dups_list, get_l_libs(tmp->data));
+      dups_list = g_slist_concat (dups_list, g_slist_copy(get_l_libs(tmp->data)));
       tmp = tmp->next;
     }
 
@@ -1066,7 +1066,7 @@ packages_get_L_libs (GSList     *pkgs, gboolean recurse)
     tmp = pkgs;
     while (tmp != NULL)
     {
-      dups_list = g_slist_concat (dups_list, get_L_libs(tmp->data));
+      dups_list = g_slist_concat (dups_list, g_slist_copy(get_L_libs(tmp->data)));
       tmp = tmp->next;
     }
 

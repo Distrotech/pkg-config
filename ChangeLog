@@ -1,3 +1,11 @@
+2005-04-13  Tollef Fog Heen  <tfheen@err.no>
+
+	* pkg.c (packages_get_l_libs, packages_get_L_libs): Duplicate
+	singly linked list before putting it on list passed to
+	string_list_strip_duplicates_from_back to avoid infinite loop when
+	g_slist_copy tries to copy self-linked list.  This happens if the
+	user specifies the same name on the command line twice.
+
 2005-04-12  Tollef Fog Heen  <tfheen@err.no>
 
 	* configure.in: 0.17.1
