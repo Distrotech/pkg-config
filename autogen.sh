@@ -13,7 +13,16 @@ FILE=pkg.m4
 
 DIE=0
 
-(autoconf --version) < /dev/null > /dev/null 2>&1 || {
+AUTOCONF=autoconf-2.13
+AUTOHEADER=autoheader-2.13
+
+($AUTOCONF --version) < /dev/null > /dev/null 2>&1 || {
+        AUTOCONF=autoconf
+        AUTOHEADER=autoheader
+}
+
+
+($AUTOCONF --version) < /dev/null > /dev/null 2>&1 || {
 	echo
 	echo "You must have autoconf installed to compile $PROJECT."
 	echo "Download the appropriate package for your distribution,"
@@ -62,7 +71,7 @@ perl -p -i.bak -e "s/man_MANS/noinst_MANS/g" `find glib-1.2.8 -name Makefile.am`
 ## patch gslist.c to have stable sort
 perl -p -w -i.bak -e 's/if \(compare_func\(l1->data,l2->data\) < 0\)/if \(compare_func\(l1->data,l2->data\) <= 0\)/g' glib-1.2.8/gslist.c
 
-(cd glib-1.2.8 && libtoolize --copy --force && $ACLOCAL $ACLOCAL_FLAGS && $AUTOMAKE && autoconf)
+(cd glib-1.2.8 && libtoolize --copy --force && $ACLOCAL $ACLOCAL_FLAGS && $AUTOMAKE && $AUTOCONF)
 
 if test -z "$*"; then
 	echo "I am going to run ./configure with no arguments - if you wish "
@@ -75,10 +84,10 @@ echo $ACLOCAL $ACLOCAL_FLAGS
 $ACLOCAL $ACLOCAL_FLAGS
 
 # optionally feature autoheader
-(autoheader --version)  < /dev/null > /dev/null 2>&1 && autoheader
+($AUTOHEADER --version)  < /dev/null > /dev/null 2>&1 && $AUTOHEADER
 
 $AUTOMAKE -a $am_opt
-autoconf
+$AUTOCONF
 
 cd $ORIGDIR
 
