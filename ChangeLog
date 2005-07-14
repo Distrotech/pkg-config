@@ -1,3 +1,7 @@
+2002-10-10  Havoc Pennington  <hp@redhat.com>
+
+	* configure.in: 0.14
+
 2002-10-02  Anders Carlsson  <andersca@gnu.org>
 
 	* pkg.c (add_env_variable_to_list): Don't return NULL, return
