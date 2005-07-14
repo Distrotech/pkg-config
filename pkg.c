@@ -271,12 +271,6 @@ internal_get_package (const char *name, gboolean warn, gboolean check_compat)
       debug_spew ("Failed to parse '%s'\n", location);
       return NULL;
     }
-
-  pkg->path_position =
-    GPOINTER_TO_INT (g_hash_table_lookup (path_positions, pkg->name));
-
-  debug_spew ("Path position of '%s' is %d\n",
-              pkg->name, pkg->path_position);
   
   if (strstr (location, "uninstalled.pc"))
     pkg->uninstalled = TRUE;
@@ -298,6 +292,12 @@ internal_get_package (const char *name, gboolean warn, gboolean check_compat)
       pkg->key = g_strndup (start, end - start);
     }
 
+  pkg->path_position =
+    GPOINTER_TO_INT (g_hash_table_lookup (path_positions, pkg->key));
+
+  debug_spew ("Path position of '%s' is %d\n",
+              pkg->name, pkg->path_position);
+  
   verify_package (pkg);
 
   debug_spew ("Adding '%s' to list of known packages, returning as package '%s'\n",
