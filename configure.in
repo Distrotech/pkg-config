@@ -6,6 +6,10 @@ AM_MAINTAINER_MODE
 
 AM_CONFIG_HEADER(config.h)
 
+AM_PROG_LIBTOOL
+
+AC_PROG_CC
+
 AC_MSG_CHECKING([for Win32])
 case "$host" in
   *-*-mingw*)
@@ -38,10 +42,6 @@ if test x$native_win32 = xyes; then
 else
   AC_CONFIG_SUBDIRS(glib-1.2.8)
 fi # !native_win32
-
-AM_PROG_LIBTOOL
-
-AC_PROG_CC
 
 AC_FUNC_ALLOCA
 

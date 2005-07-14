@@ -1,3 +1,11 @@
+2002-10-24  Tor Lillqvist  <tml@iki.fi>
+
+	* configure.in: Move the check for Win32 (which tests the $host
+	variable) and dependent code later, as it turns out that $host
+	isn't normally yet set at that point... (I hadn't noticed as I by
+	habit always pass --host=i386-pc-mingw32 to the configure script,
+	which sets $host.)
+
 2002-10-11  Havoc Pennington  <hp@redhat.com>
 
 	* pkg.c (verify_package): fix to properly cast iter->data to char*
