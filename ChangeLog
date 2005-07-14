@@ -1,5 +1,8 @@
 2005-04-02  Tollef Fog Heen  <tfheen@err.no>
 
+	* parse.c (parse_libs): Handle -framework as a single argument.
+	(Freedesktop #1278)
+
 	* configure.in: Remove extraneous " from --with-pc-path's help
 
 	* glib-patches/mkinstalldirs.update.diff: cvs admin -ko to avoid

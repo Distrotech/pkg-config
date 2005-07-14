@@ -670,6 +670,20 @@ parse_libs (Package *pkg, const char *str, const char *path)
 
           g_free (libname);
         }
+      else if (strcmp("-framework",p) == 0 && i+1 < argc)
+        {
+          /* Mac OS X has a -framework Foo which is really one option,
+           * so we join those to avoid having -framework Foo
+           * -framework Bar being changed into -framework Foo Bar
+           * later
+          */
+          gchar *framework = trim_string (argv[i+1]);
+
+          pkg->other_libs = g_slist_prepend (pkg->other_libs,
+                                             g_strconcat(arg, " ", framework, NULL));
+          i++;
+          g_free(framework);
+        }
       else
         {
           if (*arg != '\0')
