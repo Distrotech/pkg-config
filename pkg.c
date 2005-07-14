@@ -561,6 +561,7 @@ fill_list_single_package (Package *pkg, GetListFunc func,
   GSList *tmp;
 
   /* Get list of packages */
+  packages = NULL;
   packages = g_slist_append (packages, pkg);
   recursive_fill_list (pkg, get_requires, &packages);
   
