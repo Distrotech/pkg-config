@@ -1,5 +1,14 @@
 2002-02-01  Havoc Pennington  <hp@redhat.com>
 
+        Throughout: cast chars to guchar before passing to isspace, etc., 
+	noted by Morten Welinder
+	
+	* pkg.c (verify_package): actually strip system -I/-L out of the
+	cflags/libs, unless you set an environment variable asking to
+	leave them in.
+
+2002-02-01  Havoc Pennington  <hp@redhat.com>
+
 	* pkg.m4: fix shell portability issue, reported by Morten Welinder
 
 2002-01-24  Havoc Pennington  <hp@redhat.com>

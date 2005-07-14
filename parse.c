@@ -124,11 +124,11 @@ trim_string (const char *str)
 
   g_return_val_if_fail (str != NULL, NULL);
   
-  while (*str && isspace (*str))
+  while (*str && isspace ((guchar)*str))
     str++;
 
   len = strlen (str);
-  while (len > 0 && isspace (str[len-1]))
+  while (len > 0 && isspace ((guchar)str[len-1]))
     len--;
 
   return g_strndup (str, len);
@@ -242,7 +242,7 @@ parse_description (Package *pkg, const char *str, const char *path)
 }
 
 
-#define MODULE_SEPARATOR(c) ((c) == ',' || isspace ((c)))
+#define MODULE_SEPARATOR(c) ((c) == ',' || isspace ((guchar)(c)))
 #define OPERATOR_CHAR(c) ((c) == '<' || (c) == '>' || (c) == '!' || (c) == '=')
 
 /* A module list is a list of modules with optional version specification,
@@ -292,11 +292,11 @@ split_module_list (const char *str, const char *path)
           break;
 
         case IN_MODULE_NAME:
-          if (isspace (*p))
+          if (isspace ((guchar)*p))
             {
               /* Need to look ahead to determine next state */
               const char *s = p;
-              while (*s && isspace (*s))
+              while (*s && isspace ((guchar)*s))
                 ++s;
 
               if (*s == '\0')
@@ -316,7 +316,7 @@ split_module_list (const char *str, const char *path)
           /* We know an operator is coming up here due to lookahead from
            * IN_MODULE_NAME
            */
-          if (isspace (*p))
+          if (isspace ((guchar)*p))
             ; /* no change */
           else if (OPERATOR_CHAR (*p))
             state = IN_OPERATOR;
@@ -330,7 +330,7 @@ split_module_list (const char *str, const char *path)
           break;
 
         case AFTER_OPERATOR:
-          if (!isspace (*p))
+          if (!isspace ((guchar)*p))
             state = IN_MODULE_VERSION;
           break;
 
@@ -407,7 +407,7 @@ parse_module_list (Package *pkg, const char *str, const char *path)
       
       start = p;
 
-      while (*p && !isspace (*p))
+      while (*p && !isspace ((guchar)*p))
         ++p;
 
       while (*p && MODULE_SEPARATOR (*p))
@@ -427,10 +427,10 @@ parse_module_list (Package *pkg, const char *str, const char *path)
 
       start = p;
 
-      while (*p && !isspace (*p))
+      while (*p && !isspace ((guchar)*p))
         ++p;
 
-      while (*p && isspace (*p))
+      while (*p && isspace ((guchar)*p))
         {
           *p = '\0';
           ++p;
@@ -620,11 +620,11 @@ parse_libs (Package *pkg, const char *str, const char *path)
           char *libname;          
               
           p += 2;
-          while (*p && isspace (*p))
+          while (*p && isspace ((guchar)*p))
             ++p;
               
           start = p;
-          while (*p && !isspace (*p))
+          while (*p && !isspace ((guchar)*p))
             ++p;
 
           libname = g_strndup (start, p - start);
@@ -640,11 +640,11 @@ parse_libs (Package *pkg, const char *str, const char *path)
           char *libname;          
           
           p += 2;
-          while (*p && isspace (*p))
+          while (*p && isspace ((guchar)*p))
             ++p;
               
           start = p;
-          while (*p && !isspace (*p))
+          while (*p && !isspace ((guchar)*p))
             ++p;
 
           libname = g_strndup (start, p - start);
@@ -726,11 +726,11 @@ parse_cflags (Package *pkg, const char *str, const char *path)
           char *libname;          
               
           p += 2;
-          while (*p && isspace (*p))
+          while (*p && isspace ((guchar)*p))
             ++p;
               
           start = p;
-          while (*p && !isspace (*p))
+          while (*p && !isspace ((guchar)*p))
             ++p;
 
           libname = g_strndup (start, p - start);
@@ -787,14 +787,14 @@ parse_line (Package *pkg, const char *untrimmed, const char *path)
 
   tag = g_strndup (str, p - str);
   
-  while (*p && isspace (*p))
+  while (*p && isspace ((guchar)*p))
     ++p;
 
   if (*p == ':')
     {
       /* keyword */
       ++p;
-      while (*p && isspace (*p))
+      while (*p && isspace ((guchar)*p))
         ++p;
 
       if (strcmp (tag, "Name") == 0)
@@ -827,7 +827,7 @@ parse_line (Package *pkg, const char *untrimmed, const char *path)
       char *varval;
       
       ++p;
-      while (*p && isspace (*p))
+      while (*p && isspace ((guchar)*p))
         ++p;
       
       if (pkg->vars == NULL)
@@ -1139,7 +1139,7 @@ get_compat_package (const char *name)
 
       p = output;
 
-      while (*p && isspace (*p))
+      while (*p && isspace ((guchar)*p))
         ++p;
 
       if (*p == '\0')
@@ -1151,7 +1151,7 @@ get_compat_package (const char *name)
         }
 
       /* only heuristic; find a number or . */
-      while (*p && ! (isdigit (*p) || *p == '.'))
+      while (*p && ! (isdigit ((guchar)*p) || *p == '.'))
         ++p;      
 
       pkg->version = g_strdup (p);
@@ -1189,7 +1189,7 @@ get_compat_package (const char *name)
 
       p = output;
 
-      while (*p && isspace (*p))
+      while (*p && isspace ((guchar)*p))
         ++p;
 
       if (*p == '\0')
@@ -1201,7 +1201,7 @@ get_compat_package (const char *name)
         }
 
       /* only heuristic; find a number or . */
-      while (*p && ! (isdigit (*p) || *p == '.'))
+      while (*p && ! (isdigit ((guchar)*p) || *p == '.'))
         ++p;      
 
       pkg->version = g_strdup (p);
@@ -1274,7 +1274,7 @@ get_compat_package (const char *name)
        */
       p = output;
 
-      while (*p && isspace (*p))
+      while (*p && isspace ((guchar)*p))
         ++p;
 
       if (*p == '\0')
@@ -1286,7 +1286,7 @@ get_compat_package (const char *name)
         }
 
       /* only heuristic; find a number or . */
-      while (*p && ! (isdigit (*p) || *p == '.'))
+      while (*p && ! (isdigit ((guchar)*p) || *p == '.'))
         ++p;      
 
       pkg->version = g_strdup (p);

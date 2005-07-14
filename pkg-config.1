@@ -222,6 +222,14 @@ Normally if you request the package "foo" and the package
 uninstalled packages.  If this environment variable is set, it
 disables said behavior.
 
+.TP
+.I "PKG_CONFIG_ALLOW_SYSTEM_CFLAGS"
+Don't strip -I/usr/include out of cflags.
+
+.TP
+.I "PKG_CONFIG_ALLOW_SYSTEM_LIBS"
+Don't strip -L/usr/lib out of libs
+
 .SH WINDOWS SPECIALITIES
 If a .pc file is found in a directory that matches the usual
 conventions (i.e., ends with \\lib\\pkgconfig), the prefix for that

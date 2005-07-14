@@ -557,7 +557,8 @@ verify_package (Package *pkg)
   GSList *iter;
   GSList *requires_iter;
   GSList *conflicts_iter;  
-
+  int count;
+  
   /* Be sure we have the required fields */
 
   if (pkg->key == NULL)
@@ -662,6 +663,7 @@ verify_package (Package *pkg)
   g_slist_free (requires);
   g_slist_free (conflicts);
 
+  count = 0;
   iter = pkg->I_cflags;
   while (iter != NULL)
     {
@@ -673,9 +675,47 @@ verify_package (Package *pkg)
         {
           verbose_error ("Package %s has -I/usr/include in Cflags; this may cause problems and is not recommended\n",
                          pkg->name);
+          if (g_getenv ("PKG_CONFIG_ALLOW_SYSTEM_CFLAGS") == NULL)
+            {
+              iter->data = NULL;
+              ++count;
+              debug_spew ("Removing -I/usr/include from cflags for %s\n", pkg->key);              
+            }
         }
 
       iter = iter->next;
+    }
+
+  while (count)
+    {
+      pkg->I_cflags = g_slist_remove (pkg->I_cflags, NULL);
+      --count;
+    }
+
+  count = 0;
+  iter = pkg->L_libs;
+  while (iter != NULL)
+    {
+      if (strcmp (iter->data, "-L/usr/lib") == 0 ||
+          strcmp (iter->data, "-L /usr/lib") == 0)
+        {
+          verbose_error ("Package %s has -L/usr/lib in Libs; this may cause problems and is not recommended\n",
+                         pkg->name);
+          if (g_getenv ("PKG_CONFIG_ALLOW_SYSTEM_LIBS") == NULL)
+            {              
+              iter->data = NULL;
+              ++count;
+              debug_spew ("Removing -I/usr/lib from libs for %s\n", pkg->key);
+            }
+        }
+
+      iter = iter->next;
+    }
+
+  while (count)
+    {
+      pkg->L_libs = g_slist_remove (pkg->L_libs, NULL);
+      --count;
     }
 }
 
@@ -1054,8 +1094,8 @@ static int rpmvercmp(const char * a, const char * b) {
 
     /* loop through each version segment of str1 and str2 and compare them */
     while (*one && *two) {
-	while (*one && !isalnum(*one)) one++;
-	while (*two && !isalnum(*two)) two++;
+	while (*one && !isalnum((guchar)*one)) one++;
+	while (*two && !isalnum((guchar)*two)) two++;
 
 	str1 = one;
 	str2 = two;
@@ -1063,13 +1103,13 @@ static int rpmvercmp(const char * a, const char * b) {
 	/* grab first completely alpha or completely numeric segment */
 	/* leave one and two pointing to the start of the alpha or numeric */
 	/* segment and walk str1 and str2 to end of segment */
-	if (isdigit(*str1)) {
-	    while (*str1 && isdigit(*str1)) str1++;
-	    while (*str2 && isdigit(*str2)) str2++;
+	if (isdigit((guchar)*str1)) {
+	    while (*str1 && isdigit((guchar)*str1)) str1++;
+	    while (*str2 && isdigit((guchar)*str2)) str2++;
 	    isnum = 1;
 	} else {
-	    while (*str1 && isalpha(*str1)) str1++;
-	    while (*str2 && isalpha(*str2)) str2++;
+	    while (*str1 && isalpha((guchar)*str1)) str1++;
+	    while (*str2 && isalpha((guchar)*str2)) str2++;
 	    isnum = 0;
 	}
 		

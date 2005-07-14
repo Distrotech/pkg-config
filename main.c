@@ -88,7 +88,7 @@ popt_callback (poptContext con,
       tmp = g_strdup (arg);
 
       varname = tmp;
-      while (*varname && isspace (*varname))
+      while (*varname && isspace ((guchar)*varname))
         ++varname;
 
       varval = varname;
