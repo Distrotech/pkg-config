@@ -764,7 +764,7 @@ verify_package (Package *pkg)
             {              
               iter->data = NULL;
               ++count;
-              debug_spew ("Removing -I/usr/lib from libs for %s\n", pkg->key);
+              debug_spew ("Removing -L/usr/lib from libs for %s\n", pkg->key);
             }
         }
 
