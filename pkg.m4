@@ -43,16 +43,33 @@ if test -n "$PKG_CONFIG"; then
 fi[]dnl
 ])# PKG_PROG_PKG_CONFIG
 
+# PKG_CHECK_EXISTS(MODULES, [ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND])
+#
+# Check to see whether a particular set of modules exists.  Similar
+# to PKG_CHECK_MODULES(), but does not set variables or print errors.
+#
+#
+# Similar to PKG_CHECK_MODULES, make sure that the first instance of
+# this or PKG_CHECK_MODULES is called, or make sure to call
+# PKG_CHECK_EXISTS manually
+# --------------------------------------------------------------
+AC_DEFUN([PKG_CHECK_EXISTS],
+[AC_REQUIRE([PKG_PROG_PKG_CONFIG])dnl
+if test -n "$PKG_CONFIG" && \
+    AC_RUN_LOG([$PKG_CONFIG --exists --print-errors "$1"]); then
+  m4_ifval([$2], [$2], [:])
+m4_ifvaln([$3], [else
+  $3])dnl
+fi])
+
+
 # _PKG_CONFIG([VARIABLE], [COMMAND], [MODULES])
 # ---------------------------------------------
 m4_define([_PKG_CONFIG],
 [if test -n "$PKG_CONFIG"; then
-	if AC_RUN_LOG([$PKG_CONFIG --exists "$3" >/dev/null 2>&1]); then
-		pkg_cv_[]$1=`$PKG_CONFIG --[]$2 "$3" 2>/dev/null`
-	else
-		pkg_failed=yes
-	fi
-else
+        PKG_CHECK_EXISTS([$3],
+                         [pkg_cv_[]$1=`$PKG_CONFIG --[]$2 "$3" 2>/dev/null`],
+			 [pkg_failed=yes])
 	pkg_failed=untried
 fi[]dnl
 ])# _PKG_CONFIG

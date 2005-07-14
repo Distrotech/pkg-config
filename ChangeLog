@@ -1,3 +1,8 @@
+2005-06-27  Tollef Fog Heen  <tfheen@err.no>
+
+	* pkg.m4: Add PKG_CHECK_EXISTS to check if a module exists.
+	Thanks to James Henstridge for the patch.
+
 2005-06-26  Tollef Fog Heen  <tfheen@err.no>
 
 	* pkg.m4: Get rid of caching again.  This breaks too much stuff,
