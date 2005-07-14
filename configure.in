@@ -24,6 +24,11 @@ AC_MSG_RESULT([$native_win32])
 
 AM_CONDITIONAL(USE_INSTALLED_GLIB, test x$native_win32 = xyes)
 
+case "$libdir" in
+*lib64) AC_DEFINE(PREFER_LIB64,1,[Define if your native architecture defines libdir to be $prefix/lib64 instead of $prefix/lib.]) ;;
+*) : ;;
+esac
+
 if test x$native_win32 = xyes; then
   # On Win32, use the normal installed GLib.  Yes, this is a circular
   # dependency. But then, only experienced hackers that presumably can

@@ -1,5 +1,10 @@
 2003-02-15  Havoc Pennington  <hp@pobox.com>
 
+	* pkg.c (verify_package): patch from Nalin to use /usr/lib64 as
+	the system libdir on systems where that's appropriate
+
+2003-02-15  Havoc Pennington  <hp@pobox.com>
+
 	Fixes suggested by Werner Trobin
 	
 	* main.c (verbose_error): honor --errors-to-stdout and flush 

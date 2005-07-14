@@ -851,25 +851,31 @@ verify_package (Package *pkg)
   g_slist_foreach (system_directories, (GFunc) g_free, NULL);
   g_slist_free (system_directories);
 
+#ifdef PREFER_LIB64
+#define SYSTEM_LIBDIR "/usr/lib64"
+#else
+#define SYSTEM_LIBDIR "/usr/lib"
+#endif
   count = 0;
   iter = pkg->L_libs;
   while (iter != NULL)
     {
-      if (strcmp (iter->data, "-L/usr/lib") == 0 ||
-          strcmp (iter->data, "-L /usr/lib") == 0)
+      if (strcmp (iter->data, "-L" SYSTEM_LIBDIR) == 0 ||
+          strcmp (iter->data, "-L " SYSTEM_LIBDIR) == 0)
         {
-          debug_spew ("Package %s has -L/usr/lib in Libs\n",
+          debug_spew ("Package %s has -L" SYSTEM_LIBDIR " in Libs\n",
                       pkg->name);
           if (g_getenv ("PKG_CONFIG_ALLOW_SYSTEM_LIBS") == NULL)
             {              
               iter->data = NULL;
               ++count;
-              debug_spew ("Removing -L/usr/lib from libs for %s\n", pkg->key);
+              debug_spew ("Removing -L" SYSTEM_LIBDIR " from libs for %s\n", pkg->key);
             }
         }
 
       iter = iter->next;
     }
+#undef SYSTEM_LIBDIR
 
   while (count)
     {
