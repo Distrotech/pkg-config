@@ -1,5 +1,11 @@
 2005-04-12  Tollef Fog Heen  <tfheen@err.no>
 
+	* pkg.m4: Add note that PKG_PROG_PKG_CONFIG must be called
+	explicitly if the first call to PKG_CHECK_MODULES might not
+	happen.  (Debian #303211)
+	
+2005-04-12  Tollef Fog Heen  <tfheen@err.no>
+
 	* configure.in: Bump to 0.17
 
 	* NEWS: Update for 0.17
