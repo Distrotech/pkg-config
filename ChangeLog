@@ -1,3 +1,9 @@
+2005-06-26  Tollef Fog Heen  <tfheen@err.no>
+
+	* glib-patches/configure.in-fd_set.diff: Patch to grep for fd_set
+	rather than fd_mask.  Thanks to David Wolfe for the fix.  This
+	should make pkg-config happier on QNX.
+
 2005-06-03  Tollef Fog Heen  <tfheen@err.no>
 
 	* pkg.m4, README, pkg-config.1: s/configure.in/configure.ac/,
