@@ -1,5 +1,7 @@
 2005-06-27  Tollef Fog Heen  <tfheen@err.no>
 
+	* configure.in: Rename to pkg-config.
+
 	* configure.in: Release 0.18
 
 	All those Requires.private changes are thanks to James
