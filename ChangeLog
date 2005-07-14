@@ -1,3 +1,7 @@
+2002-11-19  Havoc Pennington  <hp@redhat.com>
+
+	* pkg-config.1: apply formatting fixes from  Peter Breitenlohner
+
 2002-10-24  Tor Lillqvist  <tml@iki.fi>
 
 	* configure.in: Move the check for Win32 (which tests the $host
