@@ -217,7 +217,7 @@ internal_get_package (const char *name, gboolean warn, gboolean check_compat)
         }
     }
       
-  if (pkg == NULL)
+  if (location == NULL)
     {
       if (warn)
         verbose_error ("Package %s was not found in the pkg-config search path.\n"
