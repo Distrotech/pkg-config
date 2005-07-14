@@ -14,6 +14,11 @@
 #endif
 #include <sys/types.h>
 
+#ifdef G_OS_WIN32
+int dont_define_prefix = FALSE;
+char *prefix_variable = "prefix";
+#endif
+
 /**
  * Read an entire line from a file into a buffer. Lines may
  * be delimited with '\n', '\r', '\n\r', or '\r\n'. The delimiter
@@ -816,6 +821,51 @@ parse_line (Package *pkg, const char *untrimmed, const char *path)
       
       if (pkg->vars == NULL)
         pkg->vars = g_hash_table_new (g_str_hash, g_str_equal);
+
+#ifdef G_OS_WIN32
+      if (!dont_define_prefix && strcmp (tag, prefix_variable) == 0)
+	{
+	  /* This is the prefix variable. Try to guesstimate a value for it
+	   * for this package from the location of the .pc file.
+	   */
+
+	  gchar *prefix = pkg->pcfiledir;
+	  const int prefix_len = strlen (prefix);
+	  const char *const lib_pkgconfig = "\\lib\\pkgconfig";
+	  const int lib_pkgconfig_len = strlen (lib_pkgconfig);
+
+	  if (strlen (prefix) > lib_pkgconfig_len &&
+	      g_ascii_strcasecmp (prefix + prefix_len - lib_pkgconfig_len,
+				  lib_pkgconfig) == 0)
+	    {
+	      /* It ends in lib\pkgconfig. Good. */
+	      
+	      gchar *p;
+	      
+	      prefix = g_strdup (prefix);
+	      prefix[prefix_len - lib_pkgconfig_len] = '\0';
+	      
+	      /* Turn backslashes into slashes or
+	       * poptParseArgvString() will eat them when ${prefix}
+	       * has been expanded in parse_libs().
+	       */
+	      p = prefix;
+	      while (*p)
+		{
+		  if (*p == '\\')
+		    *p = '/';
+		  p++;
+		}
+	      varname = g_strdup (tag);
+	      debug_spew (" Variable declaration, '%s' overridden with '%s'\n",
+			  tag, prefix);
+	      g_hash_table_insert (pkg->vars, varname, prefix);
+	      g_free (str);
+	      g_free (tag);
+	      return;
+	    }
+	}
+#endif
 
       if (g_hash_table_lookup (pkg->vars, tag))
         {

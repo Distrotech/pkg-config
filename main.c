@@ -11,6 +11,12 @@
 #include <ctype.h>
 #include <stdio.h>
 
+#ifdef G_OS_WIN32
+#define STRICT
+#include <windows.h>
+#undef STRICT
+#endif
+
 static int want_debug_spew = 0;
 static int want_verbose_errors = 0;
 static int want_stdout_errors = 0;
@@ -144,14 +150,12 @@ main (int argc, char **argv)
   static int want_list = 0;
   static int result;
   static int want_uninstalled = 0;
-  static int dont_define_prefix = 0;
   static char *variable_name = NULL;
   static int want_exists = 0;
   static char *required_atleast_version = NULL;
   static char *required_exact_version = NULL;
   static char *required_max_version = NULL;
   static char *required_pkgconfig_version = NULL;
-  static char *prefix_variable = NULL;
   static int want_silence_errors = 0;
   GString *str;
   GSList *packages = NULL;
@@ -208,7 +212,8 @@ main (int argc, char **argv)
       "print errors from --print-errors to stdout not stderr" },
 #ifdef G_OS_WIN32
     { "dont-define-prefix", 0, POPT_ARG_NONE, &dont_define_prefix, 0,
-      "don't set the value of prefix based on where pkg-config.exe is installed" },
+      "don't try to override the value of prefix for each .pc file found with "
+      "a guesstimated value based on the location of the .pc file" },
     { "prefix-variable", 0, POPT_ARG_STRING, &prefix_variable, 0,
       "set the name of the variable that pkg-config automatically sets", "PREFIX" },
 #endif
@@ -247,6 +252,57 @@ main (int argc, char **argv)
 
       g_strfreev (search_dirs);
     }
+
+#ifdef G_OS_WIN32
+  {
+    /* Add search directories from the Registry */
+
+    HKEY roots[] = { HKEY_CURRENT_USER, HKEY_LOCAL_MACHINE };
+    gchar *root_names[] = { "HKEY_CURRENT_USER", "HKEY_LOCAL_MACHINE" };
+    HKEY key;
+    int i;
+    gulong max_value_name_len, max_value_len;
+
+    for (i = 0; i < G_N_ELEMENTS (roots); i++)
+      {
+	key = NULL;
+	if (RegOpenKeyEx (roots[i], "Software\\" PACKAGE "\\PKG_CONFIG_PATH", 0,
+			  KEY_QUERY_VALUE, &key) == ERROR_SUCCESS &&
+	    RegQueryInfoKey (key, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
+			     &max_value_name_len, &max_value_len,
+			     NULL, NULL) == ERROR_SUCCESS)
+	  {
+	    int index = 0;
+	    gchar *value_name = g_malloc (max_value_name_len + 1);
+	    gchar *value = g_malloc (max_value_len + 1);
+	    
+	    while (TRUE)
+	      {
+		gulong type;
+		gulong value_name_len = max_value_name_len + 1;
+		gulong value_len = max_value_len + 1;
+		
+		if (RegEnumValue (key, index++, value_name, &value_name_len,
+				  NULL, &type,
+				  value, &value_len) != ERROR_SUCCESS)
+		  break;
+		
+		if (type != REG_SZ)
+		  continue;
+
+		value_name[value_name_len] = '\0';
+		value[value_len] = '\0';
+		debug_spew ("Adding directory '%s' from %s\\Software\\"
+			    PACKAGE "\\PKG_CONFIG_PATH\\%s\n",
+			    value, root_names[i], value_name);
+		add_search_dir (value);
+	      }
+	  }
+	if (key != NULL)
+	  RegCloseKey (key);
+      }
+  }
+#endif
 
   pcbuilddir = getenv ("PKG_CONFIG_TOP_BUILD_DIR");
   if (pcbuilddir)
@@ -329,26 +385,6 @@ main (int argc, char **argv)
         return 1;
     }
   
-#ifdef G_OS_WIN32
-  if (!dont_define_prefix)
-    {
-      gchar *prefix = g_win32_get_package_installation_directory (PACKAGE " " VERSION, NULL);
-      gchar *p = prefix;
-
-      /* Turn backslashes into slashes or poptParseArgvString() will eat
-       * them when ${prefix} has been expanded in parse_libs().
-       */
-      while (*p)
-	{
-	  if (*p == '\\')
-	    *p = '/';
-	  p++;
-	}
-      define_global_variable (prefix_variable ? prefix_variable : "prefix",
-			      prefix);
-    }
-#endif
-
   package_init ();
 
   if (want_list)

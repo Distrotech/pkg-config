@@ -22,12 +22,13 @@
 #include <unistd.h>
 #endif
 #include <stdlib.h>
+#include <ctype.h>
 
 #ifdef G_OS_WIN32
 /* No hardcoded paths in the binary, thanks */
 #undef PKGLIBDIR
 /* It's OK to leak this, as PKGLIBDIR is invoked only once */
-#define PKGLIBDIR g_strconcat (g_win32_get_package_installation_directory (PACKAGE " " VERSION, NULL), "\\lib\\pkgconfig", NULL)
+#define PKGLIBDIR g_strconcat (g_win32_get_package_installation_directory (PACKAGE, NULL), "\\lib\\pkgconfig", NULL)
 #endif
 
 static void verify_package (Package *pkg);
@@ -45,6 +46,15 @@ add_search_dir (const char *path)
   search_dirs = g_slist_prepend (search_dirs, g_strdup (path));
 }
 
+#ifdef G_OS_WIN32
+/* Guard against .pc file being installed with UPPER CASE name */
+# define FOLD(x) tolower(x)
+# define FOLDCMP(a, b) g_ascii_strcasecmp (a, b)
+#else
+# define FOLD(x) (x)
+# define FOLDCMP(a, b) strcmp (a, b)
+#endif
+
 #define EXT_LEN 3
 
 static gboolean
@@ -54,8 +64,8 @@ ends_in_dotpc (const char *str)
   
   if (len > EXT_LEN &&
       str[len - 3] == '.' &&
-      str[len - 2] == 'p' &&
-      str[len - 1] == 'c')
+      FOLD (str[len - 2]) == 'p' &&
+      FOLD (str[len - 1]) == 'c')
     return TRUE;
   else
     return FALSE;
@@ -70,7 +80,7 @@ name_ends_in_uninstalled (const char *str)
   int len = strlen (str);
   
   if (len > UNINSTALLED_LEN &&
-      strcmp ((str + len - UNINSTALLED_LEN), "uninstalled") == 0)
+      FOLDCMP ((str + len - UNINSTALLED_LEN), "uninstalled") == 0)
     return TRUE;
   else
     return FALSE;

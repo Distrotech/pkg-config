@@ -34,7 +34,8 @@ program: program.c
 special metadata files. These files are named after the package, 
 with the extension \fI.pc\fP. By default, pkg-config looks in 
 the directory \fIprefix\fP/lib/pkgconfig for these files; it will also
-look in the colon-separated list of directories specified by the 
+look in the colon-separated (on Windows, semicolon-separated) 
+list of directories specified by the 
 PKG_CONFIG_PATH environment variable. 
 
 .PP
@@ -170,23 +171,20 @@ Remember to use \-\-print-errors if you want error messages.
 .TP
 .I "--dont-define-prefix"
 This option is available only on Windows. It prevents \fIpkg-config\fP
-from automatically setting the value of the variable "prefix" to the
-directory where \fIpkg-config\fP was installed. (This directory is
-determined by asking the system where \fIpkg-config.exe\fP is located,
-and if that directory is called \fIbin\fP or \fIlib\fP, using its
-parent directory, otherwise itself.)
+from automatically trying to override the value of the variable
+"prefix" in each .pc file.
 
 .TP
 .I "--prefix-variable=PREFIX"
 Also this option is available only on Windows. It sets the name of the
-variable that \fIpkg-config\fP automatically sets to its own
-installation prefix.
+variable that \fIpkg-config\fP automatically sets as described above.
 
 .SH ENVIRONMENT VARIABLES
 
 .TP
 .I "PKG_CONFIG_PATH"
-A colon-separated list of directories to search for .pc files.
+A colon-separated (on Windows, semicolon-separated)
+list of directories to search for .pc files.
 The default directory will always be searched after searching the
 path; the default is \fIlibdir\fP/pkgconfig where \fIlibdir\fP
 is the libdir where \fIpkg-config\fP was installed.
@@ -213,6 +211,20 @@ Normally if you request the package "foo" and the package
 "-uninstalled" variant. This allows compilation/linking against
 uninstalled packages.  If this environment variable is set, it
 disables said behavior.
+
+.SH WINDOWS SPECIALITIES
+If a .pc file is found in a path that corresponds to the usual
+conventions (i.e., ends with lib\\pkgconfig), the prefix for that
+package is assumed to be the grandparent of the directory where the .pc file
+was found.
+
+In addition to the \fIPKG_CONFIG_PATH\fP environment variable, the
+Registry keys
+\fIHKEY_CURRENT_USER\\Software\\pkgconfig\\PKG_CONFIG_PATH\fP and
+\fIHKEY_LOCAL_MACHINE\\Software\\pkgconfig\\PKG_CONFIG_PATH\fP can be
+used to specify dorectories to search for .pc files. Each (string)
+value in these keys is treated as a directory where to look for .pc
+files.
 
 .SH AUTOCONF MACROS
 

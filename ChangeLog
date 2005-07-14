@@ -1,3 +1,24 @@
+2001-10-25  Tor Lillqvist  <tml@iki.fi>
+
+	Improve Windows behaviour: Make it even easier to install
+	developer packages in random locations, without having to modify
+	the .pc files. Don't set "prefix" globally, instead override it
+	for each .pc file parsed, if the path where the .pc file is seems
+	to be the standard .../lib/pkgconfig.
+
+	* main.c (main): Add search directories also from two Registry
+	keys, in addition to the PKG_CONFIG_PATH environment
+	variable. Don't define prefix globally.
+
+	* parse.c (parse_line): Instead, if a .pc file is in
+	/foo/bar/lib/pkgconfig, define prefix as /foo/bar for that package
+	only.
+
+	* pkg.c: Case-fold file names on Windows, in case they have been
+	uppercasified by some tool.
+
+	* pkg-config.1: Document Windows behaviour.
+
 2001-10-21  Tor Lillqvist  <tml@iki.fi>
 
 	* Makefile.am (EXTRA_DIST): Distribute README.win32.

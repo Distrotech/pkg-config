@@ -93,5 +93,13 @@ gboolean name_ends_in_uninstalled (const char *str);
 /* If TRUE, do not automatically prefer uninstalled versions */
 extern gboolean disable_uninstalled;
 
+#ifdef G_OS_WIN32
+/* If TRUE, do not automatically define "prefix"  while
+ * parsing each .pc file */
+extern int dont_define_prefix;
+/* The name of the variable that acts as prefix, unless it is "prefix" */
+extern char *prefix_variable;
+#endif
+
 #endif
 
