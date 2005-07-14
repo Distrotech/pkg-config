@@ -1,3 +1,7 @@
+2003-05-09  Havoc Pennington  <hp@redhat.com>
+
+	* pkg.m4: improve error message a bit, from Tim Janik
+
 2003-04-30  James Henstridge  <james@daa.com.au>
 
 	* pkg.c (verify_package): fix up error messages.

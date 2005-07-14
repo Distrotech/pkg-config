@@ -61,7 +61,7 @@ AC_DEFUN([PKG_CHECK_MODULES],
      ifelse([$3],, [:], [$3])
   else
      ifelse([$4],,
-            [AC_MSG_ERROR([Library requirements ($2) not met; consider adjusting the PKG_CONFIG_PATH environment variable if your libraries are in a nonstandard prefix so pkg-config can find them.])],
+            [AC_MSG_ERROR([Package requirements ($2) not met; consider adjusting the PKG_CONFIG_PATH environment variable if you installed software in a nonstandard prefix. See man page for pkg-config.])],
             [$4])
   fi
 ])
