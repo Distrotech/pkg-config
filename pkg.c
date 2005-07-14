@@ -656,7 +656,7 @@ add_env_variable_to_list (GSList *list, const gchar *env)
     }
   g_strfreev (values);
 
-  return NULL;
+  return list;
 }
 
 static void
@@ -822,6 +822,8 @@ verify_package (Package *pkg)
 		      debug_spew ("Removing %s from cflags for %s\n", iter->data, pkg->key);
 		      ++count;
 		      iter->data = NULL;
+		      
+		      break;
 		    }
 		}
 	      system_dir_iter = system_dir_iter->next;
