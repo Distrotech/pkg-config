@@ -1,0 +1,11 @@
+--- glib-1.2.8/gmodule/Makefile.am	2005-02-21 00:33:40.818983432 +0100
++++ glib-1.2.8-pkgconfig/gmodule/Makefile.am	2005-02-20 23:44:16.122685776 +0100
+@@ -41,7 +41,7 @@
+ libgplugin_b_la_LIBADD = @G_MODULE_LIBS@ # $(libglib)
+ 
+ noinst_PROGRAMS = testgmodule
+-testgmodule_LDFLAGS += @G_MODULE_LDFLAGS@
++testgmodule_LDFLAGS = @G_MODULE_LDFLAGS@
+ testgmodule_LDADD = libgmodule.la $(libglib) @G_MODULE_LIBS@
+ 
+ .PHONY: files release

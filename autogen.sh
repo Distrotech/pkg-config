@@ -13,8 +13,8 @@ FILE=pkg.m4
 
 DIE=0
 
-AUTOCONF=autoconf-2.13
-AUTOHEADER=autoheader-2.13
+AUTOCONF=autoconf2.50
+AUTOHEADER=autoheader2.50
 
 ($AUTOCONF --version) < /dev/null > /dev/null 2>&1 || {
         AUTOCONF=autoconf
@@ -30,8 +30,8 @@ AUTOHEADER=autoheader-2.13
 	DIE=1
 }
 
-AUTOMAKE=automake-1.4
-ACLOCAL=aclocal-1.4
+AUTOMAKE=automake-1.7
+ACLOCAL=aclocal-1.7
 
 ($AUTOMAKE --version) < /dev/null > /dev/null 2>&1 || {
         AUTOMAKE=automake
@@ -55,6 +55,7 @@ test $TEST_TYPE $FILE || {
 	exit 1
 }
 
+rm -r glib-1.2.8
 gunzip --stdout glib-1.2.8.tar.gz | tar xf - || { 
     echo "glib tarball not unpacked"
     exit 1
@@ -70,6 +71,11 @@ perl -p -i.bak -e "s/man_MANS/noinst_MANS/g" `find glib-1.2.8 -name Makefile.am`
 
 ## patch gslist.c to have stable sort
 perl -p -w -i.bak -e 's/if \(compare_func\(l1->data,l2->data\) < 0\)/if \(compare_func\(l1->data,l2->data\) <= 0\)/g' glib-1.2.8/gslist.c
+
+# Update random auto* files to actually have something which have a snowball's
+# chance in a hot place of working with modern auto* tools.
+
+(cd glib-1.2.8 && for p in ../glib-patches/*.diff; do echo $p; patch -p1 < $p; done )
 
 (cd glib-1.2.8 && libtoolize --copy --force && $ACLOCAL $ACLOCAL_FLAGS && $AUTOMAKE && $AUTOCONF)
 

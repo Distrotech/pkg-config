@@ -1,3 +1,8 @@
+2005-02-21  Tollef Fog Heen  <tfheen@err.no>
+
+	* glib-patches/*: Add patches for compiling with modern autotools.
+	* autogen.sh: Use said patches.  (Freedesktop #134)
+
 2005-02-20  Tollef Fog Heen  <tfheen@err.no>
 
 	* main.c (main): Unstaticify variables.  (Freedesktop #2459)
