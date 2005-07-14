@@ -2,6 +2,8 @@
 
 	* pkg.m4: remove unrelated macros
 
+	* README, AUTHORS: updates
+	
 2001-05-20  Havoc Pennington  <hp@pobox.com>
 
 	* configure.in: revert package name change, just screwing things up.
