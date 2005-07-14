@@ -1,5 +1,11 @@
 2005-02-21  Tollef Fog Heen  <tfheen@err.no>
 
+	* pkg-config.1: Get rid of groff warnings when formatting
+	pkg-config(1) on an 80-column terminal.  Thanks to Colin Watson
+	and Ubuntu for the fix.  (Freedesktop #148)
+
+2005-02-21  Tollef Fog Heen  <tfheen@err.no>
+
 	* glib-patches/*: Add patches for compiling with modern autotools.
 	* autogen.sh: Use said patches.  (Freedesktop #134)
 
