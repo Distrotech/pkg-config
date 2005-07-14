@@ -1010,6 +1010,16 @@ try_command (const char *command)
 Package *
 get_compat_package (const char *name)
 {
+#ifdef G_OS_WIN32
+  /* There has never been any of these legacy *-config scripts on
+   * Windows as far as I know. No use trying to execute them, will
+   * only confuse users to see the "blabla is not recognized as an
+   * internal or external command, operable program or batch file"
+   * messages.
+   */
+  return NULL;
+#else
+
   Package *pkg;
 
   if (name_ends_in_uninstalled (name))
@@ -1328,5 +1338,5 @@ get_compat_package (const char *name)
 
       return pkg;
     }
+#endif
 }
-
