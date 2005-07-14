@@ -1,3 +1,8 @@
+2004-07-18  Scott James Remnant  <scott@netsplit.com>
+
+	* pkg.m4: Fix a bad patch causing duplication in one of the error
+	messages.
+
 2004-07-06  Scott James Remnant  <scott@netsplit.com>
 
 	* pkg.m4: Correct quoting brackets to correctly split the words.

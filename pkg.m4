@@ -91,10 +91,7 @@ elif test $pkg_failed = untried; then
 	ifelse([$4], , [AC_MSG_FAILURE(dnl
 [[The pkg-config script could not be found or is too old.  Make sure it
 is in your PATH or set the PKG_CONFIG environment variable to the full
-path to pkg-config.  Al
-The pkg-config script could not be found or is too old.
-Make sure it is in your PATH or set the PKG_CONFIG environment variable
-to the full path to pkg-config.
+path to pkg-config.
 
 Alternatively you may set the $1_CFLAGS and $1_LIBS environment variables
 to avoid the need to call pkg-config.  See the pkg-config man page for
