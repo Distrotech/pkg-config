@@ -6,6 +6,12 @@
 
 2005-03-26  Tollef Fog Heen  <tfheen@err.no>
 
+	* configure.in: Fix default search path for .pc files.  (This was
+	done after the change above but before tagging.  Put here to avoid
+	confusion whether this went into the release).
+
+2005-03-26  Tollef Fog Heen  <tfheen@err.no>
+
 	* AUTHORS: Add myself.
 
 2005-03-18  Tollef Fog Heen  <tfheen@err.no>
