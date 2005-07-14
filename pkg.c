@@ -716,14 +716,14 @@ verify_package (Package *pkg)
   if (pkg->version == NULL)
     {
       verbose_error ("Package '%s' has no Version: field\n",
-                     pkg->name);
+                     pkg->key);
       exit (1);
     }
 
   if (pkg->description == NULL)
     {
       verbose_error ("Package '%s' has no Description: field\n",
-                     pkg->description);
+                     pkg->key);
       exit (1);
     }
   

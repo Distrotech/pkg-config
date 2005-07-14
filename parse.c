@@ -836,10 +836,13 @@ parse_line (Package *pkg, const char *untrimmed, const char *path)
         parse_url (pkg, p, path);
       else
         {
-          verbose_error ("Unknown keyword '%s' in '%s'\n",
-                         tag, path);
-
-          exit (1);
+	  /* we don't error out on unknown keywords because they may
+	   * represent additions to the .pc file format from future
+	   * versions of pkg-config.  We do make a note of them in the
+	   * debug spew though, in order to help catch mistakes in .pc
+	   * files. */
+          debug_spew ("Unknown keyword '%s' in '%s'\n",
+		      tag, path);
         }
     }
   else if (*p == '=')

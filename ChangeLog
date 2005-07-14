@@ -1,3 +1,10 @@
+2003-04-30  James Henstridge  <james@daa.com.au>
+
+	* pkg.c (verify_package): fix up error messages.
+
+	* parse.c (parse_line): don't error out on unknown keywords, as
+	they may represent future extensions to the file format.
+
 2003-02-22  James Henstridge  <james@daa.com.au>
 
 	* pkg.c (add_virtual_pkgconfig_package): function to add a virtual
