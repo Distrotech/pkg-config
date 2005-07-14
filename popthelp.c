@@ -22,6 +22,12 @@
 #include "popt.h"
 #include "poptint.h"
 
+#ifdef _WIN32
+#define SLASH '\\'
+#else
+#define SLASH '/'
+#endif
+
 static void displayArgs(poptContext con, enum poptCallbackReason foo, 
 			struct poptOption * key, 
 			const char * arg, void * data) {
@@ -156,7 +162,7 @@ static int showHelpIntro(poptContext con, FILE * f) {
     fprintf(f, POPT_("Usage:"));
     if (!(con->flags & POPT_CONTEXT_KEEP_FIRST)) {
 	fn = con->optionStack->argv[0];
-	if (strchr(fn, '/')) fn = strchr(fn, '/') + 1;
+	if (strchr(fn, SLASH)) fn = strchr(fn, SLASH) + 1;
 	fprintf(f, " %s", fn);
 	len += strlen(fn) + 1;
     }

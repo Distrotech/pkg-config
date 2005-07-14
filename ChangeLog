@@ -1,3 +1,52 @@
+2001-09-30  Tor Lillqvist  <tml@iki.fi>
+
+	Changes for "pure" Win32 (without Cygwin or similar) support. The
+	most important differences compared to pkg-config on Unix are:
+
+	We don't use hardcoded PKGLIBDIR paths but deduce the
+	installation prefix at runtime.
+
+	Use the normal GLib DLL, not a private copy. Yes, this does
+	introduce a circular dependency, but that can be worked around.
+		
+	* README.win32: New file.
+
+	* configure.in: Check for Win32. If so, define USE_INSTALLED_GLIB,
+	and don't configure in the included glib-1.2.8. Set GLIB_CFLAGS
+	and GLIB_LIBS assuming that GLib is installed in the same location
+	pkgconfig will be. Check for dirent.h, unistd.h and sys/wait.h
+	headers.
+
+	* Makefile.am: If USE_INSTALLED_GLIB, use the GLIB_* values set
+	above, and don't make in the glib-1.2.8 subdir.
+
+	* autogen.sh: Use perl -p -i.bak, works better on Win32 (and Cygwin).
+
+	* *.c: Conditionalize inclusions of unistd.h and sys/wait.h. 
+	
+	* findme.c: Define X_OK on Win32 if necessary.
+
+	* parse.c
+	* popthelp.c: Minor Win32 portability ifdefs.
+
+	* parse.c: No need to include <windows.h>. 
+
+	* pkg.c: Don't hardcode PKGLIBDIR, but use
+	g_win32_get_package_installation_directory() to deduce it.
+	(scan_dir): Make a temp copy of dirname with potential superfluous
+	trailing slash removed. The Win32 opendir implementation doesn't
+	always like those.
+
+	* pkg.h: If USE_INSTALLED_GLIB, include <glib.h> instead of
+	partial-glib.h.
+
+	* popt.c (execCommand): Don't compile on Win32.
+
+	* poptconfig.c (configLine): Don't bother with the "exec" stuff on
+	Win32, too complex to port, at least for now.
+	(poptReadDefaultConfig) Don't bother compiling on Win32, this
+	function isn't even called.
+	
 2001-07-11  Havoc Pennington  <hp@redhat.com>
 
 	* pkg.c: include sys/types.h to avoid warnings about dirent on

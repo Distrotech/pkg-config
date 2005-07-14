@@ -43,12 +43,13 @@ gunzip --stdout glib-1.2.8.tar.gz | tar xf - || {
     exit 1
 }
 
-perl -pi -e "s/lib_LTLIBRARIES/noinst_LTLIBRARIES/g" `find glib-1.2.8 -name Makefile.am`
-perl -pi -e "s/bin_SCRIPTS/noinst_SCRIPTS/g" `find glib-1.2.8 -name Makefile.am`
-perl -pi -e "s/include_HEADERS/noinst_HEADERS/g" `find glib-1.2.8 -name Makefile.am`
-perl -pi -e "s/[a-zA-Z0-9]+_DATA/noinst_DATA/g" `find glib-1.2.8 -name Makefile.am`
-perl -pi -e "s/info_TEXINFOS/noinst_TEXINFOS/g" `find glib-1.2.8 -name Makefile.am`
-perl -pi -e "s/man_MANS/noinst_MANS/g" `find glib-1.2.8 -name Makefile.am`
+chmod +w `find glib-1.2.8 -name Makefile.am`
+perl -p -i.bak -e "s/lib_LTLIBRARIES/noinst_LTLIBRARIES/g" `find glib-1.2.8 -name Makefile.am`
+perl -p -i.bak -e "s/bin_SCRIPTS/noinst_SCRIPTS/g" `find glib-1.2.8 -name Makefile.am`
+perl -p -i.bak -e "s/include_HEADERS/noinst_HEADERS/g" `find glib-1.2.8 -name Makefile.am`
+perl -p -i.bak -e "s/[a-zA-Z0-9]+_DATA/noinst_DATA/g" `find glib-1.2.8 -name Makefile.am`
+perl -p -i.bak -e "s/info_TEXINFOS/noinst_TEXINFOS/g" `find glib-1.2.8 -name Makefile.am`
+perl -p -i.bak -e "s/man_MANS/noinst_MANS/g" `find glib-1.2.8 -name Makefile.am`
 
 (cd glib-1.2.8 && automake)
 

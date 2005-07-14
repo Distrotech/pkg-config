@@ -9,15 +9,10 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include "popt.h"
+#ifdef HAVE_SYS_WAIT_H
 #include <sys/wait.h>
-#include <sys/types.h>
-
-#ifdef NATIVE_WIN32
-
-#define STRICT
-#include <windows.h>
-
 #endif
+#include <sys/types.h>
 
 /**
  * Read an entire line from a file into a buffer. Lines may
@@ -927,13 +922,21 @@ try_command (const char *command)
   int status;
   char *munged;
 
+#ifdef G_OS_WIN32
+  munged = g_strdup_printf ("%s > NUL", command);
+#else
   munged = g_strdup_printf ("%s > /dev/null 2>&1", command);
+#endif
   
   status = system (munged);
 
   g_free (munged);
   
+#ifdef G_OS_WIN32
+  return status == 0;
+#else
   return WIFEXITED(status) && (WEXITSTATUS(status) == 0);
+#endif
 }
 
 Package *

@@ -19,7 +19,9 @@
 #include <fcntl.h>
 #include <stdlib.h>
 #include <string.h>
+#ifdef HAVE_UNISTD_H
 #include <unistd.h>
+#endif
 
 #include "popt.h"
 #include "poptint.h"
@@ -58,7 +60,9 @@ static void configLine(poptContext con, char * line) {
 	if (poptParseArgvString(line, &alias.argc, &alias.argv)) return;
 	alias.longName = longName, alias.shortName = shortName;
 	poptAddAlias(con, alias, 0);
-    } else if (!strcmp(entryType, "exec")) {
+    }
+#ifndef _WIN32 /* exec stuff too complex to be worthwhile to port */
+      else if (!strcmp(entryType, "exec")) {
 	con->execs = realloc(con->execs, 
 				sizeof(*con->execs) * (con->numExecs + 1));
 	if (longName)
@@ -71,6 +75,7 @@ static void configLine(poptContext con, char * line) {
 	
 	con->numExecs++;
     }
+#endif /* !_WIN32 */
 }
 
 int poptReadConfigFile(poptContext con, char * fn) {
@@ -132,6 +137,8 @@ int poptReadConfigFile(poptContext con, char * fn) {
     return 0;
 }
 
+#ifndef _WIN32
+
 int poptReadDefaultConfig(poptContext con, int useEnv) {
     char * fn, * home;
     int rc;
@@ -153,3 +160,4 @@ int poptReadDefaultConfig(poptContext con, int useEnv) {
     return 0;
 }
 
+#endif /* !_WIN32 */

@@ -1,4 +1,11 @@
+if USE_INSTALLED_GLIB
+pkg_config_CFLAGS = @GLIB_CFLAGS@
+pkg_config_LDFLAGS = @GLIB_LIBS@
+else
 SUBDIRS = glib-1.2.8
+included_glib_includes = -I./glib-1.2.8
+pkg_config_LDADD=glib-1.2.8/libglib.la
+endif
 
 m4dir = $(datadir)/aclocal
 m4_DATA = pkg.m4
@@ -8,7 +15,7 @@ EXTRA_DIST = $(m4_DATA) $(man_MANS)
 
 bin_PROGRAMS = pkg-config
 
-INCLUDES=-DPKGLIBDIR="\"$(pkglibdir)\"" -I./glib-1.2.8
+INCLUDES=-DPKGLIBDIR="\"$(pkglibdir)\"" $(included_glib_includes)
 
 pkg_config_SOURCES= \
 	pkg.h \
@@ -27,4 +34,3 @@ pkg_config_SOURCES= \
 	poptint.h \
 	poptparse.c
 
-pkg_config_LDADD=glib-1.2.8/libglib.la

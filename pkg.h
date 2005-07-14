@@ -1,7 +1,11 @@
 #ifndef PKG_CONFIG_PKG_H
 #define PKG_CONFIG_PKG_H
 
+#ifdef USE_INSTALLED_GLIB
+#include <glib.h>
+#else
 #include "partial-glib.h"
+#endif
 
 typedef enum
 {

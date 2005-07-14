@@ -225,7 +225,7 @@ main (int argc, char **argv)
       char **search_dirs;
       char **iter;
 
-      search_dirs = g_strsplit (search_path, ":", -1);
+      search_dirs = g_strsplit (search_path, G_SEARCHPATH_SEPARATOR_S, -1);
 
       iter = search_dirs;
       while (*iter)

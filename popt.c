@@ -21,7 +21,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#ifdef HAVE_UNISTD_H
 #include <unistd.h>
+#endif
 
 #include "findme.h"
 #include "popt.h"
@@ -178,6 +180,8 @@ static int handleAlias(poptContext con, char * longName, char shortName,
     return 1;
 }
 
+#ifndef _WIN32
+
 static void execCommand(poptContext con) {
     char ** argv;
     int pos = 0;
@@ -220,6 +224,8 @@ static void execCommand(poptContext con) {
     
     execvp(argv[0], argv);
 }
+
+#endif
 
 static const struct poptOption * findOption(const struct poptOption * table,
 					    const char * longName,
@@ -284,7 +290,9 @@ int poptGetNextOpt(poptContext con) {
 	    con->os--;
 	if (!con->os->nextCharArg && con->os->next == con->os->argc) {
 	    invokeCallbacks(con, con->options, 1);
+#ifndef _WIN32
 	    if (con->doExec) execCommand(con);
+#endif
 	    return -1;
 	}
 

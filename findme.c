@@ -17,7 +17,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#ifdef HAVE_UNISTD_H
 #include <unistd.h>
+#endif
 #ifdef __NeXT
 /* access macros are not declared in non posix mode in unistd.h -
  don't try to use posix on NeXTstep 3.3 ! */ 
@@ -25,6 +27,10 @@
 #endif
 
 #include "findme.h"
+
+#if defined(G_OS_WIN32) && !defined(X_OK)
+#define X_OK 1
+#endif
 
 char * findProgramPath(char * argv0) {
     char * path = getenv("PATH");

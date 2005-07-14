@@ -18,8 +18,17 @@
 #include <string.h>
 #include <errno.h>
 #include <stdio.h>
+#ifdef HAVE_UNISTD_H
 #include <unistd.h>
+#endif
 #include <stdlib.h>
+
+#ifdef G_OS_WIN32
+/* No hardcoded paths in the binary, thanks */
+#undef PKGLIBDIR
+/* It's OK to leak this, as PKGLIBDIR is invoked only once */
+#define PKGLIBDIR g_strconcat (g_win32_get_package_installation_directory (PACKAGE " " VERSION, NULL), "\\lib\\pkgconfig", NULL)
+#endif
 
 static void verify_package (Package *pkg);
 
@@ -74,13 +83,22 @@ name_ends_in_uninstalled (const char *str)
 static void
 scan_dir (const char *dirname)
 {
-  DIR *dir = opendir (dirname);
+  DIR *dir;
   struct dirent *dent;
   int dirnamelen = strlen (dirname);
+  /* Use a copy of dirname cause Win32 opendir doesn't like
+   * superfluous trailing (back)slashes in the directory name.
+   */
+  char *dirname_copy = strdup (dirname);
 
-  if (dirnamelen > 0 && dirname[dirnamelen-1] == '/')
-    dirnamelen--;
+  if (dirnamelen > 1 && dirname[dirnamelen-1] == G_DIR_SEPARATOR)
+    {
+      dirnamelen--;
+      dirname_copy[dirnamelen-1] = '\0';
+    }
 
+  dir = opendir (dirname_copy);
+  free (dirname_copy);
   if (!dir)
     {
       debug_spew ("Cannot open directory '%s' in package search path: %s\n",
@@ -112,7 +130,7 @@ scan_dir (const char *dirname)
             {
               char *filename = g_malloc (dirnamelen + 1 + len + 1);
               strncpy (filename, dirname, dirnamelen);
-              filename[dirnamelen] = '/';
+              filename[dirnamelen] = G_DIR_SEPARATOR;
               strcpy (filename + dirnamelen + 1, dent->d_name);
               
               g_hash_table_insert (locations, pkgname, filename);
