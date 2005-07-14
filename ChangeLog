@@ -1,3 +1,7 @@
+2005-02-20  Tollef Fog Heen  <tfheen@err.no>
+
+	* main.c (main): Unstaticify variables.  (Freedesktop #2459)
+
 2004-07-18  Scott James Remnant  <scott@netsplit.com>
 
 	* pkg.m4: Fix a bad patch causing duplication in one of the error

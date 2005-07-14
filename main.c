@@ -165,25 +165,25 @@ pkg_uninstalled (Package *pkg)
 int
 main (int argc, char **argv)
 {
-  static int want_my_version = 0;
-  static int want_version = 0;
-  static int want_libs = 0;
-  static int want_cflags = 0;
-  static int want_l_libs = 0;
-  static int want_L_libs = 0;
-  static int want_other_libs = 0;
-  static int want_I_cflags = 0;
-  static int want_other_cflags = 0;
-  static int want_list = 0;
-  static int result;
-  static int want_uninstalled = 0;
-  static char *variable_name = NULL;
-  static int want_exists = 0;
-  static char *required_atleast_version = NULL;
-  static char *required_exact_version = NULL;
-  static char *required_max_version = NULL;
-  static char *required_pkgconfig_version = NULL;
-  static int want_silence_errors = 0;
+  int want_my_version = 0;
+  int want_version = 0;
+  int want_libs = 0;
+  int want_cflags = 0;
+  int want_l_libs = 0;
+  int want_L_libs = 0;
+  int want_other_libs = 0;
+  int want_I_cflags = 0;
+  int want_other_cflags = 0;
+  int want_list = 0;
+  int result;
+  int want_uninstalled = 0;
+  char *variable_name = NULL;
+  int want_exists = 0;
+  char *required_atleast_version = NULL;
+  char *required_exact_version = NULL;
+  char *required_max_version = NULL;
+  char *required_pkgconfig_version = NULL;
+  int want_silence_errors = 0;
   GString *str;
   GSList *packages = NULL;
   char *search_path;
