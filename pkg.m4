@@ -49,13 +49,11 @@ m4_define([_PKG_CONFIG],
 [if test "x$ac_cv_env_[]$1[]_set" = "xset"; then
 	pkg_cv_[]$1=$ac_cv_env_[]$1[]_value
 elif test -n "$PKG_CONFIG"; then
-	AC_RUN_LOG([
-	if $PKG_CONFIG --exists "$3" >/dev/null 2>&1; then
+	if AC_RUN_LOG([$PKG_CONFIG --exists "$3" >/dev/null 2>&1]); then
 		pkg_cv_[]$1=`$PKG_CONFIG --[]$2 "$3" 2>/dev/null`
 	else
 		pkg_failed=yes
 	fi
-	])
 else
 	pkg_failed=untried
 fi[]dnl

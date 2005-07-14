@@ -1,5 +1,8 @@
 2005-04-12  Tollef Fog Heen  <tfheen@err.no>
 
+	* pkg.m4: Apply patch from James Henstridge to have AC_RUN_LOG in
+	the right place.  (Freedesktop #2992)
+	
 	* pkg.m4: Add note that PKG_PROG_PKG_CONFIG must be called
 	explicitly if the first call to PKG_CHECK_MODULES might not
 	happen.  (Debian #303211)
