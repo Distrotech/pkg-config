@@ -1,3 +1,13 @@
+pkg-config 0.17
+===
+
+ - Evaluate second argument to PKG_CHECK_MODULES again
+ - Portability fixes (MacOS, BeOS, Cygwin)
+ - Handle inter-library dependencies and assume those are in place if
+   the platform supports them.  Disable with --enable-indirect-deps.
+ - Add initial test framework
+ - Build fixes (make distcheck now works)
+
 pkg-config 0.16
 ===
 
@@ -5,6 +15,8 @@ pkg-config 0.16
  - Fix a bunch of bugs in glib by backporting
  - More man page fixes
  - Lots of small fixes and cleanups over the place.
+ - pkg-config now grabs _PKG_* and PKG_*, so don't use variables
+   starting with that in any configure scripts.
 
 pkg-config 0.15
 ===

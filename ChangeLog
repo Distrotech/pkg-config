@@ -1,5 +1,10 @@
 2005-04-12  Tollef Fog Heen  <tfheen@err.no>
 
+	* NEWS: Update for 0.17
+	
+	* NEWS: Add note saying that we've now grabbed _PKG_* and PKG_*.
+	(Freedesktop #2962)
+
 	* pkg.m4: wrap running pkg-config in AC_RUN_LOG per James
 	Henstridge's suggestion.
 
