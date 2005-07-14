@@ -51,6 +51,7 @@ struct _Package
   GHashTable *required_versions; /* hash from name to RequiredVersion */
   GSList *conflicts; /* list of RequiredVersion */
   gboolean uninstalled; /* used the -uninstalled file */
+  int path_position; /* used to order packages by position in path of their .pc file, lower number means earlier in path */
 };
 
 Package *get_package              (const char *name);

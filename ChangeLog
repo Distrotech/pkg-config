@@ -1,5 +1,14 @@
+2001-10-28  Havoc Pennington  <hp@pobox.com>
+
+	* pkg.c: track position of package in the path search order, 
+	and sort packages accordingly before assembling flags lists, 
+	reported by Jacob Berkman
+
+	* parse.c (get_compat_package): set path position to maxint,
+	always at end of path
+
 2001-10-28  Havoc Pennington  <hp@pobox.com>	
-	
+
 	* pkg.c (add_search_dir): put the search path in the right order
 
 2001-10-28  Havoc Pennington  <hp@pobox.com>	

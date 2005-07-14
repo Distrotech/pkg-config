@@ -35,8 +35,10 @@ static void verify_package (Package *pkg);
 
 static GHashTable *packages = NULL;
 static GHashTable *locations = NULL;
+static GHashTable *path_positions = NULL;
 static GHashTable *globals = NULL;
 static GSList *search_dirs = NULL;
+static int scanned_dir_count = 0;
 
 gboolean disable_uninstalled = FALSE;
 
@@ -117,6 +119,8 @@ scan_dir (const char *dirname)
     }
 
   debug_spew ("Scanning directory '%s'\n", dirname);
+
+  scanned_dir_count += 1;
   
   while ((dent = readdir (dir)))
     {
@@ -144,7 +148,9 @@ scan_dir (const char *dirname)
               strcpy (filename + dirnamelen + 1, dent->d_name);
               
               g_hash_table_insert (locations, pkgname, filename);
-
+              g_hash_table_insert (path_positions, pkgname,
+                                   GINT_TO_POINTER (scanned_dir_count));
+              
               debug_spew ("Will find package '%s' in file '%s'\n",
                           pkgname, filename);
             }
@@ -168,6 +174,7 @@ package_init ()
       
       packages = g_hash_table_new (g_str_hash, g_str_equal);
       locations = g_hash_table_new (g_str_hash, g_str_equal);
+      path_positions = g_hash_table_new (g_str_hash, g_str_equal);
       
       g_slist_foreach (search_dirs, (GFunc)scan_dir, NULL);
       scan_dir (PKGLIBDIR);
@@ -265,6 +272,12 @@ internal_get_package (const char *name, gboolean warn, gboolean check_compat)
       return NULL;
     }
 
+  pkg->path_position =
+    GPOINTER_TO_INT (g_hash_table_lookup (path_positions, pkg->name));
+
+  debug_spew ("Path position of '%s' is %d\n",
+              pkg->name, pkg->path_position);
+  
   if (strstr (location, "uninstalled.pc"))
     pkg->uninstalled = TRUE;
   
@@ -415,15 +428,42 @@ get_requires (Package *pkg)
   return pkg->requires;
 }
 
-static void
-recursive_fill_list (Package *pkg, GetListFunc func, GSList **listp)
+static int
+pathposcmp (gconstpointer a, gconstpointer b)
 {
-  GSList *tmp;
+  const Package *pa = a;
+  const Package *pb = b;
+
+  if (pa->path_position < pb->path_position)
+    return -1;
+  else if (pa->path_position > pb->path_position)
+    return 1;
+  else
+    return 0;
+}
+
+static GSList*
+packages_sort_by_path_position (GSList *list)
+{
+  return g_slist_sort (list, pathposcmp);
+}
+
+static void
+fill_one_level (Package *pkg, GetListFunc func, GSList **listp)
+{
   GSList *copy;
 
   copy = g_slist_copy ((*func)(pkg));
 
   *listp = g_slist_concat (*listp, copy);
+}
+
+static void
+recursive_fill_list (Package *pkg, GetListFunc func, GSList **listp)
+{
+  GSList *tmp;
+
+  fill_one_level (pkg, func, listp);
   
   tmp = pkg->requires;
 
@@ -433,6 +473,62 @@ recursive_fill_list (Package *pkg, GetListFunc func, GSList **listp)
 
       tmp = g_slist_next (tmp);
     }
+}
+
+static void
+fill_list_in_path_order_single_package (Package *pkg, GetListFunc func,
+                                        GSList **listp)
+{
+  /* First we get the list in natural/recursive order, then
+   * stable sort by path position
+   */
+  GSList *packages;
+  GSList *tmp;
+  
+  packages = g_slist_append (packages, pkg);
+  recursive_fill_list (pkg, get_requires, &packages);
+
+  packages = packages_sort_by_path_position (packages);
+
+  tmp = packages;
+  while (tmp != NULL)
+    {
+      fill_one_level (tmp->data, func, listp);
+      
+      tmp = tmp->next;
+    }
+
+  g_slist_free (packages);
+}
+
+static void
+fill_list_in_path_order (GSList *packages, GetListFunc func,
+                         GSList **listp)
+{
+  GSList *tmp;
+  GSList *expanded;
+
+  expanded = NULL;
+  tmp = packages;
+  while (tmp != NULL)
+    {
+      expanded = g_slist_append (expanded, tmp->data);
+      recursive_fill_list (tmp->data, get_requires, &expanded);
+
+      tmp = tmp->next;
+    }
+
+  expanded = packages_sort_by_path_position (expanded);
+
+  tmp = expanded;
+  while (tmp != NULL)
+    {
+      fill_one_level (tmp->data, func, listp);
+      
+      tmp = tmp->next;
+    }
+
+  g_slist_free (expanded);
 }
 
 static gint
@@ -574,7 +670,7 @@ get_merged (Package *pkg, GetListFunc func)
   GSList *dups_list = NULL;
   char *retval;
   
-  recursive_fill_list (pkg, func, &dups_list);
+  fill_list_in_path_order_single_package (pkg, func, &dups_list);
   
   list = string_list_strip_duplicates (dups_list);
 
@@ -594,7 +690,7 @@ get_merged_from_back (Package *pkg, GetListFunc func)
   GSList *dups_list = NULL;
   char *retval;
   
-  recursive_fill_list (pkg, func, &dups_list);
+  fill_list_in_path_order_single_package (pkg, func, &dups_list);
   
   list = string_list_strip_duplicates_from_back (dups_list);
 
@@ -615,13 +711,7 @@ get_multi_merged (GSList *pkgs, GetListFunc func)
   GSList *list;
   char *retval;
 
-  tmp = pkgs;
-  while (tmp != NULL)
-    {
-      recursive_fill_list (tmp->data, func, &dups_list);  
-      
-      tmp = g_slist_next (tmp);
-    }
+  fill_list_in_path_order (pkgs, func, &dups_list);
   
   list = string_list_strip_duplicates (dups_list);
 
@@ -642,13 +732,7 @@ get_multi_merged_from_back (GSList *pkgs, GetListFunc func)
   GSList *list;
   char *retval;
 
-  tmp = pkgs;
-  while (tmp != NULL)
-    {
-      recursive_fill_list (tmp->data, func, &dups_list);  
-      
-      tmp = g_slist_next (tmp);
-    }
+  fill_list_in_path_order (pkgs, func, &dups_list);
   
   list = string_list_strip_duplicates_from_back (dups_list);
 
@@ -683,7 +767,6 @@ package_get_L_libs (Package *pkg)
     pkg->L_libs_merged = get_merged (pkg, get_L_libs);
 
   return pkg->L_libs_merged;
-
 }
 
 char *

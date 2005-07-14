@@ -1011,6 +1011,8 @@ get_compat_package (const char *name)
   debug_spew ("Looking for '%s' using legacy -config scripts\n", name);
   
   pkg = g_new0 (Package, 1);
+
+  pkg->path_position = G_MAXINT;
   
   if (strcmp (name, "glib") == 0)
     {
