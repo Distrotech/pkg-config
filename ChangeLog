@@ -1,3 +1,19 @@
+2004-05-08  Scott James Remnant  <scott@netsplit.com>
+
+	Improve pkg-config's configure instructure and bring it bang
+	up to date.
+
+	* pkg.m4: Complete rewrite.
+	(PKG_PROG_PKG_CONFIG): if PKG_CONFIG not defined, find the
+	pkg-config in the path or $host-pkg-config if cross-compiling,
+	check that is of at least version 0.9.0 or one given.
+	(_PKG_CONFIG): internal macro to call pkg-config.
+	(PKG_CHECK_MODULES): same semantics as the previous incarnation
+	except you can prevent pkg-config from being called by defining
+	xxx_CFLAGS and xxx_LIBS yourself, additionally all results are
+	cached.
+	* README, pkg-config.1: Adjust documentation to match.
+
 2003-05-09  Havoc Pennington  <hp@redhat.com>
 
 	* pkg.m4: improve error message a bit, from Tim Janik
