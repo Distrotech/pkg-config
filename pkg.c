@@ -506,6 +506,12 @@ get_requires (Package *pkg)
   return pkg->requires;
 }
 
+static GSList *
+get_requires_private (Package *pkg)
+{
+  return pkg->requires_private;
+}
+
 static int
 pathposcmp (gconstpointer a, gconstpointer b)
 {
@@ -590,7 +596,8 @@ recursive_fill_list (Package *pkg, GetListFunc func, GSList **listp)
 
 static void
 fill_list_single_package (Package *pkg, GetListFunc func,
-                          GSList **listp, gboolean in_path_order)
+                          GSList **listp, gboolean in_path_order,
+			  gboolean include_private)
 {
   /* First we get the list in natural/recursive order, then
    * stable sort by path position
@@ -601,7 +608,9 @@ fill_list_single_package (Package *pkg, GetListFunc func,
   /* Get list of packages */
   packages = NULL;
   packages = g_slist_append (packages, pkg);
-  recursive_fill_list (pkg, get_requires, &packages);
+  recursive_fill_list (pkg,
+		       include_private ? get_requires_private : get_requires,
+		       &packages);
   
   if (in_path_order)
     {
@@ -626,7 +635,7 @@ fill_list_single_package (Package *pkg, GetListFunc func,
 
 static void
 fill_list (GSList *packages, GetListFunc func,
-           GSList **listp, gboolean in_path_order)
+           GSList **listp, gboolean in_path_order, gboolean include_private)
 {
   GSList *tmp;
   GSList *expanded;
@@ -636,7 +645,9 @@ fill_list (GSList *packages, GetListFunc func,
   while (tmp != NULL)
     {
       expanded = g_slist_append (expanded, tmp->data);
-      recursive_fill_list (tmp->data, get_requires, &expanded);
+      recursive_fill_list (tmp->data,
+			   include_private ? get_requires_private : get_requires,
+			   &expanded);
 
       tmp = tmp->next;
     }
@@ -740,7 +751,7 @@ verify_package (Package *pkg)
   
   /* Make sure we have the right version for all requirements */
 
-  iter = pkg->requires;
+  iter = pkg->requires_private;
 
   while (iter != NULL)
     {
@@ -776,7 +787,7 @@ verify_package (Package *pkg)
    * (inefficient algorithm, who cares)
    */
   
-  recursive_fill_list (pkg, get_requires, &requires);
+  recursive_fill_list (pkg, get_requires_private, &requires);
   recursive_fill_list (pkg, get_conflicts, &conflicts);
 
   requires_iter = requires;
@@ -918,13 +929,15 @@ verify_package (Package *pkg)
 }
 
 static char*
-get_merged (Package *pkg, GetListFunc func, gboolean in_path_order)
+get_merged (Package *pkg, GetListFunc func, gboolean in_path_order,
+	    gboolean include_private)
 {
   GSList *list;
   GSList *dups_list = NULL;
   char *retval;
   
-  fill_list_single_package (pkg, func, &dups_list, in_path_order);
+  fill_list_single_package (pkg, func, &dups_list, in_path_order,
+			    include_private);
   
   list = string_list_strip_duplicates (dups_list);
 
@@ -938,13 +951,15 @@ get_merged (Package *pkg, GetListFunc func, gboolean in_path_order)
 }
 
 static char*
-get_merged_from_back (Package *pkg, GetListFunc func, gboolean in_path_order)
+get_merged_from_back (Package *pkg, GetListFunc func, gboolean in_path_order,
+		      gboolean include_private)
 {
   GSList *list;
   GSList *dups_list = NULL;
   char *retval;
   
-  fill_list_single_package (pkg, func, &dups_list, in_path_order);
+  fill_list_single_package (pkg, func, &dups_list, in_path_order,
+			    include_private);
   
   list = string_list_strip_duplicates_from_back (dups_list);
 
@@ -958,14 +973,15 @@ get_merged_from_back (Package *pkg, GetListFunc func, gboolean in_path_order)
 }
 
 static char*
-get_multi_merged (GSList *pkgs, GetListFunc func, gboolean in_path_order)
+get_multi_merged (GSList *pkgs, GetListFunc func, gboolean in_path_order,
+		  gboolean include_private)
 {
   GSList *tmp;
   GSList *dups_list = NULL;
   GSList *list;
   char *retval;
 
-  fill_list (pkgs, func, &dups_list, in_path_order);
+  fill_list (pkgs, func, &dups_list, in_path_order, include_private);
   
   list = string_list_strip_duplicates (dups_list);
 
@@ -979,14 +995,15 @@ get_multi_merged (GSList *pkgs, GetListFunc func, gboolean in_path_order)
 }
 
 static char*
-get_multi_merged_from_back (GSList *pkgs, GetListFunc func, gboolean in_path_order)
+get_multi_merged_from_back (GSList *pkgs, GetListFunc func,
+			    gboolean in_path_order, gboolean include_private)
 {
   GSList *tmp;
   GSList *dups_list = NULL;
   GSList *list;
   char *retval;
 
-  fill_list (pkgs, func, &dups_list, in_path_order);
+  fill_list (pkgs, func, &dups_list, in_path_order, include_private);
   
   list = string_list_strip_duplicates_from_back (dups_list);
 
@@ -1006,7 +1023,8 @@ package_get_l_libs (Package *pkg)
    * order, so static linking works.
    */
   if (pkg->l_libs_merged == NULL)
-    pkg->l_libs_merged = get_merged_from_back (pkg, get_l_libs, FALSE);
+    pkg->l_libs_merged = get_merged_from_back (pkg, get_l_libs, FALSE,
+					       !ignore_private_libs);
 
   return pkg->l_libs_merged;
 }
@@ -1014,7 +1032,8 @@ package_get_l_libs (Package *pkg)
 char *
 packages_get_l_libs (GSList     *pkgs)
 {
-  return get_multi_merged_from_back (pkgs, get_l_libs, FALSE);
+  return get_multi_merged_from_back (pkgs, get_l_libs, FALSE,
+				     !ignore_private_libs);
 }
 
 char *
@@ -1022,7 +1041,8 @@ package_get_L_libs (Package *pkg)
 {
   /* We want these in search path order so the -L flags don't override PKG_CONFIG_PATH */
   if (pkg->L_libs_merged == NULL)
-    pkg->L_libs_merged = get_merged (pkg, get_L_libs, TRUE);
+    pkg->L_libs_merged = get_merged (pkg, get_L_libs, TRUE,
+				     !ignore_private_libs);
 
   return pkg->L_libs_merged;
 }
@@ -1030,14 +1050,15 @@ package_get_L_libs (Package *pkg)
 char *
 packages_get_L_libs (GSList     *pkgs)
 {
-  return get_multi_merged (pkgs, get_L_libs, TRUE);
+  return get_multi_merged (pkgs, get_L_libs, TRUE, !ignore_private_libs);
 }
 
 char *
 package_get_other_libs (Package *pkg)
 {
   if (pkg->other_libs_merged == NULL)
-    pkg->other_libs_merged = get_merged (pkg, get_other_libs, TRUE);
+    pkg->other_libs_merged = get_merged (pkg, get_other_libs, TRUE,
+					 !ignore_private_libs);
 
   return pkg->other_libs_merged;
 }
@@ -1045,7 +1066,7 @@ package_get_other_libs (Package *pkg)
 char *
 packages_get_other_libs (GSList   *pkgs)
 {
-  return get_multi_merged (pkgs, get_other_libs, TRUE);
+  return get_multi_merged (pkgs, get_other_libs, TRUE, !ignore_private_libs);
 }
 
 char *
@@ -1088,7 +1109,7 @@ package_get_I_cflags (Package *pkg)
 {
   /* sort by path position so PKG_CONFIG_PATH affects -I flag order */
   if (pkg->I_cflags_merged == NULL)
-    pkg->I_cflags_merged = get_merged (pkg, get_I_cflags, TRUE);
+    pkg->I_cflags_merged = get_merged (pkg, get_I_cflags, TRUE, FALSE);
 
   return pkg->I_cflags_merged;
 }
@@ -1097,14 +1118,14 @@ char *
 packages_get_I_cflags (GSList     *pkgs)
 {
   /* sort by path position so PKG_CONFIG_PATH affects -I flag order */
-  return get_multi_merged (pkgs, get_I_cflags, TRUE);
+  return get_multi_merged (pkgs, get_I_cflags, TRUE, FALSE);
 }
 
 char *
 package_get_other_cflags (Package *pkg)
 {
   if (pkg->other_cflags_merged == NULL)
-    pkg->other_cflags_merged = get_merged (pkg, get_other_cflags, TRUE);
+    pkg->other_cflags_merged = get_merged (pkg, get_other_cflags, TRUE, FALSE);
 
   return pkg->other_cflags_merged;
 }
@@ -1112,7 +1133,7 @@ package_get_other_cflags (Package *pkg)
 char *
 packages_get_other_cflags (GSList *pkgs)
 {
-  return get_multi_merged (pkgs, get_other_cflags, TRUE);
+  return get_multi_merged (pkgs, get_other_cflags, TRUE, FALSE);
 }
 
 char *

@@ -1,5 +1,33 @@
 2005-06-27  Tollef Fog Heen  <tfheen@err.no>
 
+	All those Requires.private changes are thanks to James
+	Henstridge.  Thanks!
+	
+	* check/private-dep.pc, check/public-dep.pc,
+	  check/requires-test.pc: New files, data for the
+	check-requires-private test.
+
+	* check/check-requires-private: New test to check for
+	Requires.private support.
+
+	* check/Makefile.am (EXTRA_DIST, TESTS): Add Requires.private
+	test.
+
+	* pkg.h (struct _Package): Add requires_private
+
+	* pkg.c (get_requires_private, fill_list_single_package) 
+	(fill_list, verify_package, verify_package, get_merged) 
+	(get_merged_from_back, get_multi_merged) 
+	(get_multi_merged_from_back, package_get_l_libs) 
+	(packages_get_l_libs, package_get_L_libs, packages_get_L_libs) 
+	(package_get_other_libs, packages_get_other_libs) 
+	(package_get_I_cflags, packages_get_I_cflags) 
+	(package_get_other_cflags, packages_get_other_cflags): Handle
+	private requires and cascading changes.
+
+	* parse.c (parse_requires_private, parse_conflicts) 
+	(parse_package_file): Handle Requires.private
+
 	* pkg.m4: Add PKG_CHECK_EXISTS to check if a module exists.
 	Thanks to James Henstridge for the patch.
 

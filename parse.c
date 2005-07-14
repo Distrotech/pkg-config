@@ -563,6 +563,55 @@ parse_requires (Package *pkg, const char *str, const char *path)
 }
 
 static void
+parse_requires_private (Package *pkg, const char *str, const char *path)
+{
+  GSList *parsed;
+  GSList *iter;
+  char *trimmed;
+  
+  if (pkg->requires_private)
+    {
+      verbose_error ("Requires.private field occurs twice in '%s'\n", path);
+
+      exit (1);
+    }
+
+  trimmed = trim_and_sub (pkg, str, path);
+  parsed = parse_module_list (pkg, trimmed, path);
+  g_free (trimmed);
+  
+  iter = parsed;
+  while (iter != NULL)
+    {
+      Package *req;
+      RequiredVersion *ver = iter->data;
+      
+      req = get_package (ver->name);
+
+      if (req == NULL)
+        {
+          verbose_error ("Package '%s', required by '%s', not found\n",
+                         ver->name, pkg->name ? pkg->name : path);
+          
+          exit (1);
+        }
+
+      if (pkg->required_versions == NULL)
+        pkg->required_versions = g_hash_table_new (g_str_hash, g_str_equal);
+      
+      g_hash_table_insert (pkg->required_versions, ver->name, ver);
+      
+      pkg->requires_private = g_slist_prepend (pkg->requires_private, req);
+
+      iter = g_slist_next (iter);
+    }
+
+  g_slist_free (parsed);
+  
+  pkg->requires_private = g_slist_reverse (pkg->requires_private);
+}
+
+static void
 parse_conflicts (Package *pkg, const char *str, const char *path)
 {
   GSList *parsed;
@@ -896,10 +945,12 @@ parse_line (Package *pkg, const char *untrimmed, const char *path, gboolean igno
         parse_description (pkg, p, path);
       else if (strcmp (tag, "Version") == 0)
         parse_version (pkg, p, path);
+      else if (strcmp (tag, "Requires.private") == 0)
+	parse_requires_private (pkg, p, path);
       else if (strcmp (tag, "Requires") == 0)
-	     {
+	{
           if (ignore_requires == FALSE)
-              parse_requires (pkg, p, path);
+	    parse_requires (pkg, p, path);
           else
 	    goto cleanup;
         }
@@ -1052,6 +1103,11 @@ parse_package_file (const char *path, gboolean ignore_requires, gboolean ignore_
                    path);
   g_string_free (str, TRUE);
   fclose(f);
+
+  /* make ->requires_private include a copy of the public requires too */
+  pkg->requires_private = g_slist_concat(pkg->requires_private,
+					 g_slist_copy (pkg->requires));
+
   return pkg;
 }
 

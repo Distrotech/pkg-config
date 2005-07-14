@@ -57,6 +57,7 @@ struct _Package
   char *url;
   char *pcfiledir; /* directory it was loaded from */
   GSList *requires;
+  GSList *requires_private;
   GSList *l_libs;
   char   *l_libs_merged;
   GSList *L_libs;
