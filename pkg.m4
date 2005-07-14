@@ -15,7 +15,7 @@ AC_DEFUN(PKG_CHECK_MODULES, [
      echo "*** to the full path to pkg-config."
      echo "*** Or see http://www.freedesktop.org/software/pkgconfig to get pkg-config."
   else
-     PKG_CONFIG_MIN_VERSION=0.8.0
+     PKG_CONFIG_MIN_VERSION=0.9.0
      if $PKG_CONFIG --atleast-pkgconfig-version $PKG_CONFIG_MIN_VERSION; then
         AC_MSG_CHECKING(for $2)
 
