@@ -12,13 +12,6 @@
 #include <sys/wait.h>
 #include <sys/types.h>
 
-/* since we never use getc_unlocked now we should really
- * do something to speed up read_one_line
- */
-#  define flockfile(f) (void)1
-#  define funlockfile(f) (void)1
-#  define getc_unlocked(f) getc(f)
-
 #ifdef NATIVE_WIN32
 
 #define STRICT
@@ -43,8 +36,6 @@ read_one_line (FILE *stream, GString *str)
   gboolean quoted = FALSE;
   gboolean comment = FALSE;
   int n_read = 0;
-  
-  flockfile (stream);
 
   g_string_truncate (str, 0);
   
@@ -52,7 +43,7 @@ read_one_line (FILE *stream, GString *str)
     {
       int c;
       
-      c = getc_unlocked (stream);
+      c = getc (stream);
 
       if (c == EOF)
 	{
@@ -76,7 +67,7 @@ read_one_line (FILE *stream, GString *str)
 	    case '\r':
 	    case '\n':
 	      {
-		int next_c = getc_unlocked (stream);
+		int next_c = getc (stream);
 
 		if (!(c == EOF ||
 		      (c == '\r' && next_c == '\n') ||
@@ -103,7 +94,7 @@ read_one_line (FILE *stream, GString *str)
 	      break;
 	    case '\n':
 	      {
-		int next_c = getc_unlocked (stream);
+		int next_c = getc (stream);
 
 		if (!(c == EOF ||
 		      (c == '\r' && next_c == '\n') ||
@@ -120,8 +111,6 @@ read_one_line (FILE *stream, GString *str)
     }
 
  done:
-
-  funlockfile (stream);
 
   return n_read > 0;
 }

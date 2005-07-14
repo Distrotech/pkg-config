@@ -5,6 +5,7 @@
 	(parse_line): allow spelling Cflags as CFlags, pointed out by Tim
 	(get_compat_package): support legacy script gnome-vfs-config for
 	package name "libgnomevfs"
+	(read_one_line): just blow away all the stupid getc_unlocked crap
 
 2001-06-18  Havoc Pennington  <hp@pobox.com>
 
