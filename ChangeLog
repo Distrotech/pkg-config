@@ -1,3 +1,8 @@
+2005-04-22  Tollef Fog Heen  <tfheen@err.no>
+
+	* main.c (main): Re-add PKG_CONFIG_LIBDIR support which was
+	removed by mistake.
+
 2005-04-14  Tollef Fog Heen  <tfheen@err.no>
 
 	* configure.in: Bump to 0.17.2

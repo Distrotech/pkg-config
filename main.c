@@ -278,13 +278,20 @@ main (int argc, char **argv)
       debug_spew ("PKG_CONFIG_DEBUG_SPEW variable enabling debug spew\n");
     }
 
-  search_path = getenv ("PKG_CONFIG_PATH");
-  if (search_path) 
+  if (getenv("PKG_CONFIG_LIBDIR") != NULL) 
     {
-      add_search_dirs(search_path, G_SEARCHPATH_SEPARATOR_S);
+      add_search_dirs(getenv("PKG_CONFIG_LIBDIR"), G_SEARCHPATH_SEPARATOR_S);
     }
-
-  add_search_dirs(PKG_CONFIG_PC_PATH, G_SEARCHPATH_SEPARATOR_S);
+  else
+    {
+      search_path = getenv ("PKG_CONFIG_PATH");
+      if (search_path) 
+	{
+	  add_search_dirs(search_path, G_SEARCHPATH_SEPARATOR_S);
+	}
+      
+      add_search_dirs(PKG_CONFIG_PC_PATH, G_SEARCHPATH_SEPARATOR_S);
+    }
 
 #ifdef G_OS_WIN32
   {
