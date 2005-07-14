@@ -14,8 +14,8 @@ AC_DEFUN(PKG_CHECK_MODULES,
      echo "*** in your path, or set the PKG_CONFIG environment variable"
      echo "*** to the full path to pkg-config."
   else
-     if ! $PKG_CONFIG --atleast-pkgconfig-version 0.6.0; then
-        echo "*** Your version of pkg-config is too old. You need version 0.6.0 or newer."
+     if ! $PKG_CONFIG --atleast-pkgconfig-version 0.7.0; then
+        echo "*** Your version of pkg-config is too old. You need version 0.7.0 or newer."
      else
         AC_MSG_CHECKING(for $2)
 
@@ -47,37 +47,4 @@ AC_DEFUN(PKG_CHECK_MODULES,
   else
      ifelse([$4], , AC_MSG_ERROR([Library requirements ($2) not met; consider adjusting the PKG_CONFIG_PATH environment variable if your libraries are in a nonstandard prefix so pkg-config can find them.]), [$4])
   fi
-])
-
-
-dnl Check if the C compiler accepts a certain C flag, and if so adds it to
-dnl CFLAGS
-AC_DEFUN(PKG_CHECK_CFLAG, [
-  AC_MSG_CHECKING(if C compiler accepts $1)
-  save_CFLAGS="$CFLAGS"
-
-  dnl make sure we add it only once
-  dnl this one doesn't seem to work: *[\ \	]$1[\ \ ]*) ;;
-  case " $CFLAGS " in
-  *\ $1\ *) echo $ac_n "(already in CFLAGS) ... " ;;
-  *\ $1\	*) echo $ac_n "(already in CFLAGS) ... " ;;
-  *\	$1\ *) echo $ac_n "(already in CFLAGS) ... " ;;
-  *\	$1\	*) echo $ac_n "(already in CFLAGS) ... " ;;
-  *) CFLAGS="$CFLAGS $1" ;;
-  esac
-
-  AC_TRY_COMPILE([#include <stdio.h>], [printf("hello");],
-	         [ AC_MSG_RESULT(yes)],dnl
-	         [ CFLAGS="$save_CFLAGS" AC_MSG_RESULT(no) ])
-])
-
-dnl add $ACLOCAL_FLAGS (and optionally more dirs) to the aclocal
-dnl commandline, so make can work even if it needs to rerun aclocal
-AC_DEFUN(PKG_ACLOCALFLAGS,
-[
-  test -n "$ACLOCAL_FLAGS" && ACLOCAL="$ACLOCAL $ACLOCAL_FLAGS"
-
-  for i in "$1"; do
-    ACLOCAL="$ACLOCAL -I $i"
-  done
 ])

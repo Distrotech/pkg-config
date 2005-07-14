@@ -1,3 +1,7 @@
+2001-06-05  Havoc Pennington  <hp@redhat.com>
+
+	* pkg.m4: remove unrelated macros
+
 2001-05-20  Havoc Pennington  <hp@pobox.com>
 
 	* configure.in: revert package name change, just screwing things up.
