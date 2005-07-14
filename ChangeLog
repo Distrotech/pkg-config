@@ -1,7 +1,7 @@
 2005-06-27  Tollef Fog Heen  <tfheen@err.no>
 
 	All those Requires.private changes are thanks to James
-	Henstridge.  Thanks!
+	Henstridge.  Thanks!  Freedesktop #3097
 	
 	* check/private-dep.pc, check/public-dep.pc,
 	  check/requires-test.pc: New files, data for the
@@ -29,16 +29,16 @@
 	(parse_package_file): Handle Requires.private
 
 	* pkg.m4: Add PKG_CHECK_EXISTS to check if a module exists.
-	Thanks to James Henstridge for the patch.
+	Thanks to James Henstridge for the patch.  Freedesktop #3530
 
 2005-06-26  Tollef Fog Heen  <tfheen@err.no>
 
 	* pkg.m4: Get rid of caching again.  This breaks too much stuff,
-	and pkg-config doesn't take much time to run.
+	and pkg-config doesn't take much time to run.  Freedesktop #3550
 
 	* glib-patches/configure.in-fd_set.diff: Patch to grep for fd_set
 	rather than fd_mask.  Thanks to David Wolfe for the fix.  This
-	should make pkg-config happier on QNX.
+	should make pkg-config happier on QNX.  Gnome #129687
 
 2005-06-03  Tollef Fog Heen  <tfheen@err.no>
 
