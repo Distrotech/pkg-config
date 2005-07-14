@@ -12,7 +12,7 @@ AC_PROG_CC
 
 AC_DEFUN([PKG_CONFIG_FIND_PC_PATH],
 [AC_ARG_WITH(pc_path,
- [  --with-pc-path"          Override the default search path for .pc files ],
+ [  --with-pc-path          Override the default search path for .pc files ],
  [ pc_path="$withval"
    AC_MSG_CHECKING([for default search path for .pc files])
    AC_MSG_RESULT([$pc_path])],

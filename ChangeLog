@@ -1,5 +1,7 @@
 2005-04-02  Tollef Fog Heen  <tfheen@err.no>
 
+	* configure.in: Remove extraneous " from --with-pc-path's help
+
 	* glib-patches/mkinstalldirs.update.diff: cvs admin -ko to avoid
 	having the Id CVS keyword being expanded, which broke the
 	application of the patch.
