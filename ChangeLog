@@ -1,3 +1,9 @@
+2005-04-12  Tollef Fog Heen  <tfheen@err.no>
+
+	* pkg.m4: Patch from James Henstridge to evaluate second argument
+	again.  (Freedesktop #2987, Gnome #300232, Debian #303878,
+	#303969)
+
 2005-04-02  Tollef Fog Heen  <tfheen@err.no>
 
 	* glib-patches/remove-strsignal-prototype.diff: Remove strsignal
