@@ -265,6 +265,12 @@ error messages if you specify your own ACTION-IF-NOT-FOUND.
 However, it will set the variable MYSTUFF_PKG_ERRORS, which you can 
 use to display what went wrong.
 
+If you want to use MYSTUFF_LIBS and MYSTUFF_CFLAGS as Makefile.am
+variables (i.e. $(MYSTUFF_LIBS)) then you have to add
+AC_SUBST(MYSTUFF_LIBS) to your configure.in so automake can find the
+variable. You don't need to do this if you use the @MYSTUFF_LIBS@
+syntax in your Makefile.am instead of $(MYSTUFF_LIBS).
+
 .SH METADATA FILE SYNTAX
 To add a library to the set of packages \fIpkg-config\fP knows about,
 simply install a \fI.pc\fP file. You should install this file to 

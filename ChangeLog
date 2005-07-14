@@ -1,5 +1,10 @@
 2002-02-28  Havoc Pennington  <hp@redhat.com>
 
+	* pkg-config.1: add a note about the need for AC_SUBST with
+	PKG_CHECK_MODULES. Stefan Kost pointed this out.
+
+2002-02-28  Havoc Pennington  <hp@redhat.com>
+
         Fix for static linking, -l flag order for libs in multiple prefixes
 	
 	* pkg.c: only sort -L/-I by PKG_CONFIG_PATH order, don't sort 
