@@ -1,5 +1,8 @@
 2005-04-02  Tollef Fog Heen  <tfheen@err.no>
 
+	* glib-patches/distcheckfix.diff: Move glibconfig-sysdefs.h and
+	glibconfig.h to DISTCLEANFILES since they're made by configure.
+
 	* parse.c (parse_libs): Handle -framework as a single argument.
 	(Freedesktop #1278)
 
