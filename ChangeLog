@@ -1,5 +1,7 @@
 2005-04-01  Tollef Fog Heen  <tfheen@err.no>
 
+	Patches provided by Steve Langasek <vorlon@debian.org>
+
 	* configure.in: Try to detect whether this architecture supports
 	inter-library dependencies.  If so, we default to assuming that
 	this support is used and link to the minimal set of libraries
