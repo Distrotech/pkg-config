@@ -12,11 +12,12 @@
 #include <sys/wait.h>
 #include <sys/types.h>
 
-#ifndef HAVE_FLOCKFILE
+/* since we never use getc_unlocked now we should really
+ * do something to speed up read_one_line
+ */
 #  define flockfile(f) (void)1
 #  define funlockfile(f) (void)1
 #  define getc_unlocked(f) getc(f)
-#endif /* !HAVE_FLOCKFILE */
 
 #ifdef NATIVE_WIN32
 

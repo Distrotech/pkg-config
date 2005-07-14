@@ -1,4 +1,8 @@
 2001-06-05  Havoc Pennington  <hp@redhat.com>
+	
+	* parse.c: never use flockfile, getc_unlocked
+
+2001-06-05  Havoc Pennington  <hp@redhat.com>
 
 	* pkg.m4: remove unrelated macros
 
