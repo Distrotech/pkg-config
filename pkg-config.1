@@ -210,15 +210,23 @@ from automatically trying to override the value of the variable
 Also this option is available only on Windows. It sets the name of the
 variable that \fIpkg-config\fP automatically sets as described above.
 
+.TP
+.I "--static"
+Output libraries suitable for static linking.  That means including
+any private libraries in the output.  This relies on proper tagging in
+the .pc files, else a too large number of libraries will ordinarily be
+output.
+
 .SH ENVIRONMENT VARIABLES
 
 .TP
 .I "PKG_CONFIG_PATH"
-A colon-separated (on Windows, semicolon-separated)
-list of directories to search for .pc files.
-The default directory will always be searched after searching the
-path; the default is \fIlibdir\fP/pkgconfig where \fIlibdir\fP
-is the libdir where \fIpkg-config\fP was installed.
+A colon-separated (on Windows, semicolon-separated) list of
+directories to search for .pc files.  The default directory will
+always be searched after searching the path; the default is
+\fIlibdir\fP/pkgconfig:\fIdatadir\fP/pkgconfig where \fIlibdir\fP is
+the libdir where \fIpkg-config\fP and \fIdatadir\fP is the datadir
+where \fIpkg-config\fP was installed.
 
 .TP
 .I "PKG_CONFIG_DEBUG_SPEW"
@@ -318,6 +326,7 @@ URL: http://www.gtk.org
 Requires: glib-2.0 = 1.3.1
 Conflicts: foobar <= 4.5
 Libs: -L${libdir} -lgobject-1.3
+Libs.private: -lm
 Cflags: -I${includedir}/glib-2.0 -I${libdir}/glib/include 
 .fi
 
@@ -381,6 +390,12 @@ Don't add any flags for required packages; \fIpkg-config\fP will
 add those automatically.
 
 .TP
+.I "Libs.private:"
+This line should list any private libraries in use.  Private libraries
+are libraries which are not exposed through your library, but are
+needed in the case of static linking.
+
+.TP
 .I "Cflags:"
 This line should list the compile flags specific to your package. 
 Don't add any flags for required packages; \fIpkg-config\fP will 
@@ -396,6 +411,6 @@ various hackers in the GNOME team.  It was inspired by Owen Taylor's
 \fIgtk-config\fP program.
 
 .SH BUGS
-Hah!
 
-
+\fIpkg-config\fP does not handle mixing of parameters with and without
+= well.  Stick with one.

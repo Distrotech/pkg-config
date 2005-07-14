@@ -1,3 +1,52 @@
+2005-05-21  Tollef Fog Heen  <tfheen@err.no>
+
+	* check/check-libs-private: New test to check for support for
+	private libraries.
+
+	* check/simple.pc (prefix): Add Libs.private header.
+
+	* check/Makefile.am (TESTS): Add check-libs-private test
+
+	* pkg.h: Adjust function prototypes.
+
+	* pkg.c: Add global ignore_private_libs variable.
+	(scan_dir): Use the correct free function.  Stop leaking file
+	descriptors.
+	(package_get_l_libs, packages_get_l_libs, package_get_L_libs,
+	packages_get_L_libs): Stop the recursive silliness and go back to
+	old behaviour.
+	(packages_get_all_libs): Adjust parameters to packages_get_*_libs
+	(enable_private_libs, disable_private_libs): Trivial helper
+	functions.
+
+	* pkg-config.1: Update documentation wrt search path (Debian
+	#308942), update docs for Libs.private and add the problematic
+	handling of mixing = and non-= arguments to the bugs section.
+
+	* parse.h: Adjust parameters for parse_package_file to get private
+	libs or not.
+
+	* parse.c (trim_and_sub): Fix memory leak.
+	(_do_parse_libs): New function including what's common between
+	parse_libs and parse_private_libs.
+	(parse_libs_private): New function.  Handle private libraries.
+	(parse_line): Add . to the list of valid characters in headers (so
+	Libs.private works correctly.
+	(parse_line): Fix memory leaks.
+	(parse_line): Handle Libs.private.
+	(parse_package_file): Fix memory leak.
+
+	* main.c (main): Fix memory leak.
+
+	* NEWS: Document changes to inter-library handling.
+
+	* main.c (main): Handle inter-library dependencies old-style, but
+	do private libraries too.  Adjust parameters to
+	packages_get_*_libs.
+
+	* configure.in: Change comment wrt inter-library handling to talk
+	about private libraries instead.
+
 2005-04-22  Tollef Fog Heen  <tfheen@err.no>
 
 	* main.c (main): Re-add PKG_CONFIG_LIBDIR support which was

@@ -1,3 +1,24 @@
+pkg-config 0.18
+===
+ - The inter-library dependencies check was too tight and caused
+ problems if one used the --no-undefined flag to libtool on Solaris
+ (since it there expands to -Wl,-z,defs which disallows undefined
+ symbols).  Add a new name to .pc files: Libs.private which will not
+ be listed in the output of --libs unless --static is also given.
+
+ Private libraries are libraries which are needed in the case of
+ static linking or on platforms not supporting inter-library
+ dependencies.  They are not supposed to be used for libraries which
+ are exposed through the library in question.  An example of an
+ exposed library is GTK+ exposing Glib.  A common example of a private
+ library is libm.
+
+ Generally, if include another library's headers in your own, it's a
+ public dependency and not a private one.
+
+ Thanks a lot to James Henstridge for both the bug and the following
+ discussion.
+
 pkg-config 0.17.2
 ===
  - Don't go into an infinite loop allocating more and more memory when

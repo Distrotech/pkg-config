@@ -72,16 +72,18 @@ struct _Package
   GSList *conflicts; /* list of RequiredVersion */
   gboolean uninstalled; /* used the -uninstalled file */
   int path_position; /* used to order packages by position in path of their .pc file, lower number means earlier in path */
+  int libs_num; /* Number of times the "Libs" header has been seen */
+  int libs_private_num;  /* Number of times the "Libs.private" header has been seen */
 };
 
 Package *get_package               (const char *name);
-char *   package_get_l_libs        (Package    *pkg, gboolean recurse);
-char *   packages_get_l_libs       (GSList     *pkgs, gboolean recurse);
-char *   package_get_L_libs        (Package    *pkg, gboolean recurse);
-char *   packages_get_L_libs       (GSList     *pkgs, gboolean recurse);
+char *   package_get_l_libs        (Package    *pkg);
+char *   packages_get_l_libs       (GSList     *pkgs);
+char *   package_get_L_libs        (Package    *pkg);
+char *   packages_get_L_libs       (GSList     *pkgs);
 char *   package_get_other_libs    (Package    *pkg);
 char *   packages_get_other_libs   (GSList     *pkgs);
-char *   packages_get_all_libs     (GSList     *pkgs, gboolean recurse);
+char *   packages_get_all_libs     (GSList     *pkgs);
 char *   package_get_I_cflags      (Package    *pkg);
 char *   packages_get_I_cflags     (GSList     *pkgs);
 char *   package_get_other_cflags  (Package    *pkg);

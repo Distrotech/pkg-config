@@ -413,6 +413,11 @@ main (int argc, char **argv)
   else
     debug_spew ("Error printing disabled\n");
 
+  if (want_static_lib_list)
+    enable_private_libs();
+  else
+    disable_private_libs();
+
   if (want_my_version)
     {
       printf ("%s\n", VERSION);
@@ -445,6 +450,8 @@ main (int argc, char **argv)
       g_string_append (str, pkgname);
       g_string_append (str, " ");
     }
+
+  poptFreeContext (opt_context);
 
   g_strstrip (str->str);
 
@@ -601,14 +608,14 @@ main (int argc, char **argv)
 
   if (want_l_libs)
     {
-      char *str = packages_get_l_libs (packages, want_static_lib_list);
+      char *str = packages_get_l_libs (packages);
       printf ("%s ", str);
       g_free (str);
       need_newline = TRUE;
     }
   else if (want_L_libs)
     {
-      char *str = packages_get_L_libs (packages, want_static_lib_list);
+      char *str = packages_get_L_libs (packages);
       printf ("%s ", str);
       g_free (str);
       need_newline = TRUE;
@@ -622,7 +629,7 @@ main (int argc, char **argv)
     }
   else if (want_libs)
     {
-      char *str = packages_get_all_libs (packages, want_static_lib_list);
+      char *str = packages_get_all_libs (packages);
       printf ("%s ", str);
       g_free (str);
       need_newline = TRUE;

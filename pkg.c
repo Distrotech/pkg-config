@@ -55,6 +55,7 @@ static int scanned_dir_count = 0;
 
 gboolean disable_uninstalled = FALSE;
 gboolean ignore_requires = FALSE;
+gboolean ignore_private_libs = TRUE;
 
 void
 add_search_dir (const char *path)
@@ -145,7 +146,7 @@ scan_dir (const char *dirname)
     }
 
   dir = opendir (dirname_copy);
-  free (dirname_copy);
+  g_free (dirname_copy);
   if (!dir)
     {
       debug_spew ("Cannot open directory '%s' in package search path: %s\n",
@@ -196,6 +197,7 @@ scan_dir (const char *dirname)
                       dent->d_name);
         }
     }
+  closedir(dir);
 }
 
 static Package *
@@ -320,7 +322,7 @@ internal_get_package (const char *name, gboolean warn, gboolean check_compat)
     }
 
   debug_spew ("Reading '%s' from file '%s'\n", name, location);
-  pkg = parse_package_file (location, ignore_requires);
+  pkg = parse_package_file (location, ignore_requires, ignore_private_libs);
   
   if (pkg == NULL)
     {
@@ -998,10 +1000,8 @@ get_multi_merged_from_back (GSList *pkgs, GetListFunc func, gboolean in_path_ord
 }
 
 char *
-package_get_l_libs (Package *pkg, gboolean recurse)
+package_get_l_libs (Package *pkg)
 {
-  if (!recurse)
-    return string_list_to_string (get_l_libs(pkg));
   /* We don't want these in search path order, rather in dependency
    * order, so static linking works.
    */
@@ -1012,41 +1012,14 @@ package_get_l_libs (Package *pkg, gboolean recurse)
 }
 
 char *
-packages_get_l_libs (GSList     *pkgs, gboolean recurse)
+packages_get_l_libs (GSList     *pkgs)
 {
-  if (!recurse) {
-    GSList *tmp;
-    GSList *list;
-    GSList *dups_list = NULL;
-    char *retval;
-
-    tmp = pkgs;
-    while (tmp != NULL)
-    {
-      dups_list = g_slist_concat (dups_list, g_slist_copy(get_l_libs(tmp->data)));
-      tmp = tmp->next;
-    }
-
-    list = string_list_strip_duplicates_from_back (dups_list);
-    g_slist_free (dups_list);
-  
-    retval = string_list_to_string (list);
-
-    g_slist_free (list);
-  
-    return retval;
-
-  }
-
   return get_multi_merged_from_back (pkgs, get_l_libs, FALSE);
 }
 
 char *
-package_get_L_libs (Package *pkg, gboolean recurse)
+package_get_L_libs (Package *pkg)
 {
-  if (!recurse)
-    return string_list_to_string (get_L_libs(pkg));
-
   /* We want these in search path order so the -L flags don't override PKG_CONFIG_PATH */
   if (pkg->L_libs_merged == NULL)
     pkg->L_libs_merged = get_merged (pkg, get_L_libs, TRUE);
@@ -1055,31 +1028,8 @@ package_get_L_libs (Package *pkg, gboolean recurse)
 }
 
 char *
-packages_get_L_libs (GSList     *pkgs, gboolean recurse)
+packages_get_L_libs (GSList     *pkgs)
 {
-  if (!recurse) {
-    GSList *tmp;
-    GSList *list;
-    GSList *dups_list = NULL;
-    char *retval;
-
-    tmp = pkgs;
-    while (tmp != NULL)
-    {
-      dups_list = g_slist_concat (dups_list, g_slist_copy(get_L_libs(tmp->data)));
-      tmp = tmp->next;
-    }
-
-    list = string_list_strip_duplicates_from_back (dups_list);
-    g_slist_free (dups_list);
-  
-    retval = string_list_to_string (list);
-
-    g_slist_free (list);
-  
-    return retval;
-  }
-
   return get_multi_merged (pkgs, get_L_libs, TRUE);
 }
 
@@ -1099,7 +1049,7 @@ packages_get_other_libs (GSList   *pkgs)
 }
 
 char *
-packages_get_all_libs (GSList *pkgs, gboolean recurse)
+packages_get_all_libs (GSList *pkgs)
 {
   char *l_libs;
   char *L_libs;
@@ -1110,8 +1060,8 @@ packages_get_all_libs (GSList *pkgs, gboolean recurse)
   str = g_string_new ("");  
 
   other_libs = packages_get_other_libs (pkgs);
-  L_libs = packages_get_L_libs (pkgs, recurse);
-  l_libs = packages_get_l_libs (pkgs, recurse);
+  L_libs = packages_get_L_libs (pkgs);
+  l_libs = packages_get_l_libs (pkgs);
 
   if (other_libs)
     g_string_append (str, other_libs);
@@ -1503,3 +1453,14 @@ print_package_list (void)
   g_hash_table_foreach (locations, packages_foreach, GINT_TO_POINTER (mlen + 1));
 }
 
+void
+enable_private_libs(void)
+{
+  ignore_private_libs = FALSE;
+}
+
+void
+disable_private_libs(void)
+{
+  ignore_private_libs = TRUE;
+}

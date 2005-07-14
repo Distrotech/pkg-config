@@ -8,4 +8,5 @@ Description: Dummy pkgconfig test package for testing pkgconfig
 Version: 1.0.0
 Requires:
 Libs: -lsimple
+Libs.private: -lm
 Cflags: -I${includedir}
