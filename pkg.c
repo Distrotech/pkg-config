@@ -331,6 +331,10 @@ string_list_strip_duplicates (GSList *list)
           nodups = g_slist_prepend (nodups, tmp->data);
           g_hash_table_insert (table, tmp->data, tmp->data);
         }
+      else
+        {
+          debug_spew (" removing duplicate \"%s\"\n", tmp->data);
+        }
 
       tmp = g_slist_next (tmp);
     }
@@ -363,7 +367,11 @@ string_list_strip_duplicates_from_back (GSList *list)
           nodups = g_slist_prepend (nodups, tmp->data);
           g_hash_table_insert (table, tmp->data, tmp->data);
         }
-
+      else
+        {
+          debug_spew (" removing duplicate (from back) \"%s\"\n", tmp->data);
+        }
+      
       tmp = g_slist_next (tmp);
     }
 
@@ -433,13 +441,48 @@ pathposcmp (gconstpointer a, gconstpointer b)
 {
   const Package *pa = a;
   const Package *pb = b;
-
+  
   if (pa->path_position < pb->path_position)
     return -1;
   else if (pa->path_position > pb->path_position)
     return 1;
   else
     return 0;
+}
+
+static void
+spew_package_list (const char *name,
+                   GSList     *list)
+{
+  GSList *tmp;
+
+  debug_spew (" %s: ", name);
+  
+  tmp = list;
+  while (tmp != NULL)
+    {
+      Package *pkg = tmp->data;
+      debug_spew (" %s ", pkg->name);
+      tmp = tmp->next;
+    }
+  debug_spew ("\n");
+}
+
+static void
+spew_string_list (const char *name,
+                  GSList     *list)
+{
+  GSList *tmp;
+
+  debug_spew (" %s: ", name);
+  
+  tmp = list;
+  while (tmp != NULL)
+    {
+      debug_spew (" %s ", tmp->data);
+      tmp = tmp->next;
+    }
+  debug_spew ("\n");
 }
 
 static GSList*
@@ -488,8 +531,12 @@ fill_list_in_path_order_single_package (Package *pkg, GetListFunc func,
   packages = g_slist_append (packages, pkg);
   recursive_fill_list (pkg, get_requires, &packages);
 
+  spew_package_list ("original", packages);
+  
   packages = packages_sort_by_path_position (packages);
 
+  spew_package_list ("sorted", packages);
+  
   tmp = packages;
   while (tmp != NULL)
     {
@@ -518,8 +565,12 @@ fill_list_in_path_order (GSList *packages, GetListFunc func,
       tmp = tmp->next;
     }
 
+  spew_package_list ("original", expanded);
+  
   expanded = packages_sort_by_path_position (expanded);
 
+  spew_package_list ("sorted", expanded);
+  
   tmp = expanded;
   while (tmp != NULL)
     {

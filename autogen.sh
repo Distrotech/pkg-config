@@ -59,6 +59,9 @@ perl -p -i.bak -e "s/[a-zA-Z0-9]+_DATA/noinst_DATA/g" `find glib-1.2.8 -name Mak
 perl -p -i.bak -e "s/info_TEXINFOS/noinst_TEXINFOS/g" `find glib-1.2.8 -name Makefile.am`
 perl -p -i.bak -e "s/man_MANS/noinst_MANS/g" `find glib-1.2.8 -name Makefile.am`
 
+## patch gslist.c to have stable sort
+perl -p -w -i.bak -e 's/if \(compare_func\(l1->data,l2->data\) < 0\)/if \(compare_func\(l1->data,l2->data\) <= 0\)/g' glib-1.2.8/gslist.c
+
 (cd glib-1.2.8 && libtoolize --copy --force && $ACLOCAL $ACLOCAL_FLAGS && $AUTOMAKE && autoconf)
 
 if test -z "$*"; then
