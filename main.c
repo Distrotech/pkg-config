@@ -13,13 +13,15 @@
 
 static int want_debug_spew = 0;
 static int want_verbose_errors = 0;
+static int want_stdout_errors = 0;
 
 void
 debug_spew (const char *format, ...)
 {
   va_list args;
   gchar *str;
-
+  FILE* stream;
+  
   g_return_if_fail (format != NULL);
   
   if (!want_debug_spew)
@@ -29,8 +31,13 @@ debug_spew (const char *format, ...)
   str = g_strdup_vprintf (format, args);
   va_end (args);
 
-  fputs (str, stderr);
-  fflush (stdout);
+  if (want_stdout_errors)
+    stream = stdout;
+  else
+    stream = stderr;
+  
+  fputs (str, stream);
+  fflush (stream);
   
   g_free (str);
 }
@@ -193,6 +200,8 @@ main (int argc, char **argv)
       "show verbose information about missing or conflicting packages" },
     { "silence-errors", 0, POPT_ARG_NONE, &want_silence_errors, 0,
       "show verbose information about missing or conflicting packages" },
+    { "errors-to-stdout", 0, POPT_ARG_NONE, &want_stdout_errors, 0,
+      "print errors from --print-errors to stdout not stderr" },
     POPT_AUTOHELP
     { NULL, 0, 0, NULL, 0 }
   };

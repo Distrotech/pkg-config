@@ -1,6 +1,7 @@
 
 dnl PKG_CHECK_MODULES(GSTUFF, gtk+-2.0 >= 1.3 glib = 1.3.4, action-if, action-not)
 dnl defines GSTUFF_LIBS, GSTUFF_CFLAGS, see pkg-config man page
+dnl also defines GSTUFF_PKG_ERRORS on error
 AC_DEFUN(PKG_CHECK_MODULES,
 [
   succeeded=no
@@ -16,6 +17,7 @@ AC_DEFUN(PKG_CHECK_MODULES,
   else
      if ! $PKG_CONFIG --atleast-pkgconfig-version 0.7.0; then
         echo "*** Your version of pkg-config is too old. You need version 0.7.0 or newer."
+        echo "*** See http://www.freedesktop.org/software/pkgconfig"
      else
         AC_MSG_CHECKING(for $2)
 
@@ -33,8 +35,10 @@ AC_DEFUN(PKG_CHECK_MODULES,
         else
             $1_CFLAGS=""
             $1_LIBS=""
-            ## If we have a custom action on failure, don't print errors
-            ifelse([$4], , $PKG_CONFIG --print-errors "$2",)
+            ## If we have a custom action on failure, don't print errors, but 
+            ## do set a variable so people can do so.
+            $1_PKG_ERRORS=`$PKG_CONFIG --errors-to-stdout --print-errors "$2"`
+            ifelse([$4], ,echo $1_PKG_ERRORS,)
         fi
 
         AC_SUBST($1_CFLAGS)

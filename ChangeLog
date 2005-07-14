@@ -1,5 +1,12 @@
 2001-06-05  Havoc Pennington  <hp@redhat.com>
-	
+
+	* main.c: add --errors-to-stdout so you can capture them with backticks
+
+	* pkg.m4: set FOO_PKG_ERRORS after a failed check, so people can
+	print the errors. 
+
+2001-06-05  Havoc Pennington  <hp@redhat.com>
+
 	* parse.c: never use flockfile, getc_unlocked
 
 2001-06-05  Havoc Pennington  <hp@redhat.com>

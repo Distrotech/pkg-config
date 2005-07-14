@@ -83,6 +83,10 @@ option is only useful with options such as "--cflags" or
 "--modversion" that print errors by default. The PKG_CONFIG_DEBUG_SPEW
 environment variable overrides this option.
 
+.TP
+.I "--errors-to-stdout"
+If printing errors, print them to stdout rather than the default stderr
+
 .PP
 The following options are used to compile and link programs:
 .TP
@@ -212,6 +216,8 @@ If a module is missing or has the wrong version, by default configure
 will abort with a message. To replace the default action, 
 specify an ACTION-IF-NOT-FOUND. PKG_CHECK_MODULES will not print any
 error messages if you specify your own ACTION-IF-NOT-FOUND.
+However, it will set the variable MYSTUFF_PKG_ERRORS, which you can 
+use to display what went wrong.
 
 .SH METADATA FILE SYNTAX
 To add a library to the set of packages \fIpkg-config\fP knows about,
