@@ -1,3 +1,8 @@
+2005-06-03  Tollef Fog Heen  <tfheen@err.no>
+
+	* pkg.m4, README, pkg-config.1: s/configure.in/configure.ac/,
+	thanks to Morten Brix Pedersen <morten@wtf.dk>
+
 2005-05-21  Tollef Fog Heen  <tfheen@err.no>
 
 	* check/check-libs-private: New test to check for support for

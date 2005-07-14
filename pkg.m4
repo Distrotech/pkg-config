@@ -65,7 +65,7 @@ fi[]dnl
 #
 # Note that if there is a possibility the first call to
 # PKG_CHECK_MODULES might not happen, you should be sure to include an
-# explicit call to PKG_PROG_PKG_CONFIG in your configure.in
+# explicit call to PKG_PROG_PKG_CONFIG in your configure.ac
 #
 #
 # --------------------------------------------------------------

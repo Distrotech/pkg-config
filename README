@@ -4,7 +4,7 @@ flags when compiling/linking a lot easier.
 Report bugs at http://bugzilla.freedesktop.org/
 
 
-To use pkg-config, do something like the following in your configure.in
+To use pkg-config, do something like the following in your configure.ac
 
     PKG_CHECK_MODULES([GNOME], [gtk > 1.2.8 gnomeui >= 1.2.0])
 
