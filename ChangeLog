@@ -1,3 +1,9 @@
+2004-06-08  Scott James Remnant  <scott@netsplit.com>
+
+	* README: Change gnome.org reference to freedesktop.org
+	* AUTHORS: Add myself here, I guess.
+	* pkg.m4: Mine! (fix copyright)
+
 2004-05-08  Scott James Remnant  <scott@netsplit.com>
 
 	Improve pkg-config's configure instructure and bring it bang

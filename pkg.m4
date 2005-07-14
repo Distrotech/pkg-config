@@ -1,7 +1,6 @@
 # pkg.m4 - Macros to locate and utilise pkg-config.            -*- Autoconf -*-
 # 
-# Copyright (C) 2004 Red Hat Inc.
-# Written by Scott James Remnant <scott@netsplit.com>.
+# Copyright © 2004 Scott James Remnant <scott@netsplit.com>.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by

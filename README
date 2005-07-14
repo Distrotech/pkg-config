@@ -1,8 +1,8 @@
 pkg-config is a script to make putting together all the build
 flags when compiling/linking a lot easier.
 
-Report bugs at http://bugzilla.gnome.org (pkg-config is in no way 
-gnome-specific but gnome.org was a convenient bug tracker).
+Report bugs at http://bugzilla.freedesktop.org/
+
 
 To use pkg-config, do something like the following in your configure.in
 
