@@ -38,7 +38,7 @@ AC_DEFUN(PKG_CHECK_MODULES, [
             ## If we have a custom action on failure, don't print errors, but 
             ## do set a variable so people can do so.
             $1_PKG_ERRORS=`$PKG_CONFIG --errors-to-stdout --print-errors "$2"`
-            ifelse([$4], ,echo $1_PKG_ERRORS,)
+            ifelse([$4], ,echo $$1_PKG_ERRORS,)
         fi
 
         AC_SUBST($1_CFLAGS)

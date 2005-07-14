@@ -1,3 +1,8 @@
+2001-06-18  Havoc Pennington  <hp@pobox.com>
+
+	* pkg.m4: print the error, not the name of the variable containing
+	it, doh
+
 Sun Jun 17 17:48:45 2001  Tim Janik  <timj@gtk.org>
 
 	* pkg.c (internal_get_package): fix check before parsing a file at
