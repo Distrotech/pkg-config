@@ -652,9 +652,7 @@ add_env_variable_to_list (GSList *list, const gchar *env)
   gchar **values;
   gint i;
 
-  /* FIXME: the separator should be a ';' on Windows
-   */
-  values = g_strsplit (env, ":", 0);
+  values = g_strsplit (env, G_SEARCHPATH_SEPARATOR_S, 0);
   for (i = 0; values[i] != NULL; i++)
     {
       list = g_slist_append (list, g_strdup (values[i]));
@@ -787,8 +785,10 @@ verify_package (Package *pkg)
   /* We make a list of system directories that gcc expects so we can remove
    * them.
    */
+#ifndef G_OS_WIN32
   system_directories = g_slist_append (NULL, g_strdup ("/usr/include"));
-  
+#endif
+
   c_include_path = g_getenv ("C_INCLUDE_PATH");
   if (c_include_path != NULL)
     {

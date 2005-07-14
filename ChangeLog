@@ -1,3 +1,9 @@
+2003-02-19  Tor Lillqvist  <tml@iki.fi>
+
+	* pkg.c (add_env_variable_to_list): Use G_SEARCHPATH_SEPARATOR_S
+	instead of hardcoded ":".
+	(verify_package): Don't use /usr/include on Win32.
+
 2003-02-15  Havoc Pennington  <hp@pobox.com>
 
 	* pkg.c (verify_package): patch from Nalin to use /usr/lib64 as
