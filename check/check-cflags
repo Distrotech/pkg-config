@@ -1,0 +1,10 @@
+#! /bin/sh
+
+set -e
+
+. ${srcdir}/common
+
+ARGS="--cflags simple"
+RESULT=""
+
+run_test

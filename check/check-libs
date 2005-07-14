@@ -1,0 +1,10 @@
+#! /bin/sh
+
+set -e
+
+. ${srcdir}/common
+
+ARGS="--libs simple"
+RESULT="-lsimple"
+
+run_test

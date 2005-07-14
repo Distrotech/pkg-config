@@ -1,0 +1,10 @@
+#! /bin/sh
+
+set -e
+
+. ${srcdir}/common
+
+ARGS="--define-variable=includedir=/includedir/ --cflags simple"
+RESULT="-I/includedir/"
+
+run_test

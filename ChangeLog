@@ -1,3 +1,12 @@
+2005-03-29  Tollef Fog Heen  <tfheen@err.no>
+
+	* check/check-cflags, check/check-define-variable,
+	check/check-libs, check/common, check/Makefile.am,
+	check/simple.pc:  Add simple test framework and begin writing
+	tests.
+
+	* Makefile.am, configure.in: Make in check/ as well.
+
 2005-03-28  Tollef Fog Heen  <tfheen@err.no>
 
 	* glib-patches/distcheckfix.diff: Add some files to CLEANFILES so

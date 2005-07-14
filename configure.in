@@ -67,4 +67,4 @@ AC_FUNC_ALLOCA
 AC_CHECK_FUNCS(setresuid setreuid,break)
 AC_CHECK_HEADERS([dirent.h unistd.h sys/wait.h])
 
-AC_OUTPUT([Makefile])
+AC_OUTPUT([Makefile check/Makefile])
