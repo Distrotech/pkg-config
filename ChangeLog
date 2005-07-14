@@ -1,3 +1,7 @@
+2001-06-06  Havoc Pennington  <hp@redhat.com>
+
+	* pkg.m4: Fix mismatched backtick
+
 2001-06-05  Havoc Pennington  <hp@redhat.com>
 
 	* main.c: add --errors-to-stdout so you can capture them with backticks
