@@ -438,10 +438,22 @@ get_L_libs (Package *pkg)
   return pkg->L_libs;
 }
 
+static GSList*
+get_other_libs (Package *pkg)
+{  
+  return pkg->other_libs;
+}
+
 static GSList *
 get_I_cflags (Package *pkg)
 {
   return pkg->I_cflags;
+}
+
+static GSList *
+get_other_cflags (Package *pkg)
+{
+  return pkg->other_cflags;
 }
 
 static GSList *
@@ -917,36 +929,16 @@ packages_get_L_libs (GSList     *pkgs)
 char *
 package_get_other_libs (Package *pkg)
 {
-  return g_strdup (pkg->other_libs);
+  if (pkg->other_libs_merged == NULL)
+    pkg->other_libs_merged = get_merged (pkg, get_other_libs, TRUE);
+
+  return pkg->other_libs_merged;
 }
 
 char *
 packages_get_other_libs (GSList   *pkgs)
 {
-  GSList *tmp;
-  GString *str;
-  char *retval;
-  
-  str = g_string_new ("");
-  
-  tmp = pkgs;
-  while (tmp != NULL)
-    {
-      Package *pkg = tmp->data;
-
-      if (pkg->other_libs)
-        {
-          g_string_append (str, pkg->other_libs);
-          g_string_append (str, " ");
-        }
-
-      tmp = g_slist_next (tmp);
-    }
-
-  retval = str->str;
-  g_string_free (str, FALSE);
-
-  return retval;
+  return get_multi_merged (pkgs, get_other_libs, TRUE);
 }
 
 char *
@@ -1004,36 +996,16 @@ packages_get_I_cflags (GSList     *pkgs)
 char *
 package_get_other_cflags (Package *pkg)
 {
-  return g_strdup (pkg->other_cflags);
+  if (pkg->other_cflags_merged == NULL)
+    pkg->other_cflags_merged = get_merged (pkg, get_other_cflags, TRUE);
+
+  return pkg->other_cflags_merged;
 }
 
 char *
 packages_get_other_cflags (GSList *pkgs)
 {
-  GSList *tmp;
-  GString *str;
-  char *retval;
-  
-  str = g_string_new ("");
-  
-  tmp = pkgs;
-  while (tmp != NULL)
-    {
-      Package *pkg = tmp->data;
-
-      if (pkg->other_cflags)
-        {
-          g_string_append (str, pkg->other_cflags);
-          g_string_append (str, " ");
-        }
-
-      tmp = g_slist_next (tmp);
-    }
-
-  retval = str->str;
-  g_string_free (str, FALSE);
-
-  return retval;
+  return get_multi_merged (pkgs, get_other_cflags, TRUE);
 }
 
 char *

@@ -60,11 +60,11 @@ struct _Package
   char   *l_libs_merged;
   GSList *L_libs;
   char   *L_libs_merged;
-  char   *other_libs;
+  GSList *other_libs;
   char   *other_libs_merged;
   GSList *I_cflags;
   char   *I_cflags_merged;
-  char *other_cflags;
+  GSList *other_cflags;
   char *other_cflags_merged;
   GHashTable *vars;
   GHashTable *required_versions; /* hash from name to RequiredVersion */

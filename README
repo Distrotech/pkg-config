@@ -1,7 +1,10 @@
 pkg-config is a script to make putting together all the build
 flags when compiling/linking a lot easier.
 
-to use it, do something like the following in your configure.in
+Report bugs at http://bugzilla.gnome.org (pkg-config is in no way 
+gnome-specific but gnome.org was a convenient bug tracker).
+
+To use pkg-config, do something like the following in your configure.in
 
     PKG_CHECK_MODULES(GNOME, gtk > 1.2.8 gnomeui >= 1.2.0)
     AC_SUBST(GNOME_CFLAGS)
