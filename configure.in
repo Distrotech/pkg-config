@@ -36,7 +36,7 @@ AC_ARG_ENABLE(indirect-deps,
                               [list both direct and indirect dependencies. [default=auto]])],,
               [enable_indirect_deps=auto])
 
-AC_MSG_CHECKING([Whether to list both direct and indirect dependencies])
+AC_MSG_CHECKING([whether to list both direct and indirect dependencies])
 case $enable_indirect_deps in
   auto)
     deplib_check_method=`(./libtool --config; echo eval echo \\$deplib_check_method) | sh`
