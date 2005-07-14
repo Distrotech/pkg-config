@@ -1,5 +1,10 @@
 2002-02-01  Havoc Pennington  <hp@redhat.com>
 
+	* pkg.c (verify_package): don't warn about /usr/include /usr/lib
+	in cflags/libs, too annoying to fix
+
+2002-02-01  Havoc Pennington  <hp@redhat.com>
+
         Throughout: cast chars to guchar before passing to isspace, etc., 
 	noted by Morten Welinder
 	

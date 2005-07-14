@@ -673,8 +673,8 @@ verify_package (Package *pkg)
       if (strcmp (iter->data, "-I/usr/include") == 0 ||
           strcmp (iter->data, "-I /usr/include") == 0)
         {
-          verbose_error ("Package %s has -I/usr/include in Cflags; this may cause problems and is not recommended\n",
-                         pkg->name);
+          debug_spew ("Package %s has -I/usr/include in Cflags\n",
+                      pkg->name);
           if (g_getenv ("PKG_CONFIG_ALLOW_SYSTEM_CFLAGS") == NULL)
             {
               iter->data = NULL;
@@ -699,8 +699,8 @@ verify_package (Package *pkg)
       if (strcmp (iter->data, "-L/usr/lib") == 0 ||
           strcmp (iter->data, "-L /usr/lib") == 0)
         {
-          verbose_error ("Package %s has -L/usr/lib in Libs; this may cause problems and is not recommended\n",
-                         pkg->name);
+          debug_spew ("Package %s has -L/usr/lib in Libs\n",
+                      pkg->name);
           if (g_getenv ("PKG_CONFIG_ALLOW_SYSTEM_LIBS") == NULL)
             {              
               iter->data = NULL;
