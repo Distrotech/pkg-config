@@ -1,3 +1,10 @@
+2003-02-22  James Henstridge  <james@daa.com.au>
+
+	* popthelp.c, poptint.h, poptconfig.c, findme.h, popt.h:
+	* poptparse.c: expand licensing header to the version found in the
+	Popt distribution's COPYING file.  See discussion in bug 84804 for
+	details.
+
 2003-02-21  James Henstridge  <james@daa.com.au>
 
 	* pkg.m4: split macro into two parts.  The check for presence of
