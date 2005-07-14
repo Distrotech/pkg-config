@@ -169,12 +169,18 @@ Remember to use \-\-print-errors if you want error messages.
 
 .TP
 .I "--dont-define-prefix"
-This option is available only on Windows and prevents \fIpkg-config\fP
-from automatically setting the variable "prefix" as the same directory
-where \fIpkg-config\fP was installed. (This directory is determined by
-asking the system where \fIpkg-config.exe\fP is located, and if that
-directory is called \fIbin\fP or \fIlib\fP, using its parent
-directory, otherwise itself.)
+This option is available only on Windows. It prevents \fIpkg-config\fP
+from automatically setting the value of the variable "prefix" to the
+directory where \fIpkg-config\fP was installed. (This directory is
+determined by asking the system where \fIpkg-config.exe\fP is located,
+and if that directory is called \fIbin\fP or \fIlib\fP, using its
+parent directory, otherwise itself.)
+
+.TP
+.I "--prefix-variable=PREFIX"
+Also this option is available only on Windows. It sets the name of the
+variable that \fIpkg-config\fP automatically sets to its own
+installation prefix.
 
 .SH ENVIRONMENT VARIABLES
 

@@ -1,3 +1,11 @@
+2001-10-21  Tor Lillqvist  <tml@iki.fi>
+
+	* main.c (main): (Win32): Add option --prefix-variable in case the
+	variable used in a .pc file as "prefix" isn't called
+	"prefix".
+
+	* pkg-config.1: Document it.
+
 2001-10-19  Tor Lillqvist  <tml@iki.fi>
 
 	* main.c: (Win32): Add option --dont-define-prefix on Windows. The

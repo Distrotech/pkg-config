@@ -14,7 +14,6 @@
 static int want_debug_spew = 0;
 static int want_verbose_errors = 0;
 static int want_stdout_errors = 0;
-static int dont_define_prefix = 0;
 
 void
 debug_spew (const char *format, ...)
@@ -145,12 +144,14 @@ main (int argc, char **argv)
   static int want_list = 0;
   static int result;
   static int want_uninstalled = 0;
+  static int dont_define_prefix = 0;
   static char *variable_name = NULL;
   static int want_exists = 0;
   static char *required_atleast_version = NULL;
   static char *required_exact_version = NULL;
   static char *required_max_version = NULL;
   static char *required_pkgconfig_version = NULL;
+  static char *prefix_variable = NULL;
   static int want_silence_errors = 0;
   GString *str;
   GSList *packages = NULL;
@@ -208,6 +209,8 @@ main (int argc, char **argv)
 #ifdef G_OS_WIN32
     { "dont-define-prefix", 0, POPT_ARG_NONE, &dont_define_prefix, 0,
       "don't set the value of prefix based on where pkg-config.exe is installed" },
+    { "prefix-variable", 0, POPT_ARG_STRING, &prefix_variable, 0,
+      "set the name of the variable that pkg-config automatically sets", "PREFIX" },
 #endif
     POPT_AUTOHELP
     { NULL, 0, 0, NULL, 0 }
@@ -341,7 +344,8 @@ main (int argc, char **argv)
 	    *p = '/';
 	  p++;
 	}
-      define_global_variable ("prefix", prefix);
+      define_global_variable (prefix_variable ? prefix_variable : "prefix",
+			      prefix);
     }
 #endif
 
