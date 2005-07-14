@@ -1,3 +1,7 @@
+2002-02-01  Havoc Pennington  <hp@redhat.com>
+
+	* pkg.m4: fix shell portability issue, reported by Morten Welinder
+
 2002-01-24  Havoc Pennington  <hp@redhat.com>
 
 	* pkg.c (print_package_list): make the output halfway attractive
