@@ -661,6 +661,22 @@ verify_package (Package *pkg)
   
   g_slist_free (requires);
   g_slist_free (conflicts);
+
+  iter = pkg->I_cflags;
+  while (iter != NULL)
+    {
+      /* we put things in canonical -I/usr/include (vs. -I /usr/include) format,
+       * but if someone changes it later we may as well be robust
+       */
+      if (strcmp (iter->data, "-I/usr/include") == 0 ||
+          strcmp (iter->data, "-I /usr/include") == 0)
+        {
+          verbose_error ("Package %s has -I/usr/include in Cflags; this may cause problems and is not recommended\n",
+                         pkg->name);
+        }
+
+      iter = iter->next;
+    }
 }
 
 static char*
@@ -1197,20 +1213,37 @@ comparison_to_str (ComparisonType comparison)
 }
 
 static void
+max_len_foreach (gpointer key, gpointer value, gpointer data)
+{
+  int *mlen = data;
+
+  *mlen = MAX (*mlen, strlen (key));
+}
+
+static void
 packages_foreach (gpointer key, gpointer value, gpointer data)
 {
   Package *pkg = get_package (key);
 
   if (pkg != NULL)
     {
-      printf ("%s \t\t%s - %s\n",
-              pkg->key, pkg->name, pkg->description);
+      char *pad;
+
+      pad = g_strnfill (GPOINTER_TO_INT (data) - strlen (pkg->key), ' ');
+      
+      printf ("%s%s%s - %s\n",
+              pkg->key, pad, pkg->name, pkg->description);
+
+      g_free (pad);
     }
 }
 
 void
 print_package_list (void)
 {
-  g_hash_table_foreach (locations, packages_foreach, NULL);
+  int mlen = 0;
+  
+  g_hash_table_foreach (locations, max_len_foreach, &mlen);
+  g_hash_table_foreach (locations, packages_foreach, GINT_TO_POINTER (mlen + 1));
 }
 

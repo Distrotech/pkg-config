@@ -21,7 +21,15 @@ DIE=0
 	DIE=1
 }
 
-(automake --version) < /dev/null > /dev/null 2>&1 || {
+AUTOMAKE=automake-1.4
+ACLOCAL=aclocal-1.4
+
+($AUTOMAKE --version) < /dev/null > /dev/null 2>&1 || {
+        AUTOMAKE=automake
+        ACLOCAL=aclocal
+}
+
+($AUTOMAKE --version) < /dev/null > /dev/null 2>&1 || {
 	echo
 	echo "You must have automake installed to compile $PROJECT."
 	echo "Get ftp://ftp.cygnus.com/pub/home/tromey/automake-1.2d.tar.gz"
@@ -51,20 +59,22 @@ perl -p -i.bak -e "s/[a-zA-Z0-9]+_DATA/noinst_DATA/g" `find glib-1.2.8 -name Mak
 perl -p -i.bak -e "s/info_TEXINFOS/noinst_TEXINFOS/g" `find glib-1.2.8 -name Makefile.am`
 perl -p -i.bak -e "s/man_MANS/noinst_MANS/g" `find glib-1.2.8 -name Makefile.am`
 
-(cd glib-1.2.8 && automake)
+(cd glib-1.2.8 && $AUTOMAKE)
 
 if test -z "$*"; then
 	echo "I am going to run ./configure with no arguments - if you wish "
         echo "to pass any to it, please specify them on the $0 command line."
 fi
 
-echo aclocal $ACLOCAL_FLAGS
-aclocal $ACLOCAL_FLAGS
+libtoolize --copy --force
+
+echo $ACLOCAL $ACLOCAL_FLAGS
+$ACLOCAL $ACLOCAL_FLAGS
 
 # optionally feature autoheader
 (autoheader --version)  < /dev/null > /dev/null 2>&1 && autoheader
 
-automake -a $am_opt
+$AUTOMAKE -a $am_opt
 autoconf
 
 cd $ORIGDIR
