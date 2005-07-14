@@ -64,14 +64,14 @@ fi[]dnl
 # --------------------------------------------------------------
 AC_DEFUN([PKG_CHECK_MODULES],
 [AC_REQUIRE([PKG_PROG_PKG_CONFIG])dnl
-AC_ARG_VAR([$1[]_CFLAGS], [C compiler flags for $1, overriding pkg-config])dnl
-AC_ARG_VAR([$1[]_LIBS], [linker flags for $1, overriding pkg-config])dnl
+AC_ARG_VAR([$1][_CFLAGS], [C compiler flags for $1, overriding pkg-config])dnl
+AC_ARG_VAR([$1][_LIBS], [linker flags for $1, overriding pkg-config])dnl
 
 pkg_failed=no
-AC_CACHE_CHECK([for $1[]_CFLAGS], [pkg_cv_[]$1[]_CFLAGS],
-	[_PKG_CONFIG([$1[]_CFLAGS], [cflags], [[$2]])])
-AC_CACHE_CHECK([for $1[]_LIBS], [pkg_cv_[]$1[]_LIBS],
-	[_PKG_CONFIG([$1[]_LIBS], [libs], [[$2]])])
+AC_CACHE_CHECK([for $1][_CFLAGS], [pkg_cv_][$1][_CFLAGS],
+	[_PKG_CONFIG([$1][_CFLAGS], [cflags], [[$2]])])
+AC_CACHE_CHECK([for $1][_LIBS], [pkg_cv_][$1][_LIBS],
+	[_PKG_CONFIG([$1][_LIBS], [libs], [[$2]])])
 
 if test $pkg_failed = yes; then
 	$1[]_PKG_ERRORS=`$PKG_CONFIG --errors-to-stdout --print-errors "$2"`

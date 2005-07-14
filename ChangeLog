@@ -1,3 +1,7 @@
+2004-07-06  Scott James Remnant  <scott@netsplit.com>
+
+	* pkg.m4: Correct quoting brackets to correctly split the words.
+
 2004-06-08  Scott James Remnant  <scott@netsplit.com>
 
 	* README: Change gnome.org reference to freedesktop.org
