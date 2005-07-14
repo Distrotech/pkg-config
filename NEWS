@@ -1,3 +1,11 @@
+pkg-config 0.16
+===
+
+ - Use a search path, rather than a single default directory.
+ - Fix a bunch of bugs in glib by backporting
+ - More man page fixes
+ - Lots of small fixes and cleanups over the place.
+
 pkg-config 0.15
 ===
 
