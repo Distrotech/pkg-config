@@ -1,3 +1,11 @@
+2003-02-21  James Henstridge  <james@daa.com.au>
+
+	* pkg.m4: split macro into two parts.  The check for presence of
+	pkg-config is now in a helper macro.  The main PKG_CHECK_MODULES
+	macro now AC_REQUIRES() it, so that the pkg-config check is only
+	performed once.
+	Also update quoting to match current practices.
+
 2003-02-19  Tor Lillqvist  <tml@iki.fi>
 
 	* pkg.c (add_env_variable_to_list): Use G_SEARCHPATH_SEPARATOR_S
