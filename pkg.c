@@ -161,7 +161,7 @@ file_readable (const char *path)
 
 
 static Package *
-internal_get_package (const char *name, gboolean warn)
+internal_get_package (const char *name, gboolean warn, gboolean check_compat)
 {
   Package *pkg = NULL;
   const char *location;
@@ -189,7 +189,7 @@ internal_get_package (const char *name, gboolean warn)
 
           un = g_strconcat (name, "-uninstalled", NULL);
 
-          pkg = internal_get_package (un, FALSE);
+          pkg = internal_get_package (un, FALSE, FALSE);
 
           g_free (un);
           
@@ -204,25 +204,30 @@ internal_get_package (const char *name, gboolean warn)
       debug_spew ("Reading '%s' from file '%s'\n", name, location);
     }
   
-  if (location == NULL)
+  if (location == NULL && check_compat)
     {
       pkg = get_compat_package (name);
-      
-      if (pkg == NULL)
+
+      if (pkg)
         {
-          if (warn)
-            verbose_error ("Package %s was not found in the pkg-config search path.\n"
-                           "Perhaps you should add the directory containing `%s.pc'\n"
-                           "to the PKG_CONFIG_PATH environment variable\n",
-                           name, name);
+          debug_spew ("Returning values for '%s' from a legacy -config script\n",
+                      name);
+          
+          return pkg;
         }
-
-      debug_spew ("Returning values for '%s' from a legacy -config script\n",
-                  name);
-      
-      return pkg;
     }
+      
+  if (pkg == NULL)
+    {
+      if (warn)
+        verbose_error ("Package %s was not found in the pkg-config search path.\n"
+                       "Perhaps you should add the directory containing `%s.pc'\n"
+                       "to the PKG_CONFIG_PATH environment variable\n",
+                       name, name);
 
+      return NULL;
+    }
+  
   pkg = parse_package_file (location);
   
   if (pkg == NULL)
@@ -264,7 +269,7 @@ internal_get_package (const char *name, gboolean warn)
 Package *
 get_package (const char *name)
 {
-  return internal_get_package (name, TRUE);
+  return internal_get_package (name, TRUE, TRUE);
 }
 
 static GSList*

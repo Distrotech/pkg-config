@@ -1,3 +1,12 @@
+2001-06-14  Havoc Pennington  <hp@redhat.com>
+
+	* pkg.c (internal_get_package): don't fall back to legacy -config
+	scripts for the -uninstalled case.
+
+2001-06-07  Havoc Pennington  <hp@redhat.com>
+
+	* pkg.m4: add URL to no-pkg-config error message
+
 2001-06-06  Havoc Pennington  <hp@redhat.com>
 
 	* pkg.m4: Fix mismatched backtick

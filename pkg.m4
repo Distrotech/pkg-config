@@ -13,6 +13,7 @@ AC_DEFUN(PKG_CHECK_MODULES, [
      echo "*** The pkg-config script could not be found. Make sure it is"
      echo "*** in your path, or set the PKG_CONFIG environment variable"
      echo "*** to the full path to pkg-config."
+     echo "*** Or see http://www.freedesktop.org/software/pkgconfig to get pkg-config."
   else
      if ! $PKG_CONFIG --atleast-pkgconfig-version 0.7.0; then
         echo "*** Your version of pkg-config is too old. You need version 0.7.0 or newer."
