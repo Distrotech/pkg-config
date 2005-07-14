@@ -59,7 +59,7 @@ perl -p -i.bak -e "s/[a-zA-Z0-9]+_DATA/noinst_DATA/g" `find glib-1.2.8 -name Mak
 perl -p -i.bak -e "s/info_TEXINFOS/noinst_TEXINFOS/g" `find glib-1.2.8 -name Makefile.am`
 perl -p -i.bak -e "s/man_MANS/noinst_MANS/g" `find glib-1.2.8 -name Makefile.am`
 
-(cd glib-1.2.8 && $AUTOMAKE)
+(cd glib-1.2.8 && libtoolize --copy --force && $ACLOCAL $ACLOCAL_FLAGS && $AUTOMAKE && autoconf)
 
 if test -z "$*"; then
 	echo "I am going to run ./configure with no arguments - if you wish "
