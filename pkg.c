@@ -44,13 +44,6 @@
 #include <stdlib.h>
 #include <ctype.h>
 
-#ifdef G_OS_WIN32
-/* No hardcoded paths in the binary, thanks */
-#undef PKGLIBDIR
-/* It's OK to leak this, as PKGLIBDIR is invoked only once */
-#define PKGLIBDIR g_strconcat (g_win32_get_package_installation_directory (PACKAGE, NULL), "\\lib\\pkgconfig", NULL)
-#endif
-
 static void verify_package (Package *pkg);
 
 static GHashTable *packages = NULL;
@@ -67,6 +60,27 @@ void
 add_search_dir (const char *path)
 {
   search_dirs = g_slist_append (search_dirs, g_strdup (path));
+}
+
+void
+add_search_dirs (const char *path, const char *separator)
+{
+      char **search_dirs;
+      char **iter;
+
+      search_dirs = g_strsplit (path, separator, -1);
+    
+      iter = search_dirs;
+      while (*iter)
+        {
+          debug_spew ("Adding directory '%s' from PKG_CONFIG_PATH\n",
+                      *iter);
+          add_search_dir (*iter);
+          
+          ++iter;
+        }
+      
+      g_strfreev (search_dirs);
 }
 
 #ifdef G_OS_WIN32
@@ -208,11 +222,6 @@ void
 package_init ()
 {
   static gboolean initted = FALSE;
-  const char *pkglibdir;
-
-  pkglibdir = g_getenv ("PKG_CONFIG_LIBDIR");
-  if (pkglibdir == NULL)
-    pkglibdir = PKGLIBDIR;
 
   if (!initted)
     {
@@ -225,7 +234,6 @@ package_init ()
       add_virtual_pkgconfig_package ();
 
       g_slist_foreach (search_dirs, (GFunc)scan_dir, NULL);
-      scan_dir (pkglibdir);
     }
 }
 

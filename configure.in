@@ -10,6 +10,20 @@ AM_PROG_LIBTOOL
 
 AC_PROG_CC
 
+AC_DEFUN([PKG_CONFIG_FIND_PC_PATH],
+[AC_ARG_WITH(pc_path,
+ [  --with-pc-path"          Override the default search path for .pc files ],
+ [ pc_path="$withval"
+   AC_MSG_CHECKING([for default search path for .pc files])
+   AC_MSG_RESULT([$pc_path])],
+ [pc_path=`echo $pkglibdir:$pkgdatadir`])
+ AC_SUBST([pc_path])
+dnl AC_DEFINE_UNQUOTED(PKG_CONFIG_PC_PATH,["$pc_path"],[Default search path for .pc files])
+
+])
+
+PKG_CONFIG_FIND_PC_PATH
+
 AC_MSG_CHECKING([for Win32])
 case "$host" in
   *-*-mingw*)

@@ -13,9 +13,30 @@
 
 2005-03-18  Tollef Fog Heen  <tfheen@err.no>
 
+	* main.c (main): Use add_search_dirs for both the compile-time
+	defined pc_path and the run-time defined PKG_CONFIG_PATH.
+
+	* pkg.h: Add prototype for add_search_dirs.
+
+	* pkg.c (add_search_dirs): Add new function which takes a
+	delimiter-separated list as input and add_search_dir's it.
+	(package_init): Remove knowledge about which dirs should be
+	initially added.  Moved this to main.c(main)
+
+	* ChangeLog: Add emacs variables to set the date to this
+	ChangeLog's standard format
+
+	* Makefile.am (INCLUDES): Pass PKG_CONFIG_PCPATH on to main.c
+
+	* configure.in: Add --with-pc-path to define the default search
+	path for .pc files.  (Freedesktop #119, #648)
+
+2005-03-18  Tollef Fog Heen  <tfheen@err.no>
+
 	* glib-patches/pthread-config-fix.diff: Add patch to detect
 	pthreads properly on some architectures.  Thanks to Michael
 	Haubenwallner for reporting this bug and providing a patch.
+	(Freedesktop #1617)
 
 2005-02-21  Tollef Fog Heen  <tfheen@err.no>
 
@@ -801,3 +822,8 @@ Tue Jun  6 2000  Martijn van Beers  <martijn@earthling.net>
 	* pkg-config: removed the pc_name_pkg functionality
 	* pkg-config: show help and error out when there are no arguments
 	* pkg-config: get the version from configure
+
+;;
+;; Local variables:
+;; add-log-time-format: add-log-iso8601-time-string
+;; End:

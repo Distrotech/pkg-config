@@ -15,7 +15,7 @@ EXTRA_DIST = $(m4_DATA) $(man_MANS) README.win32
 
 bin_PROGRAMS = pkg-config
 
-INCLUDES=-DPKGLIBDIR="\"$(pkglibdir)\"" $(included_glib_includes)
+INCLUDES=-DPKG_CONFIG_PC_PATH="\"$(pc_path)\"" $(included_glib_includes)
 
 pkg_config_SOURCES= \
 	pkg.h \

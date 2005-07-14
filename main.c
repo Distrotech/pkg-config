@@ -36,6 +36,13 @@
 #undef STRICT
 #endif
 
+#ifdef G_OS_WIN32
+/* No hardcoded paths in the binary, thanks */
+#undef PKGLIBDIR
+/* It's OK to leak this, as PKGLIBDIR is invoked only once */
+#define PKG_CONFIG_PATH g_strconcat (g_win32_get_package_installation_directory (PACKAGE, NULL), "\\lib\\pkgconfig", NULL)
+#endif
+
 static int want_debug_spew = 0;
 static int want_verbose_errors = 0;
 static int want_stdout_errors = 0;
@@ -188,6 +195,9 @@ main (int argc, char **argv)
   GSList *packages = NULL;
   char *search_path;
   char *pcbuilddir;
+  const char *pkglibdir;
+  char **search_dirs;
+  char **iter;
   gboolean need_newline;
 
   const char *pkgname;
@@ -266,25 +276,12 @@ main (int argc, char **argv)
     }
 
   search_path = getenv ("PKG_CONFIG_PATH");
-  if (search_path)
+  if (search_path) 
     {
-      char **search_dirs;
-      char **iter;
-
-      search_dirs = g_strsplit (search_path, G_SEARCHPATH_SEPARATOR_S, -1);
-
-      iter = search_dirs;
-      while (*iter)
-        {
-          debug_spew ("Adding directory '%s' from PKG_CONFIG_PATH\n",
-                      *iter);
-          add_search_dir (*iter);
-
-          ++iter;
-        }
-
-      g_strfreev (search_dirs);
+      add_search_dirs(search_path, G_SEARCHPATH_SEPARATOR_S);
     }
+
+  add_search_dirs(PKG_CONFIG_PC_PATH, G_SEARCHPATH_SEPARATOR_S);
 
 #ifdef G_OS_WIN32
   {
