@@ -101,12 +101,12 @@ scan_dir (const char *dirname)
   /* Use a copy of dirname cause Win32 opendir doesn't like
    * superfluous trailing (back)slashes in the directory name.
    */
-  char *dirname_copy = strdup (dirname);
+  char *dirname_copy = g_strdup (dirname);
 
   if (dirnamelen > 1 && dirname[dirnamelen-1] == G_DIR_SEPARATOR)
     {
       dirnamelen--;
-      dirname_copy[dirnamelen-1] = '\0';
+      dirname_copy[dirnamelen] = '\0';
     }
 
   dir = opendir (dirname_copy);

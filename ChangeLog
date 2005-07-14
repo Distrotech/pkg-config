@@ -1,3 +1,9 @@
+2002-02-12  Havoc Pennington  <hp@redhat.com>
+
+	* pkg.c (scan_dir): use g_strdup, and fix the location where 
+	we assign the nul byte, so we don't mangle things for directories
+	that end in '/' - reported by Enrico Scholz
+
 2002-02-07  Havoc Pennington  <hp@redhat.com>
 
 	* configure.in: 0.11.0
