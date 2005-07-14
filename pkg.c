@@ -801,8 +801,8 @@ verify_package (Package *pkg)
       /* we put things in canonical -I/usr/include (vs. -I /usr/include) format,
        * but if someone changes it later we may as well be robust
        */
-      if (((strcmp (iter->data, "-I") == 0) && (offset = 2))||
-          ((strcmp (iter->data, "-I ") == 0) && (offset = 3)))
+      if (((strncmp (iter->data, "-I", 2) == 0) && (offset = 2))||
+          ((strncmp (iter->data, "-I ", 3) == 0) && (offset = 3)))
         {
 	  if (offset == 0)
 	    {
