@@ -1,8 +1,11 @@
 2005-04-02  Tollef Fog Heen  <tfheen@err.no>
 
+	* glib-patches/distcheckfix.diff: Move glibconfig.h.win32 and
+	config.h.win32 too.
+	
 	* glib-patches/distcheckfix.diff: Move glibconfig-sysdefs.h and
 	glibconfig.h to DISTCLEANFILES since they're made by configure.
-
+		
 	* parse.c (parse_libs): Handle -framework as a single argument.
 	(Freedesktop #1278)
 

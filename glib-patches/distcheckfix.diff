@@ -13,7 +13,7 @@
  	fi \
  	&& cp glib.spec $(distdir)
 +
-+DISTCLEANFILES = glibconfig-sysdefs.h glibconfig.h
++DISTCLEANFILES = glibconfig-sysdefs.h glibconfig.h glibconfig.h.win32 \ 
++               config.h.win32
 +
-+CLEANFILES = stamp-gc-h  makefile.msc \
-+	glibconfig.h.win32 config.h.win32
++CLEANFILES = stamp-gc-h  makefile.msc
