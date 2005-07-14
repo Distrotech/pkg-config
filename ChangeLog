@@ -1,3 +1,7 @@
+2001-10-28  Havoc Pennington  <hp@pobox.com>
+
+	* configure.in: reorder things so they work on unix
+
 2001-10-27  Tor Lillqvist  <tml@iki.fi>
 
 	New Win32 feature to make pkg-config useful for users of MSVC:

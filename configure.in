@@ -1,6 +1,11 @@
 
 AC_INIT(pkg-config.1)
 
+AM_INIT_AUTOMAKE(pkgconfig, 0.8.0)
+AM_MAINTAINER_MODE
+
+AM_CONFIG_HEADER(config.h)
+
 AC_MSG_CHECKING([for Win32])
 case "$host" in
   *-*-mingw*)
@@ -9,8 +14,10 @@ case "$host" in
   ;;
   *)
     native_win32=no
+  ;;
 esac
 AC_MSG_RESULT([$native_win32])
+
 AM_CONDITIONAL(USE_INSTALLED_GLIB, test x$native_win32 = xyes)
 
 if test x$native_win32 = xyes; then
@@ -31,12 +38,6 @@ if test x$native_win32 = xyes; then
 else
   AC_CONFIG_SUBDIRS(glib-1.2.8)
 fi # !native_win32
-
-AM_INIT_AUTOMAKE(pkgconfig, 0.8.0)
-
-AM_MAINTAINER_MODE
-
-AM_CONFIG_HEADER(config.h)
 
 AM_PROG_LIBTOOL
 
