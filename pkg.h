@@ -99,6 +99,9 @@ extern gboolean disable_uninstalled;
 extern int dont_define_prefix;
 /* The name of the variable that acts as prefix, unless it is "prefix" */
 extern char *prefix_variable;
+
+/* If TRUE, output flags in MSVC syntax. */
+extern int msvc_syntax;
 #endif
 
 #endif

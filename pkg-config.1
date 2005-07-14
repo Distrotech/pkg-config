@@ -169,6 +169,16 @@ constraint after each package name, for example:
 Remember to use \-\-print-errors if you want error messages.
 
 .TP
+.I "--msvc-syntax"
+This option is available only on Windows. It causes \fIpkg-config\fP
+to output -l and -L flags in the form recognized by the Microsoft
+Visual C++ command-line compiler, \fIcl\fP. Specifically, instead of
+\fI-Lx:/some/path\fP it prints \fI/libpath:x/some/path\fP, and instead
+of \fI-lfoo\fP it prints \fIfoo.lib\fP. Note that the --libs output
+consists of flags for the linker, and should be placed on the cl
+command line after a /link switch. 
+
+.TP
 .I "--dont-define-prefix"
 This option is available only on Windows. It prevents \fIpkg-config\fP
 from automatically trying to override the value of the variable
@@ -213,16 +223,17 @@ uninstalled packages.  If this environment variable is set, it
 disables said behavior.
 
 .SH WINDOWS SPECIALITIES
-If a .pc file is found in a path that corresponds to the usual
-conventions (i.e., ends with lib\\pkgconfig), the prefix for that
-package is assumed to be the grandparent of the directory where the .pc file
-was found.
+If a .pc file is found in a directory that matches the usual
+conventions (i.e., ends with \\lib\\pkgconfig), the prefix for that
+package is assumed to be the grandparent of the directory where the
+file was found, and the \fIprefix\fP variable is overridden for that
+file accordingly.
 
 In addition to the \fIPKG_CONFIG_PATH\fP environment variable, the
 Registry keys
 \fIHKEY_CURRENT_USER\\Software\\pkgconfig\\PKG_CONFIG_PATH\fP and
 \fIHKEY_LOCAL_MACHINE\\Software\\pkgconfig\\PKG_CONFIG_PATH\fP can be
-used to specify dorectories to search for .pc files. Each (string)
+used to specify directories to search for .pc files. Each (string)
 value in these keys is treated as a directory where to look for .pc
 files.
 

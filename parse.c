@@ -17,7 +17,9 @@
 #ifdef G_OS_WIN32
 int dont_define_prefix = FALSE;
 char *prefix_variable = "prefix";
+int msvc_syntax = FALSE;
 #endif
+
 
 /**
  * Read an entire line from a file into a buffer. Lines may
@@ -571,6 +573,15 @@ parse_libs (Package *pkg, const char *str, const char *path)
   int argc;
   int result;
   int i;
+#ifdef G_OS_WIN32
+  char *L_flag = (msvc_syntax ? "/libpath:" : "-L");
+  char *l_flag = (msvc_syntax ? "" : "-l");
+  char *lib_suffix = (msvc_syntax ? ".lib" : "");
+#else
+  char *L_flag = "-L";
+  char *l_flag = "-l";
+  char *lib_suffix = "";
+#endif
   
   if (pkg->l_libs || pkg->L_libs || pkg->other_libs)
     {
@@ -619,7 +630,7 @@ parse_libs (Package *pkg, const char *str, const char *path)
           libname = g_strndup (start, p - start);
           
           pkg->l_libs = g_slist_prepend (pkg->l_libs,
-                                         g_strconcat ("-l", libname, NULL));
+                                         g_strconcat (l_flag, libname, lib_suffix, NULL));
 
           g_free (libname);
         }
@@ -639,7 +650,7 @@ parse_libs (Package *pkg, const char *str, const char *path)
           libname = g_strndup (start, p - start);
           
           pkg->L_libs = g_slist_prepend (pkg->L_libs,
-                                         g_strconcat ("-L", libname, NULL));
+					 g_strconcat (L_flag, libname, NULL));
 
           g_free (libname);
         }

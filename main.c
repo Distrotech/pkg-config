@@ -216,6 +216,8 @@ main (int argc, char **argv)
       "a guesstimated value based on the location of the .pc file" },
     { "prefix-variable", 0, POPT_ARG_STRING, &prefix_variable, 0,
       "set the name of the variable that pkg-config automatically sets", "PREFIX" },
+    { "msvc-syntax", 0, POPT_ARG_NONE, &msvc_syntax, 0,
+      "output -l and -L flags for the Microsoft compiler (cl)" },
 #endif
     POPT_AUTOHELP
     { NULL, 0, 0, NULL, 0 }

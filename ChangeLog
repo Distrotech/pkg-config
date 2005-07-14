@@ -1,3 +1,19 @@
+2001-10-27  Tor Lillqvist  <tml@iki.fi>
+
+	New Win32 feature to make pkg-config useful for users of MSVC:
+	with the flag --msvc-syntax, munge -L and -l flags appropriately
+	for the MSVC command-line compiler. (-I flags are the same.)
+
+	* README.win32: Update.
+
+	* main.c (main): Add --msvc-syntax flag.
+
+	* pkg-config.1: Document it.
+
+	* pkg.h: Declare msvc_syntax.
+
+	* parse.c (parse_libs): Obey msvc_syntax.
+
 2001-10-25  Tor Lillqvist  <tml@iki.fi>
 
 	Improve Windows behaviour: Make it even easier to install
