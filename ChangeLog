@@ -2,9 +2,8 @@
 
 	* configure.in: 0.10.0
 
-	* autogen.sh: rerun autoconf/libtoolize in glib subdir so that 
-	auto* version matches in subdir and top dir.
-
+	Redo distribution with autoconf 2.13
+	
 2002-02-03  Havoc Pennington  <hp@pobox.com>
 
 	* pkg.m4: require 0.9.0
