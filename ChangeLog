@@ -1,5 +1,8 @@
 2005-04-12  Tollef Fog Heen  <tfheen@err.no>
 
+	* pkg.m4: wrap running pkg-config in AC_RUN_LOG per James
+	Henstridge's suggestion.
+
 	* pkg.m4: Patch from James Henstridge to evaluate second argument
 	again.  (Freedesktop #2987, Gnome #300232, Debian #303878,
 	#303969)
