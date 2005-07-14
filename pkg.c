@@ -641,16 +641,37 @@ compare_package_keys (gconstpointer a, gconstpointer b)
   return strcmp (pkg_a->key, pkg_b->key);
 }
 
+static GSList *
+add_env_variable_to_list (GSList *list, const gchar *env)
+{
+  gchar **values;
+  gint i;
+
+  /* FIXME: the separator should be a ';' on Windows
+   */
+  values = g_strsplit (env, ":", 0);
+  for (i = 0; values[i] != NULL; i++)
+    {
+      list = g_slist_append (list, g_strdup (values[i]));
+    }
+  g_strfreev (values);
+
+  return NULL;
+}
+
 static void
 verify_package (Package *pkg)
 {
   GSList *requires = NULL;
   GSList *conflicts = NULL;
+  GSList *system_directories = NULL;
   GSList *iter;
   GSList *requires_iter;
-  GSList *conflicts_iter;  
+  GSList *conflicts_iter;
+  GSList *system_dir_iter = NULL;
   int count;
-  
+  gchar *c_include_path;
+
   /* Be sure we have the required fields */
 
   if (pkg->key == NULL)
@@ -755,24 +776,58 @@ verify_package (Package *pkg)
   g_slist_free (requires);
   g_slist_free (conflicts);
 
+  /* We make a list of system directories that gcc expects so we can remove
+   * them.
+   */
+  system_directories = g_slist_append (NULL, g_strdup ("/usr/include"));
+  
+  c_include_path = g_getenv ("C_INCLUDE_PATH");
+  if (c_include_path != NULL)
+    {
+      system_directories = add_env_variable_to_list (system_directories, c_include_path);
+      g_free (c_include_path);
+    }
+  
+  c_include_path = g_getenv ("CPLUS_INCLUDE_PATH");
+  if (c_include_path != NULL)
+    {
+      system_directories = add_env_variable_to_list (system_directories, c_include_path);
+      g_free (c_include_path);
+    }
+
   count = 0;
   iter = pkg->I_cflags;
   while (iter != NULL)
     {
+      gint offset = 0;
       /* we put things in canonical -I/usr/include (vs. -I /usr/include) format,
        * but if someone changes it later we may as well be robust
        */
-      if (strcmp (iter->data, "-I/usr/include") == 0 ||
-          strcmp (iter->data, "-I /usr/include") == 0)
+      if (((strcmp (iter->data, "-I") == 0) && (offset = 2))||
+          ((strcmp (iter->data, "-I ") == 0) && (offset = 3)))
         {
-          debug_spew ("Package %s has -I/usr/include in Cflags\n",
-                      pkg->name);
-          if (g_getenv ("PKG_CONFIG_ALLOW_SYSTEM_CFLAGS") == NULL)
-            {
-              iter->data = NULL;
-              ++count;
-              debug_spew ("Removing -I/usr/include from cflags for %s\n", pkg->key);              
-            }
+	  if (offset == 0)
+	    {
+	      iter = iter->next;
+	      continue;
+	    }
+
+	  system_dir_iter = system_directories;
+	  while (system_dir_iter != NULL)
+	    {
+	      if (strcmp (system_dir_iter->data, iter->data + offset) == 0)
+		{
+		  debug_spew ("Package %s has %s in Cflags\n",
+			      pkg->name, (gchar *)iter->data);
+		  if (g_getenv ("PKG_CONFIG_ALLOW_SYSTEM_CFLAGS") == NULL)
+		    {
+		      debug_spew ("Removing %s from cflags for %s\n", iter->data, pkg->key);
+		      ++count;
+		      iter->data = NULL;
+		    }
+		}
+	      system_dir_iter = system_dir_iter->next;
+	    }
         }
 
       iter = iter->next;
@@ -783,6 +838,9 @@ verify_package (Package *pkg)
       pkg->I_cflags = g_slist_remove (pkg->I_cflags, NULL);
       --count;
     }
+
+  g_slist_foreach (system_directories, (GFunc) g_free, NULL);
+  g_slist_free (system_directories);
 
   count = 0;
   iter = pkg->L_libs;

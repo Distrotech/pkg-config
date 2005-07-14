@@ -1,3 +1,8 @@
+Tue Sep 17 14:11:51 2002  Jonathan Blandford  <jrb@redhat.com>
+
+	* pkg.c: strip out C_INCLUDE_PATH and CPLUS_INCLUDE_PATH if they
+	exist, as this can break -Werror on some newer gcc versions.
+
 2002-09-13  Tor Lillqvist  <tml@iki.fi>
 
 	* Makefile.am (USE_INSTALLED_GLIB): Seems that the automake
