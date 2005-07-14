@@ -1,3 +1,8 @@
+2001-07-11  Havoc Pennington  <hp@redhat.com>
+
+	* pkg.c: include sys/types.h to avoid warnings about dirent on
+	some systems.
+
 2001-07-11  Havoc Pennington  <hp@pobox.com>
 
 	* parse.c (parse_cflags): fix failure to put space between cflags,

@@ -13,6 +13,7 @@
 # endif
 #endif
 
+#include <sys/types.h>
 #include <dirent.h>
 #include <string.h>
 #include <errno.h>
