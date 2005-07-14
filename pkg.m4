@@ -70,6 +70,7 @@ m4_define([_PKG_CONFIG],
         PKG_CHECK_EXISTS([$3],
                          [pkg_cv_[]$1=`$PKG_CONFIG --[]$2 "$3" 2>/dev/null`],
 			 [pkg_failed=yes])
+else
 	pkg_failed=untried
 fi[]dnl
 ])# _PKG_CONFIG

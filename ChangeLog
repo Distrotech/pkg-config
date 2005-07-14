@@ -1,3 +1,8 @@
+2005-06-29  Tollef Fog Heen  <tfheen@err.no>
+
+	* pkg.m4: Brown bag fix.  pkg_failed was always set to “untried”.
+	Debian #316181.
+
 2005-06-27  Tollef Fog Heen  <tfheen@err.no>
 
 	* configure.in: Rename to pkg-config.
