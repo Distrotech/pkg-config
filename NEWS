@@ -1,3 +1,9 @@
+pkg-config 0.17.1
+===
+ - Now actually sets CFLAGS and LIBS instead of trying to set those in
+   a subshell.  (Only affects if you've autoreconfiscated with 0.17)
+ - Fix detection of inter-library dependencies.
+
 pkg-config 0.17
 ===
 

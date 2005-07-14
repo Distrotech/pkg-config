@@ -1,5 +1,9 @@
 2005-04-12  Tollef Fog Heen  <tfheen@err.no>
 
+	* configure.in: 0.17.1
+
+	* NEWS: document changes for 0.17.1
+
 	* configure.in: Fix up AC_MSG_RESULT for indirect deps.  Also fix
 	so the test no longer is inverted and auto works properly.
 	
