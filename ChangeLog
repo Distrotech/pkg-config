@@ -1,3 +1,9 @@
+2003-01-01  Zack Rusin  <zack@kde.org>
+
+	* main.c (main): added --libs-only-other and --cflags-only-other
+	arguments, thanks to which a more obscure dependencies can be
+	retrieved, e.g. -pthread
+
 2002-11-19  Havoc Pennington  <hp@redhat.com>
 
 	* pkg-config.1: apply formatting fixes from  Peter Breitenlohner

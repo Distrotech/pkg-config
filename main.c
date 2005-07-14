@@ -1,6 +1,6 @@
-/* 
+/*
  * Copyright (C) 2001, 2002 Red Hat Inc.
- * 
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
  * published by the Free Software Foundation; either version 2 of the
@@ -10,7 +10,7 @@
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
@@ -46,12 +46,12 @@ debug_spew (const char *format, ...)
   va_list args;
   gchar *str;
   FILE* stream;
-  
+
   g_return_if_fail (format != NULL);
-  
+
   if (!want_debug_spew)
     return;
-  
+
   va_start (args, format);
   str = g_strdup_vprintf (format, args);
   va_end (args);
@@ -60,10 +60,10 @@ debug_spew (const char *format, ...)
     stream = stdout;
   else
     stream = stderr;
-  
+
   fputs (str, stream);
   fflush (stream);
-  
+
   g_free (str);
 }
 
@@ -74,30 +74,30 @@ verbose_error (const char *format, ...)
   gchar *str;
 
   g_return_if_fail (format != NULL);
-  
+
   if (!want_verbose_errors)
     return;
-  
+
   va_start (args, format);
   str = g_strdup_vprintf (format, args);
   va_end (args);
 
   fputs (str, stderr);
   fflush (stdout);
-  
+
   g_free (str);
 }
 
 #define DEFINE_VARIABLE 1
 
 static void
-popt_callback (poptContext con, 
+popt_callback (poptContext con,
                enum poptCallbackReason reason,
                const struct poptOption * opt,
                const char * arg, void * data)
 {
   debug_spew ("Option --%s seen\n", opt->longName);
-  
+
   if (opt->val == DEFINE_VARIABLE)
     {
       char *varname;
@@ -141,22 +141,22 @@ pkg_uninstalled (Package *pkg)
 
   if (pkg->uninstalled)
     return TRUE;
-  
+
   tmp = pkg->requires;
   while (tmp != NULL)
     {
       Package *pkg = tmp->data;
-      
+
       if (pkg_uninstalled (pkg))
         return TRUE;
-      
+
       tmp = g_slist_next (tmp);
     }
 
   return FALSE;
 }
 
-int 
+int
 main (int argc, char **argv)
 {
   static int want_my_version = 0;
@@ -165,7 +165,9 @@ main (int argc, char **argv)
   static int want_cflags = 0;
   static int want_l_libs = 0;
   static int want_L_libs = 0;
+  static int want_other_libs = 0;
   static int want_I_cflags = 0;
+  static int want_other_cflags = 0;
   static int want_list = 0;
   static int result;
   static int want_uninstalled = 0;
@@ -181,12 +183,12 @@ main (int argc, char **argv)
   char *search_path;
   char *pcbuilddir;
   gboolean need_newline;
-  
+
   const char *pkgname;
   Package *pkg;
 
   poptContext opt_context;
-  
+
   struct poptOption options_table[] = {
     { NULL, 0, POPT_ARG_CALLBACK, popt_callback, 0, NULL, NULL },
     { "version", 0, POPT_ARG_NONE, &want_my_version, 0,
@@ -199,12 +201,16 @@ main (int argc, char **argv)
       "output all linker flags" },
     { "libs-only-l", 0, POPT_ARG_NONE, &want_l_libs, 0,
       "output -l flags" },
+    { "libs-only-other", 0, POPT_ARG_NONE, &want_other_libs, 0,
+      "output other libs (e.g. -pthread)" },
     { "libs-only-L", 0, POPT_ARG_NONE, &want_L_libs, 0,
       "output -L flags" },
     { "cflags", 0, POPT_ARG_NONE, &want_cflags, 0,
       "output all pre-processor and compiler flags" },
     { "cflags-only-I", 0, POPT_ARG_NONE, &want_I_cflags, 0,
       "output -I flags" },
+    { "cflags-only-other", 0, POPT_ARG_NONE, &want_other_cflags, 0,
+      "output cflags not covered by the cflags-only-I option"},
     { "variable", 0, POPT_ARG_STRING, &variable_name, 0,
       "get the value of a variable", "VARIABLENAME" },
     { "define-variable", 0, POPT_ARG_STRING, NULL, DEFINE_VARIABLE,
@@ -252,7 +258,7 @@ main (int argc, char **argv)
       want_silence_errors = FALSE;
       debug_spew ("PKG_CONFIG_DEBUG_SPEW variable enabling debug spew\n");
     }
-  
+
   search_path = getenv ("PKG_CONFIG_PATH");
   if (search_path)
     {
@@ -296,18 +302,18 @@ main (int argc, char **argv)
 	    int index = 0;
 	    gchar *value_name = g_malloc (max_value_name_len + 1);
 	    gchar *value = g_malloc (max_value_len + 1);
-	    
+
 	    while (TRUE)
 	      {
 		gulong type;
 		gulong value_name_len = max_value_name_len + 1;
 		gulong value_len = max_value_len + 1;
-		
+
 		if (RegEnumValue (key, index++, value_name, &value_name_len,
 				  NULL, &type,
 				  value, &value_len) != ERROR_SUCCESS)
 		  break;
-		
+
 		if (type != REG_SZ)
 		  continue;
 
@@ -341,7 +347,7 @@ main (int argc, char **argv)
       debug_spew ("disabling auto-preference for uninstalled packages\n");
       disable_uninstalled = TRUE;
     }
-  
+
   opt_context = poptGetContext (NULL, argc, argv,
                                 options_table, 0);
 
@@ -369,10 +375,12 @@ main (int argc, char **argv)
       want_cflags ||
       want_l_libs ||
       want_L_libs ||
+      want_other_libs ||
       want_I_cflags ||
+      want_other_cflags ||
       want_list)
     {
-      debug_spew ("Error printing enabled by default due to use of --version, --libs, --cflags, --libs-only-l, --libs-only-L, --cflags-only-I, or --list. Value of --silence-errors: %d\n", want_silence_errors);
+      debug_spew ("Error printing enabled by default due to use of --version, --libs, --cflags, --libs-only-l, --libs-only-L, --libs-only-other, --cflags-only-I, --cflags-only-other or --list. Value of --silence-errors: %d\n", want_silence_errors);
 
       if (want_silence_errors && getenv ("PKG_CONFIG_DEBUG_SPEW") == NULL)
         want_verbose_errors = FALSE;
@@ -386,12 +394,12 @@ main (int argc, char **argv)
 
       /* Leave want_verbose_errors unchanged, reflecting --print-errors */
     }
-  
+
   if (want_verbose_errors)
     debug_spew ("Error printing enabled\n");
   else
     debug_spew ("Error printing disabled\n");
-  
+
   if (want_my_version)
     {
       printf ("%s\n", VERSION);
@@ -405,7 +413,7 @@ main (int argc, char **argv)
       else
         return 1;
     }
-  
+
   package_init ();
 
   if (want_list)
@@ -413,7 +421,7 @@ main (int argc, char **argv)
       print_package_list ();
       return 0;
     }
-  
+
   str = g_string_new ("");
   while (1)
     {
@@ -425,17 +433,17 @@ main (int argc, char **argv)
       g_string_append (str, " ");
     }
 
-  g_strstrip (str->str);  
-  
+  g_strstrip (str->str);
+
   {
     GSList *reqs;
     GSList *iter;
-    
+
     reqs = parse_module_list (NULL, str->str,
-                              "(command line arguments)");      
-    
+                              "(command line arguments)");
+
     iter = reqs;
-    
+
     while (iter != NULL)
       {
         Package *req;
@@ -457,27 +465,27 @@ main (int argc, char **argv)
                            ver->version,
                            req->name,
                            req->version);
-              
+
             return 1;
           }
 
         packages = g_slist_prepend (packages, req);
-        
+
         iter = g_slist_next (iter);
       }
   }
 
   g_string_free (str, TRUE);
-  
+
   packages = g_slist_reverse (packages);
 
   if (packages == NULL)
-    {      
+    {
       fprintf (stderr, "Must specify package names on the command line\n");
-      
+
       exit (1);
     }
-  
+
   if (want_exists)
     return 0; /* if we got here, all the packages existed. */
 
@@ -498,7 +506,7 @@ main (int argc, char **argv)
 
       return 1;
     }
-  
+
   if (want_version)
     {
       GSList *tmp;
@@ -516,7 +524,7 @@ main (int argc, char **argv)
   if (required_exact_version)
     {
       Package *pkg = packages->data;
-      
+
       if (compare_versions (pkg->version, required_exact_version) == 0)
         return 0;
       else
@@ -525,7 +533,7 @@ main (int argc, char **argv)
   else if (required_atleast_version)
     {
       Package *pkg = packages->data;
-      
+
       if (compare_versions (pkg->version, required_atleast_version) >= 0)
         return 0;
       else
@@ -534,13 +542,13 @@ main (int argc, char **argv)
   else if (required_max_version)
     {
       Package *pkg = packages->data;
-      
+
       if (compare_versions (pkg->version, required_max_version) <= 0)
         return 0;
       else
         return 1;
     }
-  
+
   /* Print all flags; then print a newline at the end. */
   need_newline = FALSE;
 
@@ -551,10 +559,17 @@ main (int argc, char **argv)
       g_free (str);
       need_newline = TRUE;
     }
-  
+
   if (want_I_cflags)
     {
       char *str = packages_get_I_cflags (packages);
+      printf ("%s ", str);
+      g_free (str);
+      need_newline = TRUE;
+    }
+  else if (want_other_cflags)
+    {
+      char *str = packages_get_other_cflags (packages);
       printf ("%s ", str);
       g_free (str);
       need_newline = TRUE;
@@ -566,7 +581,7 @@ main (int argc, char **argv)
       g_free (str);
       need_newline = TRUE;
     }
-  
+
   if (want_l_libs)
     {
       char *str = packages_get_l_libs (packages);
@@ -581,6 +596,13 @@ main (int argc, char **argv)
       g_free (str);
       need_newline = TRUE;
     }
+  else if (want_other_libs)
+    {
+      char *str = packages_get_other_libs (packages);
+      printf ("%s ", str);
+      g_free (str);
+      need_newline = TRUE;
+    }
   else if (want_libs)
     {
       char *str = packages_get_all_libs (packages);
@@ -591,6 +613,6 @@ main (int argc, char **argv)
 
   if (need_newline)
     printf ("\n");
-  
+
   return 0;
 }
