@@ -32,18 +32,22 @@ PKG_CONFIG_FIND_PC_PATH
 #
 
 AC_ARG_ENABLE(indirect-deps,
-              [AC_HELP_STRING([--enable-indirect-deps=@<:@yes/no/auto@:>@],
-                              [list both direct and indirect dependencies. [default=auto]])],,
-              [enable_indirect_deps=auto])
-
+        [AC_HELP_STRING([--enable-indirect-deps],
+                              [list both direct and indirect dependencies.])
+AC_HELP_STRING([--disable-indirect-deps],
+                              [only list direct dependencies.])
+    [default=auto]],use_indirect_deps=$enableval,
+    [use_indirect_deps=auto])
+echo use_indirect_deps=$use_indirect_deps >&AS_MESSAGE_LOG_FD
 AC_MSG_CHECKING([whether to list both direct and indirect dependencies])
-case $enable_indirect_deps in
+case $use_indirect_deps in
   auto)
-    deplib_check_method=`(./libtool --config; echo eval echo \\$deplib_check_method) | sh`
-    if test "X$deplib_check_method" = Xnone || test "x$enable_static" = xyes ; then
-      enable_indirect_deps=yes
+    deplibs_check_method=`(./libtool --config; echo eval echo \$deplibs_check_method) | sh`
+    if test "X$deplibs_check_method" = Xnone; then
+    echo "foo: $deplibs_check_method" >&AS_MESSAGE_LOG_FD
+      use_indirect_deps=yes
     else
-      enable_indirect_deps=no
+      use_indirect_deps=no
     fi
   ;;
   yes|no)
@@ -52,9 +56,9 @@ case $enable_indirect_deps in
 or auto])
   ;;
 esac
-AC_MSG_RESULT($enable_explicit_deps)
+AC_MSG_RESULT($use_indirect_deps)
 
-AC_DEFINE_UNQUOTED(ENABLE_INDIRECT_DEPS, `test $enable_indirect_deps = yes; echo $?`, [Indirect shared library dependencies enabled])
+AC_DEFINE_UNQUOTED(ENABLE_INDIRECT_DEPS, `test $use_indirect_deps = no; echo $?`, [Link library to all dependent libraries, not only directly needed ones])
 
 AC_MSG_CHECKING([for Win32])
 case "$host" in
