@@ -1,3 +1,9 @@
+2005-03-18  Tollef Fog Heen  <tfheen@err.no>
+
+	* glib-patches/pthread-config-fix.diff: Add patch to detect
+	pthreads properly on some architectures.  Thanks to Michael
+	Haubenwallner for reporting this bug and providing a patch.
+
 2005-02-21  Tollef Fog Heen  <tfheen@err.no>
 
 	* parse.c (parse_package_file): Stop leaking file descriptors.

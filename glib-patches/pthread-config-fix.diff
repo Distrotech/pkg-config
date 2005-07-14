@@ -1,0 +1,18 @@
+--- glib-1.2.8/configure.in	2000-05-25 02:29:09.000000000 +0200
++++ glib-1.2.8/configure.in	2004-10-13 09:45:16.965305752 +0200
+@@ -831,6 +831,7 @@
+ 		AC_MSG_CHECKING(whether pthread_cond_timedwait is posix like)
+ 		# DCE Threads return -1 as failure, posix ETIMEDOUT.
+ 		AC_TRY_RUN([#include <pthread.h>
++			#include <sys/time.h>
+ 			int main () { 
+ 			pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
+ 			pthread_cond_t cond = PTHREAD_COND_INITIALIZER;
+@@ -839,6 +840,7 @@
+ 			gettimeofday (&tval, NULL);
+ 			tspec.tv_sec = tval.tv_sec;
+ 			tspec.tv_nsec = 0;
++			pthread_mutex_lock (&mutex);
+ 			return pthread_cond_timedwait (&cond,&mutex,&tspec) 
+ 				!= -1;}],
+ 			[AC_MSG_RESULT(no)],
