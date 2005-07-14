@@ -1,3 +1,9 @@
+pkg-config 0.17.2
+===
+ - Don't go into an infinite loop allocating more and more memory when
+   the same name is specified twice on the command line and we're in
+   "direct dependencies only"-mode.
+
 pkg-config 0.17.1
 ===
  - Now actually sets CFLAGS and LIBS instead of trying to set those in

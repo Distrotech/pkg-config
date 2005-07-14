@@ -1,3 +1,9 @@
+2005-04-14  Tollef Fog Heen  <tfheen@err.no>
+
+	* configure.in: Bump to 0.17.2
+	
+	* NEWS: Update for 0.17.2
+
 2005-04-13  Tollef Fog Heen  <tfheen@err.no>
 
 	* pkg.c (packages_get_l_libs, packages_get_L_libs): Duplicate
