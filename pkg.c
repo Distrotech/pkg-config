@@ -813,7 +813,8 @@ verify_package (Package *pkg)
 	  system_dir_iter = system_directories;
 	  while (system_dir_iter != NULL)
 	    {
-	      if (strcmp (system_dir_iter->data, iter->data + offset) == 0)
+	      if (strcmp (system_dir_iter->data,
+                          ((char*)iter->data) + offset) == 0)
 		{
 		  debug_spew ("Package %s has %s in Cflags\n",
 			      pkg->name, (gchar *)iter->data);
