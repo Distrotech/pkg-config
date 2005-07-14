@@ -1,4 +1,8 @@
-2001-10-28  Havoc Pennington  <hp@pobox.com>
+2001-10-28  Havoc Pennington  <hp@pobox.com>	
+	
+	* pkg.c (add_search_dir): put the search path in the right order
+
+2001-10-28  Havoc Pennington  <hp@pobox.com>	
 
 	* configure.in: reorder things so they work on unix
 

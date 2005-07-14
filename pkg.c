@@ -43,7 +43,7 @@ gboolean disable_uninstalled = FALSE;
 void
 add_search_dir (const char *path)
 {
-  search_dirs = g_slist_prepend (search_dirs, g_strdup (path));
+  search_dirs = g_slist_append (search_dirs, g_strdup (path));
 }
 
 #ifdef G_OS_WIN32
