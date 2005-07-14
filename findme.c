@@ -44,7 +44,7 @@
 
 #include "findme.h"
 
-#if defined(G_OS_WIN32) && !defined(X_OK)
+#if !defined(X_OK)
 #define X_OK 1
 #endif
 

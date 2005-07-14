@@ -1,11 +1,11 @@
 pkg-config on Win32
 ===================
 
-This file describes pkg-config for "pure" Win32. (With Cygwin,
-pkg-config 0.8.0 builds fine right out of the box. Cygwin is just
-another Unix variant, as far as pkg-config is concerned.) I don't to
-call this "pure" Win32 target mingw, as pkg-config is usable also by
-MSVC users.
+This file describes pkg-config for "native" Win32. (On Cygwin,
+pkg-config builds fine right out of the box. Cygwin is just another
+Unix variant, as far as pkg-config is concerned.) I don't call this
+"native" Win32 target MinGW, as pkg-config on Windows is supposed to
+be useable also by MSVC users.
 
 There should be no compile-time paths built into the executable of
 pkg-config. Likewise, not in the libraries it describes either.
@@ -38,13 +38,15 @@ site. This works as long as the .pc file uses the variable name
 GTK does this.
 
 On Unix, pkg-config is built using its own copy of GLib 1.2.8. On
-Windows, we use the normal GLib available for Windows (1.3.10
-currently). Yes, this does introduce a circular dependency, but that
-can be worked around. The circular dependency only appears if one uses
-the configure mechanism to build GLib. GLib's configure script checks
-for pkg-config. pkg-config depends on GLib. Thus, starting from
-scratch, with no GLib and no pkg-config, using configure, there would
-indeed be a Catch-22 situation. However, GLib can be built just fine
-using the manually written makefiles for mingw or MSVC. And if
-somebody does want to build GLib on Win32 using configure, she can
-first install a prebuilt pkgconfig.
+Windows, we use the normal GLib available for Windows (2.0.x). Yes,
+this does introduce a kind of circular dependency. But, that can be
+worked around. The circular dependency only appears if one uses the
+configure mechanism to build GLib. GLib's configure script checks for
+pkg-config. pkg-config depends on GLib. Thus, starting from scratch,
+with no GLib and no pkg-config, using configure, there would indeed be
+a Catch-22 situation. However, GLib can be built just fine using the
+manually written makefiles for mingw or MSVC. And if somebody does
+want to build GLib on Win32 using configure, she can first install a
+prebuilt pkgconfig.
+
+--Tor Lillqvist <tml@iki.fi>
