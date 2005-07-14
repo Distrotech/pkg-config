@@ -472,6 +472,10 @@ main (int argc, char **argv)
                            req->name,
                            req->version);
 
+	    if (req->url)
+	      verbose_error ("You may find new versions of %s at %s\n",
+			     req->name, req->url);
+
             return 1;
           }
 

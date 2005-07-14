@@ -74,20 +74,21 @@ struct _Package
   int path_position; /* used to order packages by position in path of their .pc file, lower number means earlier in path */
 };
 
-Package *get_package              (const char *name);
-char *   package_get_l_libs       (Package    *pkg);
-char *   packages_get_l_libs      (GSList     *pkgs);
-char *   package_get_L_libs       (Package    *pkg);
-char *   packages_get_L_libs      (GSList     *pkgs);
-char *   package_get_other_libs   (Package    *pkg);
-char *   packages_get_other_libs  (GSList     *pkgs);
-char *   packages_get_all_libs    (GSList     *pkgs);
-char *   package_get_I_cflags     (Package    *pkg);
-char *   packages_get_I_cflags    (GSList     *pkgs);
-char *   package_get_other_cflags (Package    *pkg);
-char *   packages_get_all_cflags  (GSList     *pkgs);
-char *   package_get_var          (Package    *pkg,
-                                   const char *var);
+Package *get_package               (const char *name);
+char *   package_get_l_libs        (Package    *pkg);
+char *   packages_get_l_libs       (GSList     *pkgs);
+char *   package_get_L_libs        (Package    *pkg);
+char *   packages_get_L_libs       (GSList     *pkgs);
+char *   package_get_other_libs    (Package    *pkg);
+char *   packages_get_other_libs   (GSList     *pkgs);
+char *   packages_get_all_libs     (GSList     *pkgs);
+char *   package_get_I_cflags      (Package    *pkg);
+char *   packages_get_I_cflags     (GSList     *pkgs);
+char *   package_get_other_cflags  (Package    *pkg);
+char *   packages_get_other_cflags (GSList     *pkgs);
+char *   packages_get_all_cflags   (GSList     *pkgs);
+char *   package_get_var           (Package    *pkg,
+                                    const char *var);
 char *   packages_get_var          (GSList     *pkgs,
                                     const char *var);
 

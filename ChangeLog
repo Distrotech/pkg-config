@@ -1,5 +1,10 @@
 2003-02-22  James Henstridge  <james@daa.com.au>
 
+	* pkg.h: add missing prototype.
+
+	* main.c (main): print the url if the package is too old, to match
+	the output of verify_package().
+
 	* popthelp.c, poptint.h, poptconfig.c, findme.h, popt.h:
 	* poptparse.c: expand licensing header to the version found in the
 	Popt distribution's COPYING file.  See discussion in bug 84804 for
