@@ -1,3 +1,9 @@
+2003-01-15  Havoc Pennington  <hp@pobox.com>
+
+	* pkg.c (package_init): honor a PKG_CONFIG_LIBDIR to move default 
+	search dir, useful in cross-compilation for example, bug 
+	#103545 fix from David Schleef
+	
 2003-01-01  Zack Rusin  <zack@kde.org>
 
 	* main.c (main): added --libs-only-other and --cflags-only-other
