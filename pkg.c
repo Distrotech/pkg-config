@@ -785,14 +785,12 @@ verify_package (Package *pkg)
   if (c_include_path != NULL)
     {
       system_directories = add_env_variable_to_list (system_directories, c_include_path);
-      g_free (c_include_path);
     }
   
   c_include_path = g_getenv ("CPLUS_INCLUDE_PATH");
   if (c_include_path != NULL)
     {
       system_directories = add_env_variable_to_list (system_directories, c_include_path);
-      g_free (c_include_path);
     }
 
   count = 0;
