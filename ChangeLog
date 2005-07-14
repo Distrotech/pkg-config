@@ -1,5 +1,10 @@
 2005-03-28  Tollef Fog Heen  <tfheen@err.no>
 
+	* glib-patches/distcheckfix.diff: Add some files to CLEANFILES so
+	make distcheck now works.
+
+2005-03-28  Tollef Fog Heen  <tfheen@err.no>
+
 	* autogen.sh: Extra paranoia -- fail if running auto* fails or if
 	patching fails.
 
