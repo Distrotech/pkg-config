@@ -125,6 +125,7 @@ To get pkg-config, see <http://www.freedesktop.org/software/pkgconfig>.])],
 else
 	$1[]_CFLAGS=$pkg_cv_[]$1[]_CFLAGS
 	$1[]_LIBS=$pkg_cv_[]$1[]_LIBS
+        AC_MSG_RESULT([yes])
 	ifelse([$3], , :, [$3])
 fi[]dnl
 ])# PKG_CHECK_MODULES
