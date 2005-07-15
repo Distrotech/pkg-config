@@ -16,7 +16,7 @@ AC_DEFUN([PKG_CONFIG_FIND_PC_PATH],
  [ pc_path="$withval"
    AC_MSG_CHECKING([for default search path for .pc files])
    AC_MSG_RESULT([$pc_path])],
- [pc_path="$libdir/$PACKAGE:$datadir/$PACKAGE"])
+ [pc_path="$libdir/pkgconfig:$datadir/pkgconfig"])
  AC_SUBST([pc_path])
 dnl AC_DEFINE_UNQUOTED(PKG_CONFIG_PC_PATH,["$pc_path"],[Default search path for .pc files])
 

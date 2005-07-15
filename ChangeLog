@@ -1,5 +1,8 @@
 2005-07-15  Tollef Fog Heen  <tfheen@err.no>
 
+	* configure.in: Fix default search path to be pkgconfig rather
+	than pkg-config again.  Freedesktop #3662
+
 	* pkg.m4: Add a missing AC_MSG_RESULT.  Thanks to Gary Kramlich
 	for noticing this and harassing me to fix it.
 
