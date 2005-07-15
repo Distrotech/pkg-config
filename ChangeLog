@@ -1,5 +1,9 @@
 2005-07-15  Tollef Fog Heen  <tfheen@err.no>
 
+	* pkg.c (package_get_var): Make sure to g_strdup all the return
+	values and not return some values which should not be freed and
+	some which should.  Yay valgrind.  Freedesktop #3682
+
 	* configure.in: Fix default search path to be pkgconfig rather
 	than pkg-config again.  Freedesktop #3662
 

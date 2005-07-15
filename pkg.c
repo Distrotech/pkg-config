@@ -1200,7 +1200,7 @@ package_get_var (Package *pkg,
   char *varval = NULL;
 
   if (globals)
-    varval = g_hash_table_lookup (globals, var);
+    varval = g_strdup (g_hash_table_lookup (globals, var));
   
   if (varval == NULL && pkg->vars)
     varval = g_strdup (g_hash_table_lookup (pkg->vars, var));
