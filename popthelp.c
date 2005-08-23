@@ -83,7 +83,6 @@ static void singleOptionHelp(FILE * f, int maxLeftCol,
     const char * help = _(opt->descrip);
     int helpLength;
     const char * ch;
-    char format[10];
     char * left = alloca(maxLeftCol + 1);
     const char * argDescrip = getArgDescrip(opt);
 
@@ -115,8 +114,8 @@ static void singleOptionHelp(FILE * f, int maxLeftCol,
 	while (ch > (help + 1) && isspace(*ch)) ch--;
 	ch++;
 
-	sprintf(format, "%%.%ds\n%%%ds", (int) (ch - help), indentLength);
-	fprintf(f, format, help, " ");
+	fprintf(f, "%.*s\n%*s", (int) (ch - help), help, indentLength, " ");
+
 	help = ch;
 	while (isspace(*help) && *help) help++;
 	helpLength = strlen(help);

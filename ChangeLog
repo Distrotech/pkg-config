@@ -1,3 +1,10 @@
+2005-08-23  Tollef Fog Heen  <tfheen@err.no>
+
+	* popthelp.c: char format[10] overflowed always with gcc4, so use
+	positional parameters instead.  Thanks to Scott James Remnant for
+	pointing me to that solution.  Debian #321961, Ubuntu #13950,
+	Freedesktop #2661
+
 2005-08-22  Tollef Fog Heen  <tfheen@err.no>
 
 	* check/check-cflags, check/check-define-variable,
