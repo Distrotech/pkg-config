@@ -116,6 +116,9 @@ void verbose_error (const char *format, ...);
 
 gboolean name_ends_in_uninstalled (const char *str);
 
+void enable_private_libs(void);
+void disable_private_libs(void);
+
 /* If TRUE, do not automatically prefer uninstalled versions */
 extern gboolean disable_uninstalled;
 
