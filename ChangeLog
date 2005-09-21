@@ -1,3 +1,8 @@
+2005-09-21  Tollef Fog Heen  <tfheen@err.no>
+
+	* pkg.m4: Apply patch from Roberto Huelga to look at XXX_CFLAGS
+	and XXX_LIBS which got lost somewhere.
+
 2005-08-27  Tollef Fog Heen  <tfheen@err.no>
 
 	* Makefile.am (AM_CFLAGS): Add default CFLAGS
