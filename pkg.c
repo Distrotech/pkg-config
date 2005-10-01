@@ -1241,7 +1241,8 @@ packages_get_var (GSList     *pkgs,
     }
 
   /* chop last space */
-  str->str[str->len - 1] = '\0';
+  if (str->len > 0)
+      str->str[str->len - 1] = '\0';
   retval = str->str;
   g_string_free (str, FALSE);
 
