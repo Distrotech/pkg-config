@@ -144,7 +144,22 @@ scan_dir (const char *dirname)
       dirnamelen--;
       dirname_copy[dirnamelen] = '\0';
     }
-
+#ifdef G_OS_WIN32
+    {
+      gchar *p;
+      /* Turn backslashes into slashes or
+       * poptParseArgvString() will eat them when ${prefix}
+       * has been expanded in parse_libs().
+       */
+      p = dirname;
+      while (*p)
+        {
+          if (*p == '\\')
+            *p = '/';
+          p++;
+        }
+    }
+#endif
   dir = opendir (dirname_copy);
   g_free (dirname_copy);
   if (!dir)

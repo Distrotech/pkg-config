@@ -2,6 +2,9 @@
 
 	* pkg.c (packages_get_var): Don't try to chop if string length is
 	zero.  Freedesktop #4034.
+	(scan_dir): Turn backslashes into slashes or poptParseArgvString()
+	will eat them when ${prefix} has been expanded in parse_libs().
+	Thanks to j^ for the patch.
 
 2005-09-21  Tollef Fog Heen  <tfheen@err.no>
 
