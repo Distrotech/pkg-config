@@ -4,7 +4,7 @@
 	zero.  Freedesktop #4034.
 	(scan_dir): Turn backslashes into slashes or poptParseArgvString()
 	will eat them when ${prefix} has been expanded in parse_libs().
-	Thanks to j^ for the patch.
+	Thanks to j^ for the patch.  Freedesktop #4267
 
 2005-09-21  Tollef Fog Heen  <tfheen@err.no>
 
