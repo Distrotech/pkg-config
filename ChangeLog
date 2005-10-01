@@ -1,3 +1,8 @@
+2005-10-01  Tollef Fog Heen  <tfheen@err.no>
+
+	* pkg.c (packages_get_var): Don't try to chop if string length is
+	zero.  Freedesktop #4034.
+
 2005-09-21  Tollef Fog Heen  <tfheen@err.no>
 
 	* pkg.m4: Apply patch from Roberto Huelga to look at XXX_CFLAGS
