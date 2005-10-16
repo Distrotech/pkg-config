@@ -112,6 +112,10 @@ AC_MSG_CHECKING([for $1])
 _PKG_CONFIG([$1][_CFLAGS], [cflags], [$2])
 _PKG_CONFIG([$1][_LIBS], [libs], [$2])
 
+m4_define([_PKG_TEXT], [Alternatively, you may set the environment variables $1[]_CFLAGS
+and $1[]_LIBS to avoid the need to call pkg-config.
+See the pkg-config man page for more details.])
+
 if test $pkg_failed = yes; then
         _PKG_SHORT_ERRORS_SUPPORTED
         if test $_pkg_short_errors_supported = yes; then
@@ -130,9 +134,8 @@ $$1_PKG_ERRORS
 Consider adjusting the PKG_CONFIG_PATH environment variable if you
 installed software in a non-standard prefix.
 
-Alternatively you may set the $1_CFLAGS and $1_LIBS environment variables
-to avoid the need to call pkg-config.  See the pkg-config man page for
-more details.])],
+_PKG_TEXT
+])],
 		[$4])
 elif test $pkg_failed = untried; then
 	ifelse([$4], , [AC_MSG_FAILURE(dnl
@@ -140,9 +143,7 @@ elif test $pkg_failed = untried; then
 is in your PATH or set the PKG_CONFIG environment variable to the full
 path to pkg-config.
 
-Alternatively you may set the $1_CFLAGS and $1_LIBS environment variables
-to avoid the need to call pkg-config.  See the pkg-config man page for
-more details.
+_PKG_TEXT
 
 To get pkg-config, see <http://www.freedesktop.org/software/pkgconfig>.])],
 		[$4])
