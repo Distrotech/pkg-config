@@ -78,6 +78,7 @@ struct _Package
 };
 
 Package *get_package               (const char *name);
+Package *get_package_quiet         (const char *name);
 char *   package_get_l_libs        (Package    *pkg);
 char *   packages_get_l_libs       (GSList     *pkgs);
 char *   package_get_L_libs        (Package    *pkg);

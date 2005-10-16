@@ -387,6 +387,12 @@ get_package (const char *name)
   return internal_get_package (name, TRUE, TRUE);
 }
 
+Package *
+get_package_quiet (const char *name)
+{
+  return internal_get_package (name, FALSE, TRUE);
+}
+
 static GSList*
 string_list_strip_duplicates (GSList *list)
 {

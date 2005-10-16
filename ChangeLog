@@ -1,3 +1,13 @@
+2005-10-16  Tollef Fog Heen  <tfheen@err.no>
+
+	* pkg.c (get_package_quiet): Add get_package_quiet which is just
+	the same as get_package except it sets warn to false.
+
+	* pkg.h: Add prototype for get_package_quiet.
+
+	* main.c (main): Add --short-errors flag to suppress most of the
+	output when a module is not found.
+
 2005-10-01  Tollef Fog Heen  <tfheen@err.no>
 
 	* pkg.c (packages_get_var): Don't try to chop if string length is

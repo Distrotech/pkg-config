@@ -183,6 +183,7 @@ main (int argc, char **argv)
   int want_other_cflags = 0;
   int want_list = 0;
   int want_static_lib_list = ENABLE_INDIRECT_DEPS;
+  int want_short_errors = 0;
   int result;
   int want_uninstalled = 0;
   char *variable_name = NULL;
@@ -218,6 +219,8 @@ main (int argc, char **argv)
       "output all linker flags" },
     { "static", 0, POPT_ARG_NONE, &want_static_lib_list, 0,
       "output linker flags for static linking" },
+    { "short-errors", 0, POPT_ARG_NONE, &want_short_errors, 0,
+      "print short errors" },
     { "libs-only-l", 0, POPT_ARG_NONE, &want_l_libs, 0,
       "output -l flags" },
     { "libs-only-other", 0, POPT_ARG_NONE, &want_other_libs, 0,
@@ -469,7 +472,10 @@ main (int argc, char **argv)
         Package *req;
         RequiredVersion *ver = iter->data;
 
-        req = get_package (ver->name);
+        if (want_short_errors)
+          req = get_package_quiet (ver->name);
+        else
+          req = get_package (ver->name);
 
         if (req == NULL)
           {
