@@ -1,5 +1,8 @@
 2005-10-16  Tollef Fog Heen  <tfheen@err.no>
 
+	* pkg.m4: Minor cleanups, use m4_default rather than m4_ifval and
+	echo 1>&FD is silly, just use echo >&FD
+
 	* main.c (main): Try to print out all the errors and not just the
 	first.
 
