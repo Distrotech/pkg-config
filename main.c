@@ -459,6 +459,7 @@ main (int argc, char **argv)
   g_strstrip (str->str);
 
   {
+    gboolean failed = FALSE;
     GSList *reqs;
     GSList *iter;
 
@@ -479,12 +480,14 @@ main (int argc, char **argv)
 
         if (req == NULL)
           {
+            failed = TRUE;
             verbose_error ("No package '%s' found\n", ver->name);
-            return 1;
+            goto nextiter;
           }
 
         if (!version_test (ver->comparison, req->version, ver->version))
           {
+            failed = TRUE;
             verbose_error ("Requested '%s %s %s' but version of %s is %s\n",
                            ver->name,
                            comparison_to_str (ver->comparison),
@@ -496,13 +499,19 @@ main (int argc, char **argv)
 	      verbose_error ("You may find new versions of %s at %s\n",
 			     req->name, req->url);
 
-            return 1;
+            goto nextiter;
           }
 
         packages = g_slist_prepend (packages, req);
 
+      nextiter:
         iter = g_slist_next (iter);
       }
+
+    if (failed) {
+      return 1;
+    }
+
   }
 
   g_string_free (str, TRUE);

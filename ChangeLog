@@ -1,5 +1,8 @@
 2005-10-16  Tollef Fog Heen  <tfheen@err.no>
 
+	* main.c (main): Try to print out all the errors and not just the
+	first.
+
 	* pkg.m4: Use --short-errors if it's available.
 
 	* pkg.c (get_package_quiet): Add get_package_quiet which is just
