@@ -1,5 +1,8 @@
 2005-10-17  Tollef Fog Heen  <tfheen@err.no>
 
+	* pkg.m4: Do AC_MSG_RESULT([no]) even if $4 is set (so we don't
+	fail).  Gnome #166537.
+
 	* NEWS: Add missing news and really release 0.20, since I didn't
 	get around to actually uploading last night.
 
