@@ -1,3 +1,23 @@
+pkg-config 0.20
+===
+ - Fix test suite to work on Solaris.  Yay non-POSIX /bin/sh :-(
+ - Fix segfault on --help with gcc4.  Fix segfault on bigendian arches
+   in some cases.
+ - Win32 fixes
+ - Add --short-errors, now used by pkg.m4 if available.  This gives a
+   better error message if some libraries can't be found.
+
+pkg-config 0.19
+===
+ - Fix a segfault
+ - Fix default search path
+ - Fix cosmetic bug in pkg.m4 where AC_MSG_RESULT wasn't called in
+   some cases.
+
+pkg-config 0.18.1
+===
+ - Fix up pkg.m4 to not end up with pkg_failed=untried always.
+
 pkg-config 0.18
 ===
  - The inter-library dependencies check was too tight and caused
