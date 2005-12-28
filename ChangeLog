@@ -1,3 +1,9 @@
+2005-12-28  Tollef Fog Heen  <tfheen@err.no>
+
+	* configure.in, Makefile.am: Only use -Wall and other gcc-only
+	flags when we don't have a set of CFLAGS already set and we're
+	using gcc.  Freedesktop #4888.
+
 2005-10-17  Tollef Fog Heen  <tfheen@err.no>
 
 	* pkg.m4: Do AC_MSG_RESULT([no]) even if $4 is set (so we don't

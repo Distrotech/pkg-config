@@ -58,6 +58,16 @@ or auto])
 esac
 AC_MSG_RESULT($use_indirect_deps)
 
+#
+# Choose default CFLAGS and warnings depending on compiler.
+#
+
+WARN_CFLAGS=""
+if test "${GCC}" = "yes" && test "${ac_env_CFLAGS_set}" != "set"; then
+   WARN_CFLAGS="-g -Wall -O2"
+fi
+AC_SUBST(WARN_CFLAGS)
+
 AC_DEFINE_UNQUOTED(ENABLE_INDIRECT_DEPS, `test $use_indirect_deps = no; echo $?`, [Link library to all dependent libraries, not only directly needed ones])
 
 AC_MSG_CHECKING([for Win32])

@@ -14,7 +14,7 @@ man_MANS = pkg-config.1
 EXTRA_DIST = $(m4_DATA) $(man_MANS) README.win32
 
 bin_PROGRAMS = pkg-config
-AM_CFLAGS=-g -Wall -O2
+AM_CFLAGS=@WARN_CFLAGS@
 
 INCLUDES=-DPKG_CONFIG_PC_PATH="\"$(pc_path)\"" $(included_glib_includes)
 
