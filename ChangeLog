@@ -1,5 +1,8 @@
 2006-08-16  Tollef Fog Heen  <tfheen@err.no>
 
+	* main.c (main): Always add the elements from PKG_CONFIG_PATH.
+	Freedesktop #4795.
+
 	* pkg-config.1: Apply patch from Ed Catmur to document
 	PKG_PROG_PKG_CONFIG and that it should be used if the first call
 	to PKG_CHECK_MODULES might not happen.
