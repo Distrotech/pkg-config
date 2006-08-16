@@ -1,5 +1,10 @@
 2006-08-16  Tollef Fog Heen  <tfheen@err.no>
 
+	* parse.c (trim_and_sub): Since %{...} has not been used for a
+	long time, there is no point in being able to escape %.  However,
+	make the code able to escape $ by doubling the $ to $$.  
+	Debian #378570
+
 	* pkg.c (packages_get_other_cflags, package_get_other_cflags)
 	(packages_get_I_cflags): Always add all cflags.  Debian #340904
 

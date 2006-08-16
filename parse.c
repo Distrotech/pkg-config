@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2001, 2002, 2005 Red Hat Inc.
+ * Copyright (C) 2001, 2002, 2005-2006 Red Hat Inc.
  * 
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -169,8 +169,8 @@ trim_and_sub (Package *pkg, const char *str, const char *path)
       if (p[0] == '$' &&
           p[1] == '$')
         {
-          /* escaped % */
-          g_string_append_c (subst, '%');
+          /* escaped $ */
+          g_string_append_c (subst, '$');
           p += 2;
         }
       else if (p[0] == '$' &&
