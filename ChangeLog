@@ -1,5 +1,7 @@
 2006-08-16  Tollef Fog Heen  <tfheen@err.no>
 
+	* NEWS: Update for 0.21
+
 	* pkg.c: Add internal pkg-config package which can be queried for
 	version number, name and URL for now.  More information will be
 	added later.

@@ -1,3 +1,14 @@
+pkg-config 0.21
+===
+ - Fix some cosmetic output from pkg.m4
+ - Fix build problems with !gcc due to always passing -Wall
+ - Documentation fixes
+ - We now always add the Cflags from packages we depend on, whether
+   they are public or private dependencies.  The discussion surrouding
+   this change can be found in http://bugs.debian.org/340904 .
+ - Add internal pkg-config package which can be queried for version
+   number and other information.
+
 pkg-config 0.20
 ===
  - Fix test suite to work on Solaris.  Yay non-POSIX /bin/sh :-(
