@@ -4,6 +4,9 @@
 	PKG_PROG_PKG_CONFIG and that it should be used if the first call
 	to PKG_CHECK_MODULES might not happen.
 
+	* pkg-config.1: Apply patch from Ed Catmur to document
+	PKG_CHECK_EXIST.  Thanks a lot for both patches.
+
 2005-12-28  Tollef Fog Heen  <tfheen@err.no>
 
 	* configure.in, Makefile.am: Only use -Wall and other gcc-only
