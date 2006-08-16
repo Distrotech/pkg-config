@@ -1,5 +1,9 @@
 2006-08-16  Tollef Fog Heen  <tfheen@err.no>
 
+	* pkg.c: Add internal pkg-config package which can be queried for
+	version number, name and URL for now.  More information will be
+	added later.
+
 	* parse.c (trim_and_sub): Since %{...} has not been used for a
 	long time, there is no point in being able to escape %.  However,
 	make the code able to escape $ by doubling the $ to $$.  
