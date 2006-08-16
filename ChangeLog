@@ -1,5 +1,8 @@
 2006-08-16  Tollef Fog Heen  <tfheen@err.no>
 
+	* pkg.c (packages_get_other_cflags, package_get_other_cflags)
+	(packages_get_I_cflags): Always add all cflags.  Debian #340904
+
 	* main.c (main): Always add the elements from PKG_CONFIG_PATH.
 	Freedesktop #4795.
 

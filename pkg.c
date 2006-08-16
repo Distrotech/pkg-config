@@ -1139,14 +1139,14 @@ char *
 packages_get_I_cflags (GSList     *pkgs)
 {
   /* sort by path position so PKG_CONFIG_PATH affects -I flag order */
-  return get_multi_merged (pkgs, get_I_cflags, TRUE, FALSE);
+  return get_multi_merged (pkgs, get_I_cflags, TRUE, TRUE);
 }
 
 char *
 package_get_other_cflags (Package *pkg)
 {
   if (pkg->other_cflags_merged == NULL)
-    pkg->other_cflags_merged = get_merged (pkg, get_other_cflags, TRUE, FALSE);
+    pkg->other_cflags_merged = get_merged (pkg, get_other_cflags, TRUE, TRUE);
 
   return pkg->other_cflags_merged;
 }
@@ -1154,7 +1154,7 @@ package_get_other_cflags (Package *pkg)
 char *
 packages_get_other_cflags (GSList *pkgs)
 {
-  return get_multi_merged (pkgs, get_other_cflags, TRUE, FALSE);
+  return get_multi_merged (pkgs, get_other_cflags, TRUE, TRUE);
 }
 
 char *
