@@ -4,7 +4,7 @@
 
 	* pkg.c: Add internal pkg-config package which can be queried for
 	version number, name and URL for now.  More information will be
-	added later.
+	added later.  Debian #254289, #287339
 
 	* parse.c (trim_and_sub): Since %{...} has not been used for a
 	long time, there is no point in being able to escape %.  However,
@@ -19,10 +19,11 @@
 
 	* pkg-config.1: Apply patch from Ed Catmur to document
 	PKG_PROG_PKG_CONFIG and that it should be used if the first call
-	to PKG_CHECK_MODULES might not happen.
+	to PKG_CHECK_MODULES might not happen.  Freedesktop #7742
 
 	* pkg-config.1: Apply patch from Ed Catmur to document
-	PKG_CHECK_EXIST.  Thanks a lot for both patches.
+	PKG_CHECK_EXIST.  Thanks a lot for both patches.  Freedesktop
+	#7741
 
 2005-12-28  Tollef Fog Heen  <tfheen@err.no>
 
