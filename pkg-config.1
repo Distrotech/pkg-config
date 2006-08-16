@@ -300,6 +300,10 @@ error messages if you specify your own ACTION-IF-NOT-FOUND.
 However, it will set the variable MYSTUFF_PKG_ERRORS, which you can 
 use to display what went wrong.
 
+Note that if there is a possibility the first call to
+PKG_CHECK_MODULES might not happen, you should be sure to include an
+explicit call to PKG_PROG_PKG_CONFIG in your configure.ac
+
 .I "PKG_PROG_PKG_CONFIG([MIN-VERSION])"
 
 Defines the PKG_CONFIG variable to the best pkg-config available,

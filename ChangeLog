@@ -1,3 +1,9 @@
+2006-08-16  Tollef Fog Heen  <tfheen@err.no>
+
+	* pkg-config.1: Apply patch from Ed Catmur to document
+	PKG_PROG_PKG_CONFIG and that it should be used if the first call
+	to PKG_CHECK_MODULES might not happen.
+
 2005-12-28  Tollef Fog Heen  <tfheen@err.no>
 
 	* configure.in, Makefile.am: Only use -Wall and other gcc-only
