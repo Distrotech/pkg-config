@@ -103,7 +103,6 @@ if test x$native_win32 = xyes; then
   AC_SUBST(GLIB_LIBS)
   AC_SUBST(GLIB_CFLAGS)
 
-  AC_CONFIG_AUX_DIR(.)
 else
   AC_CONFIG_SUBDIRS(glib-1.2.8)
 fi # !native_win32
