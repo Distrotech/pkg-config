@@ -558,8 +558,6 @@ parse_requires (Package *pkg, const char *str, const char *path)
     }
 
   g_slist_free (parsed);
-  
-  pkg->requires = g_slist_reverse (pkg->requires);
 }
 
 static void
@@ -607,8 +605,6 @@ parse_requires_private (Package *pkg, const char *str, const char *path)
     }
 
   g_slist_free (parsed);
-  
-  pkg->requires_private = g_slist_reverse (pkg->requires_private);
 }
 
 static void
@@ -719,10 +715,6 @@ static void _do_parse_libs (Package *pkg, int argc, char **argv)
       ++i;
     }
 
-  pkg->l_libs = g_slist_reverse (pkg->l_libs);
-  pkg->L_libs = g_slist_reverse (pkg->L_libs);
-  pkg->other_libs = g_slist_reverse (pkg->other_libs);
-  
 }
 
 
@@ -883,9 +875,6 @@ parse_cflags (Package *pkg, const char *str, const char *path)
 
   g_free (argv);
   g_free (trimmed);
-
-  pkg->I_cflags = g_slist_reverse (pkg->I_cflags);
-  pkg->other_cflags = g_slist_reverse (pkg->other_cflags);
 }
 
 static void
@@ -1105,9 +1094,20 @@ parse_package_file (const char *path, gboolean ignore_requires, gboolean ignore_
   fclose(f);
 
   /* make ->requires_private include a copy of the public requires too */
-  pkg->requires_private = g_slist_concat(pkg->requires_private,
-					 g_slist_copy (pkg->requires));
+  pkg->requires_private = g_slist_concat(g_slist_copy (pkg->requires),
+					 pkg->requires_private);
+  
+  pkg->requires = g_slist_reverse (pkg->requires);
+  
+  pkg->requires_private = g_slist_reverse (pkg->requires_private);
 
+  pkg->I_cflags = g_slist_reverse (pkg->I_cflags);
+  pkg->other_cflags = g_slist_reverse (pkg->other_cflags);
+
+  pkg->l_libs = g_slist_reverse (pkg->l_libs);
+  pkg->L_libs = g_slist_reverse (pkg->L_libs);
+  pkg->other_libs = g_slist_reverse (pkg->other_libs);
+  
   return pkg;
 }
 
