@@ -1,0 +1,39 @@
+	This is file patch-05-automake-warning for pkg-config-0.21
+
+	Fix automake (1.10) warnings
+		BUILT_SOURCES multiply defined in condition TRUE ...
+		noinst_DATA multiply defined in condition TRUE ...
+		whitespace following trailing backslash
+
+diff -ur -x autom4te.cache -x aclocal.m4 -x configure -x Makefile.in -x config.h.in -x 'config.h.in~' pkg-config-0.21.orig/glib-1.2.8/Makefile.am pkg-config-0.21/glib-1.2.8/Makefile.am
+--- pkg-config-0.21.orig/glib-1.2.8/Makefile.am	2006-08-16 20:24:29.000000000 +0200
++++ pkg-config-0.21/glib-1.2.8/Makefile.am	2007-01-19 15:03:19.000000000 +0100
+@@ -8,7 +8,7 @@
+ configincludedir = $(pkglibdir)/include
+ 
+ noinst_SCRIPTS=glib-config
+-BUILT_SOURCES=glib-config
++#BUILT_SOURCES=glib-config
+ glib-config: glib-config.in
+ 
+ INCLUDES = -DG_LOG_DOMAIN=g_log_domain_glib @GLIB_DEBUG_FLAGS@
+@@ -60,8 +60,8 @@
+ noinst_HEADERS = \
+ 	glib.h
+ 
+-noinst_DATA = \
+-	glibconfig.h
++#noinst_DATA = \
++#	glibconfig.h
+ 
+ CONFIGURE_DEPENDENCIES = acglib.m4		
+ 
+@@ -121,7 +121,7 @@
+ 	fi \
+ 	&& cp glib.spec $(distdir)
+ 
+-DISTCLEANFILES = glibconfig-sysdefs.h glibconfig.h glibconfig.h.win32 \ 
++DISTCLEANFILES = glibconfig-sysdefs.h glibconfig.h glibconfig.h.win32 \
+                config.h.win32
+ 
+ CLEANFILES = stamp-gc-h  makefile.msc

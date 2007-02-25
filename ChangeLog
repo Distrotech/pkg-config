@@ -1,3 +1,15 @@
+2007-02-25  Tollef Fog Heen  <tfheen@err.no>
+
+	* Makefile.am: Add support for using the system glib.  Thanks to
+	Peter Breitenlohner for the bug and the patch.  Freedesktop #9708
+
+	* configure.in: Add support for using the system glib.
+
+	* glib-patches/no-dist-distclean-files.diff,
+	glib-patches/automake-warning.diff,
+	glib-patches/autoconf-warning.diff:  Get rid of some warnings when
+	configuring glib.
+
 2007-02-21  Tollef Fog Heen  <tfheen@err.no>
 
 	* parse.c (parse_package_file and others): Move the reversal of

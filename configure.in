@@ -74,15 +74,12 @@ AC_MSG_CHECKING([for Win32])
 case "$host" in
   *-*-mingw*)
     native_win32=yes
-    AC_DEFINE(USE_INSTALLED_GLIB, 1, [We are using an installed GLib])
   ;;
   *)
     native_win32=no
   ;;
 esac
 AC_MSG_RESULT([$native_win32])
-
-AM_CONDITIONAL(USE_INSTALLED_GLIB, test x$native_win32 = xyes)
 
 case "$libdir" in
 *lib64) AC_DEFINE(PREFER_LIB64,1,[Define if your native architecture defines libdir to be $prefix/lib64 instead of $prefix/lib.]) ;;
@@ -99,7 +96,29 @@ if test x$native_win32 = xyes; then
   # These are correct for GLib 2.x
   GLIB_CFLAGS="-I$includedir/glib-2.0 -I$libdir/glib-2.0/include"
   GLIB_LIBS="-L$libdir -lglib-2.0 -liconv -lintl"
+  use_installed_glib=yes
+else
+  use_installed_glib=no
+  AC_ARG_WITH([installed-glib],
+    [  --with-installed-glib   Use installed Glib-2.x], [
+    if test x$withval = xyes; then
+      # Not on Win32, but the user requested to use the installed Glib-2.x,
+      # therefore we may assume that (some older version of) pkg-config can
+      # be found in the users PATH (otherwise we simply ignore the request).
+      AC_CHECK_PROGS([PKG_CONFIG], [pkg-config], [])
+      if test -n $PKG_CONFIG && $PKG_CONFIG --exists glib-2.0; then
+	GLIB_CFLAGS=`$PKG_CONFIG --cflags glib-2.0`
+	GLIB_LIBS=`$PKG_CONFIG --libs glib-2.0`
+	use_installed_glib=yes
+      fi
+    fi
+  ])
+fi # !use_installed_glib
 
+AM_CONDITIONAL(USE_INSTALLED_GLIB, test x$use_installed_glib = xyes)
+
+if test x$use_installed_glib = xyes; then
+  AC_DEFINE(USE_INSTALLED_GLIB, 1, [We are using an installed GLib])
   AC_SUBST(GLIB_LIBS)
   AC_SUBST(GLIB_CFLAGS)
 

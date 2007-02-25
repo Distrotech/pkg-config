@@ -2,10 +2,11 @@ if USE_INSTALLED_GLIB
 included_glib_includes = @GLIB_CFLAGS@
 pkg_config_LDADD=@GLIB_LIBS@
 else
-SUBDIRS = glib-1.2.8 check
+GLIB_SUBDIR = glib-1.2.8
 included_glib_includes = -I./glib-1.2.8
 pkg_config_LDADD=glib-1.2.8/libglib.la
 endif
+SUBDIRS = $(GLIB_SUBDIR) check
 
 m4dir = $(datadir)/aclocal
 m4_DATA = pkg.m4

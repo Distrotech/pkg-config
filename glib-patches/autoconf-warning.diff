@@ -1,0 +1,24 @@
+	This is file patch-06-autoconf-warning for pkg-config-0.21
+
+	Fix autoconf (2.61a) warning
+		AC_CACHE_VAL(glib_cv_sane_realloc, ...): suspicious presence of
+		an AC_DEFINE in the second argument, where no actions should be taken
+
+diff -ur -x autom4te.cache -x aclocal.m4 -x configure -x Makefile.in -x config.h.in -x 'config.h.in~' pkg-config-0.21.orig/glib-1.2.8/configure.in pkg-config-0.21/glib-1.2.8/configure.in
+--- pkg-config-0.21.orig/glib-1.2.8/configure.in	2006-08-16 20:24:29.000000000 +0200
++++ pkg-config-0.21/glib-1.2.8/configure.in	2007-01-19 15:05:37.000000000 +0100
+@@ -384,11 +384,13 @@
+ 	  return realloc (0, sizeof (int)) == 0;
+ 	}],
+ 	glib_cv_sane_realloc=yes
+-	AC_DEFINE(REALLOC_0_WORKS)
+ 	,
+ 	glib_cv_sane_realloc=no
+ 	,)
+ ])
++if test x$glib_cv_sane_realloc = xyes; then
++	AC_DEFINE(REALLOC_0_WORKS)
++fi
+ AC_MSG_RESULT($glib_cv_sane_realloc)
+ 
+ 
