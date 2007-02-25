@@ -188,7 +188,7 @@ scan_dir (const char *dirname)
 
       if (ends_in_dotpc (dent->d_name))
         {
-          char *pkgname = malloc (len - 2);
+          char *pkgname = g_malloc (len - 2);
 
           debug_spew ("File '%s' appears to be a .pc file\n", dent->d_name);
           

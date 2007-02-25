@@ -1,5 +1,7 @@
 2007-02-25  Tollef Fog Heen  <tfheen@err.no>
 
+	* pkg.c (scan_dir): Use g_malloc, not malloc for pkgname.
+
 	* Makefile.am: Add support for using the system glib.  Thanks to
 	Peter Breitenlohner for the bug and the patch.  Freedesktop #9708
 
