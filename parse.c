@@ -39,6 +39,12 @@ char *prefix_variable = "prefix";
 int msvc_syntax = FALSE;
 #endif
 
+#ifdef G_OS_WIN32
+#ifndef G_IS_DIR_SEPARATOR
+#define G_IS_DIR_SEPARATOR(c) ((c) == G_DIR_SEPARATOR || (c) == '/')
+#endif
+#endif
+
 /**
  * Read an entire line from a file into a buffer. Lines may
  * be delimited with '\n', '\r', '\n\r', or '\r\n'. The delimiter
@@ -890,6 +896,22 @@ parse_url (Package *pkg, const char *str, const char *path)
   pkg->url = trim_and_sub (pkg, str, path);
 }
 
+#ifdef G_OS_WIN32
+static int
+pathnamecmp (const char *a,
+	     const char *b)
+{
+  while (*a && *b &&
+	 ((G_IS_DIR_SEPARATOR (*a) && G_IS_DIR_SEPARATOR (*b)) ||
+	  g_ascii_toupper (*a) == g_ascii_toupper (*b)))
+    {
+      a++;
+      b++;
+    }
+  return g_ascii_toupper (*a) - g_ascii_toupper (*b);
+}
+#endif
+
 static void
 parse_line (Package *pkg, const char *untrimmed, const char *path, gboolean ignore_requires, gboolean ignore_private_libs)
 {
@@ -992,8 +1014,8 @@ parse_line (Package *pkg, const char *untrimmed, const char *path, gboolean igno
 	  const int lib_pkgconfig_len = strlen (lib_pkgconfig);
 
 	  if (strlen (prefix) > lib_pkgconfig_len &&
-	      g_ascii_strcasecmp (prefix + prefix_len - lib_pkgconfig_len,
-				  lib_pkgconfig) == 0)
+	      pathnamecmp (prefix + prefix_len - lib_pkgconfig_len,
+			   lib_pkgconfig) == 0)
 	    {
 	      /* It ends in lib\pkgconfig. Good. */
 	      

@@ -1,3 +1,13 @@
+2007-05-30  Tor Lillqvist  <tml@novell.com>
+
+	* parse.c: Fix problem on Win32 where the automagic prefix
+	replacement logic didn't work. I don't know what change had 
+	broken it.
+	(pathnamecmp): New Win32-only function. Compares two file
+	paths case insensitively and treating backslashes as equal to
+	slashes.
+	(parse_line): Use it instead of g_ascii_strcasecmp().	
+
 2007-05-29  Tollef Fog Heen  <tfheen@err.no>
 
 	* pkg.m4: Update URL to pkg-config website.  Thanks to Peter
