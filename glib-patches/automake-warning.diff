@@ -28,12 +28,3 @@ diff -ur -x autom4te.cache -x aclocal.m4 -x configure -x Makefile.in -x config.h
  
  CONFIGURE_DEPENDENCIES = acglib.m4		
  
-@@ -121,7 +121,7 @@
- 	fi \
- 	&& cp glib.spec $(distdir)
- 
--DISTCLEANFILES = glibconfig-sysdefs.h glibconfig.h glibconfig.h.win32 \ 
-+DISTCLEANFILES = glibconfig-sysdefs.h glibconfig.h glibconfig.h.win32 \
-                config.h.win32
- 
- CLEANFILES = stamp-gc-h  makefile.msc
