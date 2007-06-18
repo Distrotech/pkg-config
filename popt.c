@@ -230,13 +230,6 @@ static void execCommand(poptContext con) {
 
     argv[pos++] = NULL;
 
-#ifdef HAVE_SETRESUID
-    setresuid(getuid(), getuid(),-1);
-#endif
-#ifdef HAVE_SETREUID
-    setreuid(getuid(), getuid()); /*hlauer: not portable to hpux9.01 */
-#endif
-    
     execvp(argv[0], argv);
 }
 

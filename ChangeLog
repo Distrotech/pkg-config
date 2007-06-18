@@ -1,5 +1,8 @@
 2007-06-18  Tollef Fog Heen  <tfheen@err.no>
 
+	* popt.c: Remove code calling setresuid and setreuid, pkg-config
+	should not ever be suid.  Partially addresses Freedesktop #10652
+
 	* glib-patches/autoconf-warning.diff,
 	glib-patches/automake-warning.diff Fix path prefix so it applies.
 
