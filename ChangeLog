@@ -6,6 +6,8 @@
 	Also fix automake-warning.diff to not patch on top of another
 	patch from glib-patches.
 
+	* glib-patches/no-dist-distclean-files.diff: Fix prefix.
+
 2007-05-30  Tor Lillqvist  <tml@novell.com>
 
 	* parse.c: Fix problem on Win32 where the automagic prefix

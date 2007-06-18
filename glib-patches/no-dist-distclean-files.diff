@@ -4,8 +4,8 @@
 	Don't distribute DISTCLEAN files
 
 diff -ur -x autom4te.cache -x aclocal.m4 -x configure -x Makefile.in -x config.h.in -x 'config.h.in~' pkg-config-0.21.orig/glib-1.2.8/Makefile.am pkg-config-0.21/glib-1.2.8/Makefile.am
---- pkg-config-0.21.orig/glib-1.2.8/Makefile.am	2007-01-19 15:03:19.000000000 +0100
-+++ pkg-config-0.21/glib-1.2.8/Makefile.am	2007-01-19 15:07:29.000000000 +0100
+--- glib-1.2.8/Makefile.am	2007-01-19 15:03:19.000000000 +0100
++++ glib-1.2.8/Makefile.am	2007-01-19 15:07:29.000000000 +0100
 @@ -23,9 +23,7 @@
  	makefile.msc.in		\
  	makefile.msc		\
