@@ -1,3 +1,12 @@
+pkg-config 0.22
+===
+ - Make Requires.private a whole lot more useful by traversing the
+   whole tree, not just the top-level, for Cflags.
+ - Add support for using the system glib.
+ - Update URL to pkg-config website
+ - Fix some win32 problems.
+ - Other minor fixes.
+
 pkg-config 0.21
 ===
  - Fix some cosmetic output from pkg.m4
