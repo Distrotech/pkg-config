@@ -1,5 +1,9 @@
 2007-06-18  Tollef Fog Heen  <tfheen@err.no>
 
+	* configure.in: Fix expansion of default pc_path as per GNU coding
+	standards.  Thanks to Andreas Hanke for the fix.
+	Freedesktop #10326
+
 	* pkg.c (recursive_fill_list): Make sure to act recursively with
 	Requires.private, making them much more useful.  Special thanks to
 	Matthias Clasen for lots and lots of nagging.  Freedesktop #8788
