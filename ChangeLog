@@ -1,5 +1,9 @@
 2007-06-18  Tollef Fog Heen  <tfheen@err.no>
 
+	* glib-patches/remove-strsignal-prototype.diff: define _GNU_SOURCE
+	there to get strsignal prototype, addresses the rest of
+	Freedesktop 10652.
+
 	* popt.c: Remove code calling setresuid and setreuid, pkg-config
 	should not ever be suid.  Partially addresses Freedesktop #10652
 
