@@ -1,3 +1,8 @@
+2007-06-18  Tollef Fog Heen  <tfheen@err.no>
+
+	* glib-patches/autoconf-warning.diff,
+	glib-patches/automake-warning.diff Fix path prefix so it applies.
+
 2007-05-30  Tor Lillqvist  <tml@novell.com>
 
 	* parse.c: Fix problem on Win32 where the automagic prefix
