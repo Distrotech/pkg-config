@@ -617,7 +617,7 @@ recursive_fill_list (Package *pkg, GetListFunc func, GSList **listp)
 
   fill_one_level (pkg, func, listp);
   
-  tmp = pkg->requires;
+  tmp = (*func) (pkg);
 
   while (tmp != NULL)
     {
