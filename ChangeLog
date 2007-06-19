@@ -1,7 +1,8 @@
 2007-06-19  Tollef Fog Heen  <tfheen@err.no>
 
 	* pkg.m4: Fix bug so it's possible to override variables in case
-	pkg-config is not installed.
+	pkg-config is not installed.  Thanks to Thomas Klausner for the
+	patch. 
 
 2007-06-18  Tollef Fog Heen  <tfheen@err.no>
 
