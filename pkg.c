@@ -57,15 +57,6 @@ gboolean disable_uninstalled = FALSE;
 gboolean ignore_requires = FALSE;
 gboolean ignore_private_libs = TRUE;
 
-static Package pkg_config_package = {
-  .key = PACKAGE,
-  .name = PACKAGE,
-  .version = VERSION, /* .version */
-  .description = "returns metainformation about installed libraries",
-  .url = "http://pkg-config.freedesktop.org",
-  0 /* keep the rest as null */
-};
-
 void
 add_search_dir (const char *path)
 {
@@ -284,9 +275,6 @@ internal_get_package (const char *name, gboolean warn, gboolean check_compat)
   Package *pkg = NULL;
   const char *location;
   
-  if (strcmp(PACKAGE, name) == 0)
-    return &pkg_config_package;
-
   pkg = g_hash_table_lookup (packages, name);
 
   if (pkg)

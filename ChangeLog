@@ -1,5 +1,8 @@
 2007-12-29  Tollef Fog Heen  <tfheen@err.no>
 
+	* pkg.c (internal_get_package): Don't add the internal-only
+	pkg-config package twice.
+
 	* pkg.c (verify_package): Apply patch from Matthias Clasen of
 	RedHat to prevent segfaults if a Conflicts line is encountered.
 
