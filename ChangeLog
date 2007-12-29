@@ -1,5 +1,8 @@
 2007-12-29  Tollef Fog Heen  <tfheen@err.no>
 
+	* pkg.c (verify_package): Apply patch from Matthias Clasen of
+	RedHat to prevent segfaults if a Conflicts line is encountered.
+
 	* popthelp.c: Apply patch from Tom Tromey <tromey@redhat.com> to
 	make pkg-config --help print to stdout, not stderr.  Gnome
 	#127314.
