@@ -1,5 +1,10 @@
 2007-12-29  Tollef Fog Heen  <tfheen@err.no>
 
+	* pkg.m4: Don't use --errors-to-stdout in pkg.m4, but rather
+	redirect stderr to stdout.  This makes pkg.m4 with old (pre 0.15)
+	pkg-config look good, and it makes newer pkg-config with ancient
+	pkg.m4 work well.  Gnome #111054
+
 	* Update to glib 1.2.10, adjust lots of the glib patches.  Gnome
 	#81847.
 
