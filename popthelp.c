@@ -53,9 +53,9 @@ static void displayArgs(poptContext con, enum poptCallbackReason foo,
 			struct poptOption * key, 
 			const char * arg, void * data) {
     if (key->shortName== '?')
-	poptPrintHelp(con, stderr, 0);
+	poptPrintHelp(con, stdout, 0);
     else
-	poptPrintUsage(con, stderr, 0);
+	poptPrintUsage(con, stdout, 0);
     exit(0);
 }
 

@@ -1,5 +1,9 @@
 2007-12-29  Tollef Fog Heen  <tfheen@err.no>
 
+	* popthelp.c: Apply patch from Tom Tromey <tromey@redhat.com> to
+	make pkg-config --help print to stdout, not stderr.  Gnome
+	#127314.
+
 	* pkg.m4: Don't use --errors-to-stdout in pkg.m4, but rather
 	redirect stderr to stdout.  This makes pkg.m4 with old (pre 0.15)
 	pkg-config look good, and it makes newer pkg-config with ancient
