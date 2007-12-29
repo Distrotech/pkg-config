@@ -10,7 +10,7 @@
  # The following version number definitions apply to GLib, GModule and GThread
  # as a whole, so if changes occoured in any of them, they are all
 @@ -38,7 +38,7 @@
- GLIB_BINARY_AGE=8
+ GLIB_BINARY_AGE=10
  GLIB_VERSION=$GLIB_MAJOR_VERSION.$GLIB_MINOR_VERSION.$GLIB_MICRO_VERSION
  dnl
 -AC_DIVERT_POP()dnl
@@ -43,7 +43,7 @@
  
  dnl declare --enable-* args and collect ac_help strings
  AC_ARG_ENABLE(debug, [  --enable-debug=[no/minimum/yes] turn on debugging [default=$debug_default]],,enable_debug=$debug_default)
-@@ -485,18 +485,20 @@
+@@ -509,18 +509,20 @@
  dnl *** dlopen() and dlsym() in system libraries
  if test -z "$G_MODULE_IMPL"; then
  	AC_CHECK_FUNC(dlopen,

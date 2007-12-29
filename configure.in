@@ -122,7 +122,7 @@ if test x$use_installed_glib = xyes; then
   AC_SUBST(GLIB_CFLAGS)
 
 else
-  AC_CONFIG_SUBDIRS(glib-1.2.8)
+  AC_CONFIG_SUBDIRS(glib-1.2.10)
 fi # !native_win32
 
 AC_FUNC_ALLOCA

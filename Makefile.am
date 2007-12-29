@@ -2,9 +2,9 @@ if USE_INSTALLED_GLIB
 included_glib_includes = @GLIB_CFLAGS@
 pkg_config_LDADD=@GLIB_LIBS@
 else
-GLIB_SUBDIR = glib-1.2.8
-included_glib_includes = -I./glib-1.2.8
-pkg_config_LDADD=glib-1.2.8/libglib.la
+GLIB_SUBDIR = glib-1.2.10
+included_glib_includes = -I./glib-1.2.10
+pkg_config_LDADD=glib-1.2.10/libglib.la
 endif
 SUBDIRS = $(GLIB_SUBDIR) check
 

@@ -8,7 +8,7 @@
 +CLEANFILES = makefile.msc
 --- glib-1.2.8/Makefile.am.old	2005-03-28 13:20:29.053829656 +0200
 +++ glib-1.2.8/Makefile.am	2005-03-28 13:20:47.429836916 +0200
-@@ -120,3 +120,8 @@
+@@ -128,3 +128,8 @@
  	     && cp INSTALL README $(distdir) ; \
  	fi \
  	&& cp glib.spec $(distdir)

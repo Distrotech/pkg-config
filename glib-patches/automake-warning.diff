@@ -17,8 +17,8 @@ diff -ur -x autom4te.cache -x aclocal.m4 -x configure -x Makefile.in -x config.h
  glib-config: glib-config.in
  
  INCLUDES = -DG_LOG_DOMAIN=g_log_domain_glib @GLIB_DEBUG_FLAGS@
-@@ -60,8 +60,8 @@
- noinst_HEADERS = \
+@@ -65,8 +65,8 @@
+ glibnoinst_HEADERS =   \
  	glib.h
  
 -noinst_DATA = \

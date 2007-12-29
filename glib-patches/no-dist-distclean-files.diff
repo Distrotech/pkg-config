@@ -13,6 +13,6 @@ diff -ur -x autom4te.cache -x aclocal.m4 -x configure -x Makefile.in -x config.h
 -	glibconfig.h.win32	\
  	glibconfig.h.win32.in	\
 -	config.h.win32		\
- 	config.h.win32.in
- 
- noinst_LTLIBRARIES = libglib.la
+ 	config.h.win32.in	\
+ 	glib.pc.in 		\
+ 	gmodule.pc.in		\

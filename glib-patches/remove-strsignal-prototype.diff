@@ -1,17 +1,15 @@
 --- glib-1.2.8/gstrfuncs.c	2000-04-17 17:05:16.000000000 +0200
 +++ glib-1.2.8/gstrfuncs.c.new	2005-04-02 16:39:10.627002672 +0200
-@@ -38,9 +38,10 @@
- #include <string.h>
- #include <locale.h>
- #include <ctype.h>		/* For tolower() */
- #if !defined (HAVE_STRSIGNAL) || !defined(NO_SYS_SIGLIST_DECL)
-+#define _GNU_SOURCE
- #include <signal.h>
+@@ -31,7 +31,8 @@
+ #ifdef HAVE_CONFIG_H
+ #include <config.h>
  #endif
- #include "glib.h"
- /* do not include <unistd.h> in this place since it
-  * inteferes with g_strsignal() on some OSes
-@@ -671,7 +671,6 @@
++#define _GNU_SOURCE
+ 
+ #include <stdarg.h>
+ #include <stdio.h>
+ #include <stdlib.h>
+@@ -702,7 +703,6 @@
    char *msg;
  
  #ifdef HAVE_STRSIGNAL

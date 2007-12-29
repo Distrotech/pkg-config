@@ -1,3 +1,8 @@
+2007-12-29  Tollef Fog Heen  <tfheen@err.no>
+
+	* Update to glib 1.2.10, adjust lots of the glib patches.  Gnome
+	#81847.
+
 2007-06-19  Tollef Fog Heen  <tfheen@err.no>
 
 	* pkg.m4: Fix bug so it's possible to override variables in case
