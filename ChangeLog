@@ -1,5 +1,7 @@
 2008-01-16  Tollef Fog Heen  <tfheen@err.no>
 
+	* NEWS, configure.in: Release 0.23
+
 	* check/check-requires-private: Fix up test case.  We want to get
 	the private -I option in all cases.
 

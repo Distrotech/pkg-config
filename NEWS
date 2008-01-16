@@ -1,3 +1,10 @@
+pkg-config 0.23
+===
+ - Add support for setting sysroot through PKG_CONFIG_SYSROOT_DIR in
+   the environment.
+ - Update included glib to 1.2.10.
+ - Other minor fixes, including a segfault.
+
 pkg-config 0.22
 ===
  - Make Requires.private a whole lot more useful by traversing the
