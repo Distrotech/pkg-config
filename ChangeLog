@@ -1,5 +1,8 @@
 2008-01-16  Tollef Fog Heen  <tfheen@err.no>
 
+	* check/check-requires-private: Fix up test case.  We want to get
+	the private -I option in all cases.
+
 	* pkg.h, pkg.c (string_list_to_string), pkg-config.1, main.c
 	(main): Add sysroot support and document same.  Triggered by
 	setting PKG_CONFIG_SYSROOT_DIR in the environment.

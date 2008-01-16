@@ -9,14 +9,15 @@ set -e
 
 . ${srcdir}/common
 
+set -x 
 # expect cflags from requires-test and public-dep
 ARGS="--cflags requires-test"
-RESULT="-I/requires-test/include -I/public-dep/include"
+RESULT="-I/requires-test/include -I/private-dep/include -I/public-dep/include"
 run_test
 
 # still expect those cflags for static linking case
 ARGS="--static --cflags requires-test"
-RESULT="-I/requires-test/include -I/public-dep/include"
+RESULT="-I/requires-test/include -I/private-dep/include -I/public-dep/include"
 run_test
 
 # expect libs for just requires-test and public-dep
