@@ -46,6 +46,7 @@
 static int want_debug_spew = 0;
 static int want_verbose_errors = 0;
 static int want_stdout_errors = 0;
+char *pcsysrootdir = NULL;
 
 void
 debug_spew (const char *format, ...)
@@ -345,6 +346,16 @@ main (int argc, char **argv)
       }
   }
 #endif
+
+  pcsysrootdir = getenv ("PKG_CONFIG_SYSROOT_DIR");
+  if (pcsysrootdir)
+    {
+      define_global_variable ("pc_sysrootdir", pcsysrootdir);
+    }
+  else
+    {
+      define_global_variable ("pc_sysrootdir", "/");
+    }
 
   pcbuilddir = getenv ("PKG_CONFIG_TOP_BUILD_DIR");
   if (pcbuilddir)

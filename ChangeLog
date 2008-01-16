@@ -1,3 +1,9 @@
+2008-01-16  Tollef Fog Heen  <tfheen@err.no>
+
+	* pkg.h, pkg.c (string_list_to_string), pkg-config.1, main.c
+	(main): Add sysroot support and document same.  Triggered by
+	setting PKG_CONFIG_SYSROOT_DIR in the environment.
+
 2007-12-29  Tollef Fog Heen  <tfheen@err.no>
 
 	* pkg.c (internal_get_package): Don't add the internal-only

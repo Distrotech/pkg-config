@@ -123,6 +123,8 @@ void disable_private_libs(void);
 /* If TRUE, do not automatically prefer uninstalled versions */
 extern gboolean disable_uninstalled;
 
+extern char *pcsysrootdir;
+
 #ifdef G_OS_WIN32
 /* If TRUE, do not automatically define "prefix"  while
  * parsing each .pc file */
