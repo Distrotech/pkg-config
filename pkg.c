@@ -483,8 +483,12 @@ string_list_to_string (GSList *list)
 	      g_string_append (str, pcsysrootdir);
 	      g_string_append (str, tmpstr+2);
 	    }
+	  else
+	    {
+	      g_string_append (str, tmpstr);
+	    }
 	}
-      else 
+      else
 	{
 	  g_string_append (str, tmpstr);
 	}
