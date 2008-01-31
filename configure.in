@@ -11,12 +11,21 @@ AM_PROG_LIBTOOL
 AC_PROG_CC
 
 AC_DEFUN([PKG_CONFIG_FIND_PC_PATH],
-[AC_ARG_WITH(pc_path,
+[
+AC_MSG_CHECKING([for default search path for .pc files])
+AC_ARG_WITH(pc_path,
  [  --with-pc-path          Override the default search path for .pc files ],
- [ pc_path="$withval"
-   AC_MSG_CHECKING([for default search path for .pc files])
-   AC_MSG_RESULT([$pc_path])],
- [pc_path='${libdir}/pkgconfig:${datadir}/pkgconfig'])
+ [ pc_path="$withval" ],
+ [
+# This is slightly wrong, but hopefully causes less confusion than
+# people being unable to find their .pc files in the standard location.
+if test "${prefix}" = "NONE"; then
+	pc_path='${libdir}/pkgconfig:${datadir}/pkgconfig:/usr/lib/pkgconfig:/usr/share/pkgconfig'
+else
+	pc_path='${libdir}/pkgconfig:${datadir}/pkgconfig'
+fi
+])
+ AC_MSG_RESULT([$pc_path])
  AC_SUBST([pc_path])
 
 ])

@@ -1,5 +1,11 @@
 2008-01-31  Tollef Fog Heen  <tfheen@err.no>
 
+	* configure.in: If prefix is unset, add /usr/lib/pkgconfig and
+	/usr/share/pkgconfig to default search path.  Based on patch by
+	Damjan Jovanovic.
+
+	Also, make configure always print the path it is defaulting to.
+
 	* pkg.c (string_list_to_string): Patch from Paul Bender so flags
 	other than -I and -L are passed through (with mangling) when
 	PKG_CONFIG_SYSROOT_DIR is set.
