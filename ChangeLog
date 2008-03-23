@@ -1,5 +1,12 @@
 2008-03-23  Tollef Fog Heen  <tfheen@err.no>
 
+	* check/check-conflicts, check/conflicts-test.pc: New test,
+	testing that conflicts work as they should.
+
+	* pkg.c (verify_package): Make the conflicts check not only check
+	package versions, but also package names.  This makes conflicts
+	functional, something they were not before.
+
 	* check/check-requires-private: Remove unnecessary set -x
 
 	* check/check-cflags, check/check-define-variable,

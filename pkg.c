@@ -842,9 +842,10 @@ verify_package (Package *pkg)
         {
           RequiredVersion *ver = conflicts_iter->data;
 
-          if (version_test (ver->comparison,
-                            req->version,
-                            ver->version))
+	  if (strcmp (ver->name, req->key) == 0 &&
+	      version_test (ver->comparison,
+			    req->version,
+			    ver->version))
             {
               verbose_error ("Version %s of %s creates a conflict.\n"
                              "(%s %s %s conflicts with %s %s)\n",
