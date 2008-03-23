@@ -1011,18 +1011,25 @@ parse_line (Package *pkg, const char *untrimmed, const char *path, gboolean igno
 	  gchar *prefix = pkg->pcfiledir;
 	  const int prefix_len = strlen (prefix);
 	  const char *const lib_pkgconfig = "\\lib\\pkgconfig";
+	  const char *const share_pkgconfig = "\\share\\pkgconfig";
 	  const int lib_pkgconfig_len = strlen (lib_pkgconfig);
+	  const int share_pkgconfig_len = strlen (share_pkgconfig);
 
-	  if (strlen (prefix) > lib_pkgconfig_len &&
-	      pathnamecmp (prefix + prefix_len - lib_pkgconfig_len,
-			   lib_pkgconfig) == 0)
+	  if ((strlen (prefix) > lib_pkgconfig_len &&
+	       pathnamecmp (prefix + prefix_len - lib_pkgconfig_len, lib_pkgconfig) == 0) ||
+	      (strlen (prefix) > share_pkgconfig_len &&
+	       pathnamecmp (prefix + prefix_len - share_pkgconfig_len, share_pkgconfig) == 0))
 	    {
-	      /* It ends in lib\pkgconfig. Good. */
+	      /* It ends in lib\pkgconfig or share\pkgconfig. Good. */
 	      
 	      gchar *p;
 	      
 	      prefix = g_strdup (prefix);
-	      prefix[prefix_len - lib_pkgconfig_len] = '\0';
+	      if (strlen (prefix) > lib_pkgconfig_len &&
+		  pathnamecmp (prefix + prefix_len - lib_pkgconfig_len, lib_pkgconfig) == 0)
+		prefix[prefix_len - lib_pkgconfig_len] = '\0';
+	      else
+		prefix[prefix_len - share_pkgconfig_len] = '\0';
 	      
 	      /* Turn backslashes into slashes or
 	       * poptParseArgvString() will eat them when ${prefix}

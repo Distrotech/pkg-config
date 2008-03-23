@@ -38,9 +38,13 @@
 
 #ifdef G_OS_WIN32
 /* No hardcoded paths in the binary, thanks */
-#undef PKGLIBDIR
-/* It's OK to leak this, as PKGLIBDIR is invoked only once */
-#define PKG_CONFIG_PATH g_strconcat (g_win32_get_package_installation_directory (PACKAGE, NULL), "\\lib\\pkgconfig", NULL)
+/* It's OK to leak this */
+#undef PKG_CONFIG_PC_PATH
+#define PKG_CONFIG_PC_PATH \
+  g_strconcat (g_win32_get_package_installation_subdirectory (NULL, NULL, "lib/pkgconfig"), \
+	       ";", \
+	       g_win32_get_package_installation_subdirectory (NULL, NULL, "share/pkgconfig"), \
+	       NULL)
 #endif
 
 static int want_debug_spew = 0;
@@ -295,57 +299,6 @@ main (int argc, char **argv)
     {
       add_search_dirs(PKG_CONFIG_PC_PATH, G_SEARCHPATH_SEPARATOR_S);
     }
-
-#ifdef G_OS_WIN32
-  {
-    /* Add search directories from the Registry */
-
-    HKEY roots[] = { HKEY_CURRENT_USER, HKEY_LOCAL_MACHINE };
-    gchar *root_names[] = { "HKEY_CURRENT_USER", "HKEY_LOCAL_MACHINE" };
-    HKEY key;
-    int i;
-    gulong max_value_name_len, max_value_len;
-
-    for (i = 0; i < G_N_ELEMENTS (roots); i++)
-      {
-	key = NULL;
-	if (RegOpenKeyEx (roots[i], "Software\\" PACKAGE "\\PKG_CONFIG_PATH", 0,
-			  KEY_QUERY_VALUE, &key) == ERROR_SUCCESS &&
-	    RegQueryInfoKey (key, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-			     &max_value_name_len, &max_value_len,
-			     NULL, NULL) == ERROR_SUCCESS)
-	  {
-	    int index = 0;
-	    gchar *value_name = g_malloc (max_value_name_len + 1);
-	    gchar *value = g_malloc (max_value_len + 1);
-
-	    while (TRUE)
-	      {
-		gulong type;
-		gulong value_name_len = max_value_name_len + 1;
-		gulong value_len = max_value_len + 1;
-
-		if (RegEnumValue (key, index++, value_name, &value_name_len,
-				  NULL, &type,
-				  value, &value_len) != ERROR_SUCCESS)
-		  break;
-
-		if (type != REG_SZ)
-		  continue;
-
-		value_name[value_name_len] = '\0';
-		value[value_len] = '\0';
-		debug_spew ("Adding directory '%s' from %s\\Software\\"
-			    PACKAGE "\\PKG_CONFIG_PATH\\%s\n",
-			    value, root_names[i], value_name);
-		add_search_dir (value);
-	      }
-	  }
-	if (key != NULL)
-	  RegCloseKey (key);
-      }
-  }
-#endif
 
   pcsysrootdir = getenv ("PKG_CONFIG_SYSROOT_DIR");
   if (pcsysrootdir)

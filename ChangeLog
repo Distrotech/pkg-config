@@ -7,6 +7,26 @@
 	apply to some of the Win32 variables, but I don't believe that is
 	a problem with the existing compilers there.
 
+2008-02-19  Tor Lillqvist  <tml@novell.com>
+
+	* main.c: Remove the possibility to have a default PKG_CONFIG_PATH
+	in the Registry. It is much more flexible to just use environment
+	variables. In general the Registry is not used in the ports of
+	GTK+ or GNOME libraries and software to Windows.
+
+	* parse.c (parse_line): On Windows, handle also .pc files found in
+	a share/pkgconfig folder when automatically redefining a prefix
+	variable for the package.
+
+	* pkg-config.1: Corresponding changes.
+
+2008-02-18  Tor Lillqvist  <tml@novell.com>
+
+	* main.c: Fix some bitrot: On Windows, don't use the compile-time
+	PKG_CONFIG_PC_PATH, but deduce a default one at run-time based on
+	the location of the executable. This was originally what
+	pkg-config did on Windows, but it had bit-rotted.
+
 2008-01-31  Tollef Fog Heen  <tfheen@err.no>
 
 	* configure.in: If prefix is unset, add /usr/lib/pkgconfig and
