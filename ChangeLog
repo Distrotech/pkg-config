@@ -1,5 +1,12 @@
 2008-03-23  Tollef Fog Heen  <tfheen@err.no>
 
+	* check/check-cflags, check/check-define-variable,
+	check/check-includedir, check/check-libs,
+	check/check-libs-private, check/check-requires-private: Replace
+	the crazy -d ~root check with a more proper way to just make sure
+	we are running under a POSIX shell.  Thanks to Kjetil Torgrim
+	Homme for the tip about using getconf PATH.
+
 	* main.c (main): Add logging support from NetBSD.  Thanks to Julio
 	M. Merino Vidal for forwarding the patch from ages ago.
 
