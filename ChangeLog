@@ -1,3 +1,12 @@
+2008-03-23  Tollef Fog Heen  <tfheen@err.no>
+
+	* main.c (main): Fix small portability problem by defining all the
+	variables in main that are used in the static initialiser as
+	static variables.  This makes the IRIX/mipseb compiler happier.
+	Thanks to Roland Illig of NetBSD for the patch.  This doesn't
+	apply to some of the Win32 variables, but I don't believe that is
+	a problem with the existing compilers there.
+
 2008-01-31  Tollef Fog Heen  <tfheen@err.no>
 
 	* configure.in: If prefix is unset, add /usr/lib/pkgconfig and
