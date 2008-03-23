@@ -206,7 +206,7 @@ main (int argc, char **argv)
   char **search_dirs;
   char **iter;
   gboolean need_newline;
-
+  FILE *log;
   const char *pkgname;
   Package *pkg;
 
@@ -421,6 +421,17 @@ main (int argc, char **argv)
 
   g_strstrip (str->str);
 
+  if (getenv("PKG_CONFIG_LOG") != NULL)
+    {
+      log = fopen (getenv ("PKG_CONFIG_LOG"), "a");
+      if (log == NULL)
+	{
+	  fprintf (stderr, "Cannot open log file: %s\n",
+		   getenv ("PKG_CONFIG_LOG"));
+	  exit (1);
+	}
+    }
+
   {
     gboolean failed = FALSE;
     GSList *reqs;
@@ -440,6 +451,17 @@ main (int argc, char **argv)
           req = get_package_quiet (ver->name);
         else
           req = get_package (ver->name);
+
+	if (log != NULL)
+	  {
+	    if (req == NULL)
+	      fprintf (log, "%s NOT-FOUND", ver->name);
+	    else
+	      fprintf (log, "%s %s %s", ver->name,
+		       comparison_to_str (ver->comparison),
+		       (ver->version == NULL) ? "(null)" : ver->version);
+	    fprintf (log, "\n");
+	  }
 
         if (req == NULL)
           {
@@ -469,6 +491,11 @@ main (int argc, char **argv)
 
       nextiter:
         iter = g_slist_next (iter);
+      }
+
+    if (log != NULL)
+      {
+	fclose (log);
       }
 
     if (failed) {

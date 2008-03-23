@@ -1,3 +1,8 @@
+2008-03-23  Tollef Fog Heen  <tfheen@err.no>
+
+	* main.c (main): Add logging support from NetBSD.  Thanks to Julio
+	M. Merino Vidal for forwarding the patch from ages ago.
+
 2008-03-23  Stepan Kasal  <skasal@redhat.com>
 
 	* pkg-config.1: Document "Requires.private" and recommend it
