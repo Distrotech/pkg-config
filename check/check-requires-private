@@ -8,7 +8,6 @@ set -e
 
 . ${srcdir}/common
 
-set -x 
 # expect cflags from requires-test and public-dep
 ARGS="--cflags requires-test"
 RESULT="-I/requires-test/include -I/private-dep/include -I/public-dep/include"

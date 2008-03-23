@@ -1,5 +1,7 @@
 2008-03-23  Tollef Fog Heen  <tfheen@err.no>
 
+	* check/check-requires-private: Remove unnecessary set -x
+
 	* check/check-cflags, check/check-define-variable,
 	check/check-includedir, check/check-libs,
 	check/check-libs-private, check/check-requires-private: Replace
