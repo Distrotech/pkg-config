@@ -1,3 +1,9 @@
+2008-03-23  Stepan Kasal  <skasal@redhat.com>
+
+	* pkg-config.1: Fix a few typos--add two omitted .TP tags and two
+	omitted full stops; and empty lines do influence the formatting in
+	nroff.
+
 2008-03-23  Tollef Fog Heen  <tfheen@err.no>
 
 	* main.c (main): Fix small portability problem by defining all the
