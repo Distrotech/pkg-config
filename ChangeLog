@@ -1,5 +1,8 @@
 2008-03-23  Stepan Kasal  <skasal@redhat.com>
 
+	* pkg-config.1: Document "Requires.private" and recommend it
+	for libraries.  Freedesktop #13188
+
 	* pkg-config.1: Fix a few typos--add two omitted .TP tags and two
 	omitted full stops; and empty lines do influence the formatting in
 	nroff.

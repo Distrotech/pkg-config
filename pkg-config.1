@@ -357,6 +357,19 @@ checks. You may only mention the same package one time on the
 .I "Requires:"
 line. If the version of a package is unspecified, any version will
 be used with no checking.
+TP
+.I Requires.private:
+A list of packages required by this package. The difference from
+.I Requires
+is that the packages listed under
+.I Requires.private
+are not taken into account when a flag list is computed for
+dynamically linked executable (i.e., when \-\-static was not
+specified).  In the situation where each .pc file corresponds to a
+library,
+.I Requires.private
+shall be used exclusively to specify the dependencies between the
+libraries.
 .TP
 .I "Conflicts:"
 This optional line allows \fIpkg-config\fP to perform additional
