@@ -1,5 +1,9 @@
 2008-04-28  Tollef Fog Heen  <tfheen@err.no>
 
+	* parse.c (_do_parse_libs): Special-case "-lib:" in the Libs
+	field; it's not an -l.  Yes, this breaks if your library is called
+	libib:$something, in which case you lose.  Gnome #142952
+
 	* main.c (main): Make sure log is initialized to prevent
 	segfaults.
 

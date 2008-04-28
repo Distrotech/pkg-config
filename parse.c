@@ -656,7 +656,10 @@ static void _do_parse_libs (Package *pkg, int argc, char **argv)
       p = start;      
 
       if (p[0] == '-' &&
-          p[1] == 'l')
+          p[1] == 'l' &&
+	  /* -lib: is used by the C# compiler for libs; it's not an -l
+              flag. */
+	  (strncmp(p, "-lib:", 5) != 0))
         {
           char *libname;          
               
