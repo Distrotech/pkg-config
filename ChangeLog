@@ -1,3 +1,8 @@
+2008-04-28  Tollef Fog Heen  <tfheen@err.no>
+
+	* main.c (main): Make sure log is initialized to prevent
+	segfaults.
+
 2008-03-23  Tollef Fog Heen  <tfheen@err.no>
 
 	* check/check-conflicts, check/conflicts-test.pc: New test,

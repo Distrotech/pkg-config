@@ -206,7 +206,7 @@ main (int argc, char **argv)
   char **search_dirs;
   char **iter;
   gboolean need_newline;
-  FILE *log;
+  FILE *log = NULL;
   const char *pkgname;
   Package *pkg;
 
