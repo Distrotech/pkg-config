@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2006-2008 Tollef Fog Heen <tfheen@err.no>
+ * Copyright (C) 2006-2009 Tollef Fog Heen <tfheen@err.no>
  * Copyright (C) 2001, 2002, 2005-2006 Red Hat Inc.
  * 
  * This program is free software; you can redistribute it and/or
@@ -917,7 +917,9 @@ pathnamecmp (const char *a,
 #endif
 
 static void
-parse_line (Package *pkg, const char *untrimmed, const char *path, gboolean ignore_requires, gboolean ignore_private_libs)
+parse_line (Package *pkg, const char *untrimmed, const char *path,
+	    gboolean ignore_requires, gboolean ignore_private_libs,
+	    gboolean ignore_requires_private)
 {
   char *str;
   char *p;
@@ -961,7 +963,10 @@ parse_line (Package *pkg, const char *untrimmed, const char *path, gboolean igno
       else if (strcmp (tag, "Version") == 0)
         parse_version (pkg, p, path);
       else if (strcmp (tag, "Requires.private") == 0)
-	parse_requires_private (pkg, p, path);
+	{
+	  if (!ignore_requires_private)
+	    parse_requires_private (pkg, p, path);
+	}
       else if (strcmp (tag, "Requires") == 0)
 	{
           if (ignore_requires == FALSE)
@@ -1078,7 +1083,9 @@ parse_line (Package *pkg, const char *untrimmed, const char *path, gboolean igno
 }
 
 Package*
-parse_package_file (const char *path, gboolean ignore_requires, gboolean ignore_private_libs)
+parse_package_file (const char *path, gboolean ignore_requires,
+		    gboolean ignore_private_libs,
+		    gboolean ignore_requires_private)
 {
   FILE *f;
   Package *pkg;
@@ -1115,7 +1122,8 @@ parse_package_file (const char *path, gboolean ignore_requires, gboolean ignore_
     {
       one_line = TRUE;
       
-      parse_line (pkg, str->str, path, ignore_requires, ignore_private_libs);
+      parse_line (pkg, str->str, path, ignore_requires, ignore_private_libs,
+		  ignore_requires_private);
 
       g_string_truncate (str, 0);
     }

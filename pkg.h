@@ -119,6 +119,8 @@ gboolean name_ends_in_uninstalled (const char *str);
 
 void enable_private_libs(void);
 void disable_private_libs(void);
+void enable_requires_private(void);
+void disable_requires_private(void);
 
 /* If TRUE, do not automatically prefer uninstalled versions */
 extern gboolean disable_uninstalled;

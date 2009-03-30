@@ -23,7 +23,8 @@
 #include "pkg.h"
 
 Package *parse_package_file (const char *path, gboolean ignore_requires,
-                             gboolean ignore_private_libs);
+			     gboolean ignore_private_libs,
+			     gboolean ignore_requires_private);
 
 Package *get_compat_package (const char *name);
 

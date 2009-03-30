@@ -55,6 +55,7 @@ static int scanned_dir_count = 0;
 
 gboolean disable_uninstalled = FALSE;
 gboolean ignore_requires = FALSE;
+gboolean ignore_requires_private = TRUE;
 gboolean ignore_private_libs = TRUE;
 
 void
@@ -337,7 +338,8 @@ internal_get_package (const char *name, gboolean warn, gboolean check_compat)
     }
 
   debug_spew ("Reading '%s' from file '%s'\n", name, location);
-  pkg = parse_package_file (location, ignore_requires, ignore_private_libs);
+  pkg = parse_package_file (location, ignore_requires, ignore_private_libs, 
+			    ignore_requires_private);
   
   if (pkg == NULL)
     {
@@ -1509,8 +1511,9 @@ void
 print_package_list (void)
 {
   int mlen = 0;
-  
+
   ignore_requires = TRUE;
+  ignore_requires_private = TRUE;
 
   g_hash_table_foreach (locations, max_len_foreach, &mlen);
   g_hash_table_foreach (locations, packages_foreach, GINT_TO_POINTER (mlen + 1));
@@ -1526,4 +1529,17 @@ void
 disable_private_libs(void)
 {
   ignore_private_libs = TRUE;
+}
+
+
+void
+enable_requires_private(void)
+{
+  ignore_requires_private = FALSE;
+}
+
+void
+disable_requires_private(void)
+{
+  ignore_requires_private = TRUE;
 }

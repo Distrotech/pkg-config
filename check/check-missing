@@ -1,0 +1,52 @@
+#! /bin/sh
+
+# Make sure we're POSIX
+if [ "$PKG_CONFIG_SHELL_IS_POSIX" != "1" ]; then
+    PKG_CONFIG_SHELL_IS_POSIX=1 PATH=`getconf PATH` exec sh $0 "$@"
+fi
+
+. ${srcdir}/common
+
+# non-existent package; call should fail and cause no output
+EXPECT_RETURN=1
+RESULT=""
+ARGS="pkg-non-existent"
+run_test
+
+# tests below are on an existing package, but with missing Requires.private;
+# when pkg-config outputs error, the actual error text isn't checked
+# package exists
+ARGS="missing-requires-private"
+EXPECT_RETURN=0
+RESULT=""
+run_test
+
+# get Libs
+ARGS="--libs missing-requires-private"
+EXPECT_RETURN=0
+RESULT="-L/missing-requires-private/lib -lmissing-requires-private"
+run_test
+
+# Libs.private should fail (verbosely, but the output isn't verified)
+ARGS="--silence-errors --static --libs missing-requires-private"
+EXPECT_RETURN=1
+RESULT=""
+run_test
+
+# Cflags.private should fail (verbosely, but the output isn't verified)
+ARGS="--silence-errors --static --cflags missing-requires-private"
+EXPECT_RETURN=1
+RESULT=""
+run_test
+
+# Cflags should fail (verbosely, but the output isn't verified)
+ARGS="--silence-errors --cflags missing-requires-private"
+EXPECT_RETURN=1
+RESULT=""
+run_test
+
+# get includedir var
+ARGS="--variable includedir missing-requires-private"
+EXPECT_RETURN=0
+RESULT="/usr/include/somedir"
+run_test

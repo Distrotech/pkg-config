@@ -384,6 +384,13 @@ main (int argc, char **argv)
   else
     disable_private_libs();
 
+  /* honor Requires.private if any Cflags are requested or any static
+   * libs are requested */
+
+  if (want_I_cflags || want_other_cflags || want_cflags ||
+      (want_static_lib_list && (want_libs || want_l_libs || want_L_libs)))
+    enable_requires_private();
+
   if (want_my_version)
     {
       printf ("%s\n", VERSION);
