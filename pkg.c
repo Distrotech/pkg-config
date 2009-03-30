@@ -234,6 +234,10 @@ add_virtual_pkgconfig_package (void)
 			       "compile/link flags for libraries");
   pkg->url = g_strdup ("http://pkg-config.freedesktop.org/");
 
+  if (pkg->vars == NULL)
+    pkg->vars = g_hash_table_new (g_str_hash, g_str_equal);
+  g_hash_table_insert (pkg->vars, "pc_path", PKG_CONFIG_PC_PATH);
+
   debug_spew ("Adding virtual 'pkg-config' package to list of known packages\n");
   g_hash_table_insert (packages, pkg->key, pkg);
 

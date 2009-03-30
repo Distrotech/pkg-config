@@ -1,5 +1,8 @@
 2009-03-30  Tollef Fog Heen  <tfheen@err.no>
 
+	* pkg.c (add_virtual_pkgconfig_package): Add pc_path as a variable
+	which you can use to get at the compiled-in PKG_CONFIG_PC_PATH.
+
 	* pkg.h: Fix up path to glib.h
 
 	* pkg.c (add_virtual_pkgconfig_package): Fix URL to pkg-config.
