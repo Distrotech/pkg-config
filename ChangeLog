@@ -1,5 +1,9 @@
 2009-03-30  Tollef Fog Heen  <tfheen@err.no>
 
+	* check/check-missing, check/check-libs,
+	check/check-requires-private: Handle the case of indirect being
+	enabled correctly in checks.
+
 	* check/common, check/config.sh.in, check/Makefile.am,
 	configure.in: Make it possible to check for configure variables in
 	the check scripts.  So far, only direct/indirect is exposed.

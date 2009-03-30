@@ -20,7 +20,11 @@ run_test
 
 # expect libs for just requires-test and public-dep
 ARGS="--libs requires-test"
-RESULT="-L/requires-test/lib -L/public-dep/lib -lrequires-test -lpublic-dep"
+if [ "$list_indirect_deps" = "yes" ]; then
+    RESULT="-L/requires-test/lib -L/private-dep/lib -L/public-dep/lib -lrequires-test -lprivate-dep -lpublic-dep"
+else
+    RESULT="-L/requires-test/lib -L/public-dep/lib -lrequires-test -lpublic-dep"
+fi
 run_test
 
 # expect libs for requires-test, public-dep and private-dep in static case
