@@ -1531,6 +1531,17 @@ disable_private_libs(void)
   ignore_private_libs = TRUE;
 }
 
+void
+enable_requires(void)
+{
+  ignore_requires = FALSE;
+}
+
+void
+disable_requires(void)
+{
+  ignore_requires = TRUE;
+}
 
 void
 enable_requires_private(void)

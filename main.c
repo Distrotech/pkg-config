@@ -391,6 +391,12 @@ main (int argc, char **argv)
       (want_static_lib_list && (want_libs || want_l_libs || want_L_libs)))
     enable_requires_private();
 
+  /* ignore Requires if no Cflags or Libs are requested */
+
+  if (!want_I_cflags && !want_other_cflags && !want_cflags &&
+      !want_libs && !want_l_libs && !want_L_libs)
+    disable_requires();
+
   if (want_my_version)
     {
       printf ("%s\n", VERSION);

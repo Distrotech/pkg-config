@@ -50,3 +50,29 @@ ARGS="--variable includedir missing-requires-private"
 EXPECT_RETURN=0
 RESULT="/usr/include/somedir"
 run_test
+
+# tests below are on an existing package, but with missing Requires; when
+# pkg-config outputs error, the actual error text isn't checked
+# package exists
+ARGS="missing-requires"
+EXPECT_RETURN=0
+RESULT=""
+run_test
+
+# Libs should fail
+ARGS="--silence-errors --libs missing-requires"
+EXPECT_RETURN=1
+RESULT=""
+run_test
+
+# Cflags should fail
+ARGS="--silence-errors --cflags missing-requires"
+EXPECT_RETURN=1
+RESULT=""
+run_test
+
+# get includedir var
+ARGS="--variable includedir missing-requires"
+EXPECT_RETURN=0
+RESULT="/usr/include/somedir"
+run_test

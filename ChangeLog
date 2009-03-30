@@ -1,5 +1,9 @@
 2009-03-30  Tollef Fog Heen  <tfheen@err.no>
 
+	* pkg.[ch], main.c, check/check-missing: Don't recurse Requires at
+	all unless we need to.  Add check.  Again, thanks to Loïc Minier
+	for most of the idea and the implementation.
+
 	* pkg.[ch], parse.[ch], main.c, check/Makefile.am,
 	check/check-missing, check/missing-requires-private.pc:
 	Skip Requires.private unless we need to look at them for cflags.
