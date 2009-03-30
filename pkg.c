@@ -232,7 +232,7 @@ add_virtual_pkgconfig_package (void)
   pkg->name = g_strdup ("pkg-config");
   pkg->description = g_strdup ("pkg-config is a system for managing "
 			       "compile/link flags for libraries");
-  pkg->url = g_strdup ("http://www.freedesktop.org/software/pkgconfig/");
+  pkg->url = g_strdup ("http://pkg-config.freedesktop.org/");
 
   debug_spew ("Adding virtual 'pkg-config' package to list of known packages\n");
   g_hash_table_insert (packages, pkg->key, pkg);
