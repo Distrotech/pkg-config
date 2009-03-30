@@ -22,8 +22,6 @@ INCLUDES=-DPKG_CONFIG_PC_PATH="\"$(pc_path)\"" $(included_glib_includes)
 pkg_config_SOURCES= \
 	pkg.h \
 	pkg.c \
-	partial-glib.h \
-	partial-glib.c \
 	parse.h \
 	parse.c \
 	main.c \

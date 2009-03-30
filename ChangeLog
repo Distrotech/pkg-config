@@ -1,5 +1,7 @@
 2009-03-30  Tollef Fog Heen  <tfheen@err.no>
 
+	* partial-glib.[ch]: Get rid of those, they are no longer in use.
+
 	* poptparse.c, popthelp.c, poptconfig.c, popt.c, pkg.c, findme.c,
 	configure.in: Check for malloc.h and use that if it exists.
 	Apparently this makes Win32 happier.  Thanks to Carlo Bramini for
