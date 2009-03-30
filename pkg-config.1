@@ -396,7 +396,9 @@ add those automatically.
 .I "Libs.private:"
 This line should list any private libraries in use.  Private libraries
 are libraries which are not exposed through your library, but are
-needed in the case of static linking.
+needed in the case of static linking. This differs from
+\fIRequires.private:\fP in that it references libraries that do not have
+package files installed.
 .TP
 .I "Cflags:"
 This line should list the compile flags specific to your package. 

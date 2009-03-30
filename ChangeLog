@@ -1,5 +1,8 @@
 2009-03-30  Tollef Fog Heen  <tfheen@err.no>
 
+	* pkg-config.1: Verbosify the text about Libs.private a bit. Patch
+	from Loïc Minier.
+
 	* pkg-config.1: Add documentation for --cflags-only-I, patch from
 	Loïc Minier.
 
