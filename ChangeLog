@@ -1,5 +1,9 @@
 2009-03-30  Tollef Fog Heen  <tfheen@err.no>
 
+	* check/common, check/config.sh.in, check/Makefile.am,
+	configure.in: Make it possible to check for configure variables in
+	the check scripts.  So far, only direct/indirect is exposed.
+
 	* pkg.c (add_virtual_pkgconfig_package): Add pc_path as a variable
 	which you can use to get at the compiled-in PKG_CONFIG_PC_PATH.
 

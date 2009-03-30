@@ -77,6 +77,7 @@ fi
 AC_SUBST(WARN_CFLAGS)
 
 AC_DEFINE_UNQUOTED(ENABLE_INDIRECT_DEPS, `test $use_indirect_deps = no; echo $?`, [Link library to all dependent libraries, not only directly needed ones])
+AC_SUBST(use_indirect_deps)
 
 AC_MSG_CHECKING([for Win32])
 case "$host" in
@@ -139,4 +140,6 @@ AC_FUNC_ALLOCA
 AC_CHECK_FUNCS(setresuid setreuid,break)
 AC_CHECK_HEADERS([dirent.h unistd.h sys/wait.h malloc.h])
 
-AC_OUTPUT([Makefile check/Makefile])
+AC_OUTPUT([Makefile
+	   check/Makefile
+	   check/config.sh])

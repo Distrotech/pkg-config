@@ -7,3 +7,4 @@ EXTRA_DIST = $(TESTS) common simple.pc requires-test.pc public-dep.pc	\
 	private-dep.pc includedir.pc missing-requires-private.pc \
 	missing-requires.pc
 
+DISTCLEANFILES = config.sh
