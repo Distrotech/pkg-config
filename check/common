@@ -11,12 +11,13 @@ export PKG_CONFIG_PATH
 
 run_test () {
     ${pkgconfig} $ARGS >/dev/null 2>&1
-    if [ "$?" -ne "0" ]; then
-        echo "Running ${pkgconfig} $ARGS failed altogether, bailing"
+    R=$?
+    if [ "$R" -ne "${EXPECT_RETURN:-0}" ]; then
+	echo "${pkgconfig} $ARGS exited with $R (expected $EXPECT_RETURN)"
         exit 1
     fi
 
-    R=$(${pkgconfig} $ARGS | sed -e 's,^[[:space:]]*,,' -e 's,[[:space:]]*$,,')
+    R=$(${pkgconfig} $ARGS 2>&1 | sed -e 's,^[[:space:]]*,,' -e 's,[[:space:]]*$,,')
     if [ "$R" != "$RESULT" ]; then
 	echo "${pkgconfig} $ARGS :"
 	echo "'$R' != '$RESULT'"
