@@ -112,6 +112,10 @@ dependencies. Flags are "compressed" so that each identical flag
 appears only once. \fIpkg-config\fP exits with a nonzero code if it
 can't find metadata for one or more of the packages on the command
 line.
+.TP
+.I "--cflags-only-I"
+This prints the -I part of "--cflags". That is, it defines the header
+search path but doesn't specify anything else.
 .TP 
 .I "--libs"
 This option is identical to "--cflags", only it prints the link
