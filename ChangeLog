@@ -1,5 +1,7 @@
 2009-03-30  Tollef Fog Heen  <tfheen@err.no>
 
+	* autogen.sh: Allow not running configure, wanted by cygwin.
+
 	* check/check-missing, check/check-libs,
 	check/check-requires-private: Handle the case of indirect being
 	enabled correctly in checks.

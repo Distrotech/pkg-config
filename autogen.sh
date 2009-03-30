@@ -80,9 +80,14 @@ perl -p -w -i.bak -e 's/if \(compare_func\(l1->data,l2->data\) < 0\)/if \(compar
 
 (cd glib-1.2.10 && libtoolize --copy --force && $ACLOCAL $ACLOCAL_FLAGS && $AUTOMAKE && $AUTOCONF) || exit 1
 
+run_configure=yes
 if test -z "$*"; then
 	echo "I am going to run ./configure with no arguments - if you wish "
         echo "to pass any to it, please specify them on the $0 command line."
+else
+    case "--no-configure" in
+	"*$") run_configure=no
+    esac
 fi
 
 libtoolize --copy --force
@@ -98,9 +103,12 @@ $AUTOCONF
 
 cd $ORIGDIR
 
-export AUTOMAKE
-export ACLOCAL
-$srcdir/configure --enable-maintainer-mode --disable-shared --disable-threads "$@"
-
-echo 
-echo "Now type 'make' to compile $PROJECT."
+if [ "$run_configure" = "yes" ]; then
+    export AUTOMAKE
+    export ACLOCAL
+    $srcdir/configure --enable-maintainer-mode --disable-shared --disable-threads "$@"
+    echo 
+    echo "Now type 'make' to compile $PROJECT."
+else
+    echo "Now type './configure && make' to compile $PROJECT."
+fi
