@@ -195,10 +195,11 @@ void poptPrintHelp(poptContext con, FILE * f, int flags) {
 
     showHelpIntro(con, f);
     if (con->otherHelp)
-	fprintf(f, " %s\n", con->otherHelp);
+	fprintf(f, " %s", con->otherHelp);
     else
-	fprintf(f, " %s\n", POPT_("[OPTION...]"));
+	fprintf(f, " %s", POPT_("[OPTION...]"));
 
+    fprintf(f, " [LIBRARIES]\n");
     leftColWidth = maxArgWidth(con->options);
     singleTableHelp(f, con->options, leftColWidth);
 }
@@ -292,8 +293,7 @@ void poptPrintUsage(poptContext con, FILE * f, int flags) {
 	if (cursor > 79) fprintf(f, "\n       ");
 	fprintf(f, " %s", con->otherHelp);
     }
-
-    fprintf(f, "\n");
+    fprintf(f, "\n        [LIBRARIES]\n");
 }
 
 void poptSetOtherOptionHelp(poptContext con, const char * text) {

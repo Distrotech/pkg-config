@@ -1,3 +1,8 @@
+2009-03-30  Tollef Fog Heen  <tfheen@err.no>
+
+	* popthelp.c (poptPrintUsage,poptPrintHelp): Add [LIBRARIES] to
+	help output.  Debian #389066
+
 2008-04-28  Tollef Fog Heen  <tfheen@err.no>
 
 	* parse.c Add my name to the copyright header, mainly to prevent
