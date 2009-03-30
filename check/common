@@ -8,6 +8,7 @@ pkgconfig=../pkg-config
 
 PKG_CONFIG_PATH=$srcdir
 export PKG_CONFIG_PATH
+export LC_ALL=C
 
 run_test () {
     ${pkgconfig} $ARGS >/dev/null 2>&1

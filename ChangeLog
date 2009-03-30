@@ -1,5 +1,7 @@
 2009-03-30  Tollef Fog Heen  <tfheen@err.no>
 
+	* check/common: Run all tests in the C locale
+
 	* check/common: Add support for non-zero return codes to test
 	framework.  Thanks to Loïc Minier for the idea.
 
