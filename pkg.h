@@ -23,7 +23,7 @@
 #ifdef USE_INSTALLED_GLIB
 #include <glib.h>
 #else
-#include "partial-glib.h"
+#include "glib-1.2.10/glib.h"
 #endif
 
 typedef enum
