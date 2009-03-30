@@ -35,6 +35,10 @@ in this Software without prior written authorization from the X Consortium.
 # endif
 #endif
 
+#ifdef HAVE_MALLOC_H
+# include <malloc.h>
+#endif
+
 #include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>

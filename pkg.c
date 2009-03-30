@@ -33,6 +33,10 @@
 # endif
 #endif
 
+#ifdef HAVE_MALLOC_H
+# include <malloc.h>
+#endif
+
 #include <sys/types.h>
 #include <dirent.h>
 #include <string.h>

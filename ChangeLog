@@ -1,5 +1,10 @@
 2009-03-30  Tollef Fog Heen  <tfheen@err.no>
 
+	* poptparse.c, popthelp.c, poptconfig.c, popt.c, pkg.c, findme.c,
+	configure.in: Check for malloc.h and use that if it exists.
+	Apparently this makes Win32 happier.  Thanks to Carlo Bramini for
+	the patch.
+
 	* pkg-config.1: Verbosify the text about Libs.private a bit. Patch
 	from Loïc Minier.
 

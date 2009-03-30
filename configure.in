@@ -137,6 +137,6 @@ fi # !native_win32
 AC_FUNC_ALLOCA
 
 AC_CHECK_FUNCS(setresuid setreuid,break)
-AC_CHECK_HEADERS([dirent.h unistd.h sys/wait.h])
+AC_CHECK_HEADERS([dirent.h unistd.h sys/wait.h malloc.h])
 
 AC_OUTPUT([Makefile check/Makefile])
