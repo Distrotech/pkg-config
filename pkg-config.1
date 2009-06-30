@@ -261,6 +261,10 @@ conventions (i.e., ends with \\lib\\pkgconfig or \\share\\pkgconfig),
 the prefix for that package is assumed to be the grandparent of the
 directory where the file was found, and the \fIprefix\fP variable is
 overridden for that file accordingly.
+
+If the value of a variable in a .pc file begins with the original,
+non-overridden, value of the \fIprefix\fP variable, then the overridden
+value of \fIprefix\fP is used instead.
 .\"
 .SH AUTOCONF MACROS
 .TP

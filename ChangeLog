@@ -1,3 +1,22 @@
+2009-06-30  Tollef Fog Heen  <tfheen@err.no>
+
+	* pkg.m4: Add patch from Peter Rosin for somewhat nicer output if
+	you use the four-clause form of PKG_CHECK_MODULES.
+
+2009-06-12  Tor Lillqvist  <tml@iki.fi>
+
+	* parse.c: On Win32, if the value of a a variable other than the
+	"prefix" one starts with the non-overridden value of "prefix",
+	then replace that prefix, too, with the run-time one.
+
+	To avoid shadowing warnings, rename a 'p' variable to 'q'.
+
+	* pkg-config.1: Corresponding update.
+
+	* main.c
+	* pkg.h: Move the Win32 redefinition of PKG_CONFIG_PC_PATH from
+	main.c to pkg.h as it now is needed in pkg.c, too.
+
 2009-03-30  Tollef Fog Heen  <tfheen@err.no>
 
 	* autogen.sh: Allow not running configure, wanted by cygwin.
