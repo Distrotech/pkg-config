@@ -26,6 +26,17 @@
 #include "glib-1.2.10/glib.h"
 #endif
 
+#ifdef G_OS_WIN32
+/* No hardcoded paths in the binary, thanks */
+/* It's OK to leak this */
+#undef PKG_CONFIG_PC_PATH
+#define PKG_CONFIG_PC_PATH \
+  g_strconcat (g_win32_get_package_installation_subdirectory (NULL, NULL, "lib/pkgconfig"), \
+	       ";", \
+	       g_win32_get_package_installation_subdirectory (NULL, NULL, "share/pkgconfig"), \
+	       NULL)
+#endif
+
 typedef enum
 {
   LESS_THAN,

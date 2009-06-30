@@ -901,6 +901,8 @@ parse_url (Package *pkg, const char *str, const char *path)
 }
 
 #ifdef G_OS_WIN32
+static char *orig_prefix = NULL;
+
 static int
 pathnamecmp (const char *a,
 	     const char *b)
@@ -1031,8 +1033,10 @@ parse_line (Package *pkg, const char *untrimmed, const char *path,
 	    {
 	      /* It ends in lib\pkgconfig or share\pkgconfig. Good. */
 	      
-	      gchar *p;
+	      gchar *q;
 	      
+	      orig_prefix = g_strdup (p);
+
 	      prefix = g_strdup (prefix);
 	      if (strlen (prefix) > lib_pkgconfig_len &&
 		  pathnamecmp (prefix + prefix_len - lib_pkgconfig_len, lib_pkgconfig) == 0)
@@ -1044,12 +1048,12 @@ parse_line (Package *pkg, const char *untrimmed, const char *path,
 	       * poptParseArgvString() will eat them when ${prefix}
 	       * has been expanded in parse_libs().
 	       */
-	      p = prefix;
-	      while (*p)
+	      q = prefix;
+	      while (*q)
 		{
-		  if (*p == '\\')
-		    *p = '/';
-		  p++;
+		  if (*q == '\\')
+		    *q = '/';
+		  q++;
 		}
 	      varname = g_strdup (tag);
 	      debug_spew (" Variable declaration, '%s' overridden with '%s'\n",
@@ -1057,6 +1061,16 @@ parse_line (Package *pkg, const char *untrimmed, const char *path,
 	      g_hash_table_insert (pkg->vars, varname, prefix);
 	      goto cleanup;
 	    }
+	}
+      else if (!dont_define_prefix &&
+	       orig_prefix != NULL &&
+	       strncmp (p, orig_prefix, strlen (orig_prefix)) == 0 &&
+	       G_IS_DIR_SEPARATOR (p[strlen (orig_prefix)]))
+	{
+	  char *oldstr = str;
+
+	  p = str = g_strconcat (g_hash_table_lookup (pkg->vars, prefix_variable), p + strlen (orig_prefix), NULL);
+	  g_free (oldstr);
 	}
 #endif
 

@@ -36,17 +36,6 @@
 #undef STRICT
 #endif
 
-#ifdef G_OS_WIN32
-/* No hardcoded paths in the binary, thanks */
-/* It's OK to leak this */
-#undef PKG_CONFIG_PC_PATH
-#define PKG_CONFIG_PC_PATH \
-  g_strconcat (g_win32_get_package_installation_subdirectory (NULL, NULL, "lib/pkgconfig"), \
-	       ";", \
-	       g_win32_get_package_installation_subdirectory (NULL, NULL, "share/pkgconfig"), \
-	       NULL)
-#endif
-
 static int want_debug_spew = 0;
 static int want_verbose_errors = 0;
 static int want_stdout_errors = 0;
