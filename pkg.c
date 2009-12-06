@@ -479,33 +479,22 @@ string_list_to_string (GSList *list)
   char *retval;
   
   tmp = list;
-  while (tmp != NULL)
-    {
-      char *tmpstr = (char*) tmp->data;
-      if (pcsysrootdir != NULL)
-	{
-	  if (tmpstr[0] == '-' &&
-	      (tmpstr[1] == 'I' ||
-	       tmpstr[1] == 'L'))
-	    {
-	      g_string_append_c (str, '-');
-	      g_string_append_c (str, tmpstr[1]);
-	      g_string_append (str, pcsysrootdir);
-	      g_string_append (str, tmpstr+2);
-	    }
-	  else
-	    {
-	      g_string_append (str, tmpstr);
-	    }
-	}
-      else
-	{
-	  g_string_append (str, tmpstr);
-	}
-      g_string_append_c (str, ' ');
-      
-      tmp = g_slist_next (tmp);
+  while (tmp != NULL) {
+    char *tmpstr = (char*) tmp->data;
+    if (pcsysrootdir != NULL &&
+	tmpstr[0] == '-' &&
+	(tmpstr[1] == 'I' ||
+	 tmpstr[1] == 'L')) {
+      g_string_append_c (str, '-');
+      g_string_append_c (str, tmpstr[1]);
+      g_string_append (str, pcsysrootdir);
+      g_string_append (str, tmpstr+2);
+    } else {
+      g_string_append (str, tmpstr);
     }
+    g_string_append_c (str, ' ');
+    tmp = g_slist_next (tmp);
+  }
 
   retval = str->str;
   g_string_free (str, FALSE);
