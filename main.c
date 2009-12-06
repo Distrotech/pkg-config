@@ -246,9 +246,11 @@ main (int argc, char **argv)
     { "debug", 0, POPT_ARG_NONE, &want_debug_spew, 0,
       "show verbose debug information" },
     { "print-errors", 0, POPT_ARG_NONE, &want_verbose_errors, 0,
-      "show verbose information about missing or conflicting packages" },
+      "show verbose information about missing or conflicting packages,"
+      "default if --cflags or --libs given on the command line" },
     { "silence-errors", 0, POPT_ARG_NONE, &want_silence_errors, 0,
-      "show verbose information about missing or conflicting packages" },
+      "be silent about errors (default unless --cflags or --libs"
+      "given on the command line)" },
     { "errors-to-stdout", 0, POPT_ARG_NONE, &want_stdout_errors, 0,
       "print errors from --print-errors to stdout not stderr" },
 #ifdef G_OS_WIN32
