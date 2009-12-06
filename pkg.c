@@ -768,7 +768,7 @@ verify_package (Package *pkg)
   GSList *conflicts_iter;
   GSList *system_dir_iter = NULL;
   int count;
-  gchar *c_include_path;
+  const gchar *c_include_path;
 
   /* Be sure we have the required fields */
 
