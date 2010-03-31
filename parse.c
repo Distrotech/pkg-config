@@ -28,7 +28,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <ctype.h>
-#include "popt.h"
+#include <popt.h>
 #ifdef HAVE_SYS_WAIT_H
 #include <sys/wait.h>
 #endif

@@ -24,7 +24,7 @@
 #include "pkg.h"
 #include "parse.h"
 
-#include "popt.h"
+#include <popt.h>
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>

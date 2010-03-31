@@ -141,5 +141,6 @@ AC_CHECK_FUNCS(setresuid setreuid,break)
 AC_CHECK_HEADERS([dirent.h unistd.h sys/wait.h malloc.h])
 
 AC_OUTPUT([Makefile
+	   popt/Makefile
 	   check/Makefile
 	   check/config.sh])
