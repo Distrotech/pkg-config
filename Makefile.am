@@ -6,9 +6,16 @@ GLIB_SUBDIR = glib-1.2.10
 included_glib_includes = -I./glib-1.2.10
 pkg_config_LDADD=glib-1.2.10/libglib.la
 endif
+
+if USE_INSTALLED_POPT
+pkg_config_LDADD += $(POPT_LIBS)
+else
 pkg_config_LDADD += popt/libpopt.la
 popt_includes = -I./popt
-SUBDIRS = $(GLIB_SUBDIR) popt check
+POPT_SUBDIR = popt
+endif
+
+SUBDIRS = $(GLIB_SUBDIR) $(POPT_SUBDIR) check
 
 m4dir = $(datadir)/aclocal
 m4_DATA = pkg.m4
