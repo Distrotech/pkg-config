@@ -35,7 +35,7 @@ pkg-config \- Return metainformation about installed libraries
 [\-\-define-variable=VARIABLENAME=VARIABLEVALUE]
 [\-\-uninstalled]
 [\-\-exists] [\-\-atleast-version=VERSION] [\-\-exact-version=VERSION]
-[\-\-max-version=VERSION] [LIBRARIES...]
+[\-\-max-version=VERSION] [\-\-list\-all] [LIBRARIES...]
 .SH DESCRIPTION
 
 The \fIpkg-config\fP program is used to retrieve information about
@@ -207,6 +207,9 @@ Output libraries suitable for static linking.  That means including
 any private libraries in the output.  This relies on proper tagging in
 the .pc files, else a too large number of libraries will ordinarily be
 output.
+.TP
+.I "--list-all"
+List all modules found in the \fIpkg-config\fP path.
 .\"
 .SH ENVIRONMENT VARIABLES
 .TP
