@@ -1,3 +1,9 @@
+
+*************************************************************************
+This file is no longer kept up to date, please see git commit logs
+instead.
+*************************************************************************
+
 2009-06-30  Tollef Fog Heen  <tfheen@err.no>
 
 	* pkg.m4: Add patch from Peter Rosin for somewhat nicer output if
