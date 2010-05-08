@@ -1323,6 +1323,9 @@ static int rpmvercmp(const char * a, const char * b) {
 	while (*one && !isalnum((guchar)*one)) one++;
 	while (*two && !isalnum((guchar)*two)) two++;
 
+	/* If we ran to the end of either, we are finished with the loop */
+	if (!(*one && *two)) break;
+
 	str1 = one;
 	str2 = two;
 
@@ -1349,7 +1352,8 @@ static int rpmvercmp(const char * a, const char * b) {
 	/* take care of the case where the two version segments are */
 	/* different types: one numeric and one alpha */
 	if (one == str1) return -1;	/* arbitrary */
-	if (two == str2) return -1;
+	/* XXX See patch #60884 (and details) from bugzilla #50977. */
+	if (two == str2) return (isnum ? 1 : -1);
 
 	if (isnum) {
 	    /* this used to be done by converting the digit segments */
