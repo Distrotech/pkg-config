@@ -11,6 +11,8 @@ SUBDIRS = $(GLIB_SUBDIR) check
 m4dir = $(datadir)/aclocal
 m4_DATA = pkg.m4
 
+dist_doc_DATA = pkg-config-guide.html
+
 man_MANS = pkg-config.1
 EXTRA_DIST = $(m4_DATA) $(man_MANS) README.win32
 
