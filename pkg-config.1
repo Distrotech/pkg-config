@@ -48,13 +48,17 @@ program: program.c
 	cc program.c $(pkg-config --cflags --libs gnomeui)
 .fi
 .PP
-\fIpkg-config\fP retrieves information about packages from 
-special metadata files. These files are named after the package, 
-with the extension \fI.pc\fP. By default, pkg-config looks in 
-the directory \fIprefix\fP/lib/pkgconfig for these files; it will also
-look in the colon-separated (on Windows, semicolon-separated) 
-list of directories specified by the 
-PKG_CONFIG_PATH environment variable. 
+.I pkg-config
+retrieves information about packages from special metadata
+files. These files are named after the package, and has a
+.I .pc
+extension.  On most systems, \fIpkg-config\fP looks in
+.I/usr/lib/pkgconfig, /usr/share/pkgconfig, /usr/local/lib/pkgconfig
+and
+.I/usr/local/share/pkgconfig
+ for these files.  It will additionally look in the colon-separated
+(on Windows, semicolon-separated) list of directories specified by the
+PKG_CONFIG_PATH environment variable.
 .PP
 The package name specified on the \fIpkg-config\fP command line is
 defined to be the name of the metadata file, minus the \fI.pc\fP
@@ -71,8 +75,8 @@ the command line be displayed.  If \fIpkg-config\fP can find all the
 libraries on the command line, each library's version string is
 printed to stdout, one version per line. In this case \fIpkg-config\fP
 exits successfully. If one or more libraries is unknown,
-\fIpkg-config\fP exits with a nonzero code, and the contents of stdout
-are undefined.
+.I pkg-config
+exits with a nonzero code, and the contents of stdout are undefined.
 .TP
 .I "--help"
 Displays a help message and terminates.
@@ -82,7 +86,8 @@ If one or more of the modules on the command line, or their
 dependencies, are not found, or if an error occurs in parsing
 a \fI.pc\fP file, then this option will cause errors explaining the
 problem to be printed. With "predicate" options such as "--exists"
-\fIpkg-config\fP runs silently by default, because it's usually used
+.I "pkg-config"
+runs silently by default, because it's usually used
 in scripts that want to control what's output. This option can be used
 alone (to just print errors encountered locating modules on the 
 command line) or with other options. The PKG_CONFIG_DEBUG_SPEW
@@ -144,8 +149,9 @@ can say:
 .TP
 .I "--define-variable=VARIABLENAME=VARIABLEVALUE"
 This sets a global value for a variable, overriding the value in any
-\fI.pc\fP files. Most packages define the variable "prefix", for
-example, so you can say:
+.I.pc
+files. Most packages define the variable "prefix", for example, so you
+can say:
 .nf
   $ pkg-config --print-errors --define-variable=prefix=/foo \e
                --variable=prefix glib-2.0
@@ -157,12 +163,14 @@ Normally if you request the package "foo" and the package
 "foo-uninstalled" exists, \fIpkg-config\fP will prefer the 
 "-uninstalled" variant. This allows compilation/linking against
 uninstalled packages. If you specify the "--uninstalled" option,
-\fIpkg-config\fP will return successfully if any "-uninstalled"
-packages are being used, and return failure (false) otherwise.
-(The "PKG_CONFIG_DISABLE_UNINSTALLED" environment variable keeps 
-\fIpkg-config\fP from implicitly choosing "-uninstalled" packages, so
-if that variable is set, they will only have been used if you pass 
-a name like "foo-uninstalled" on the command line explicitly.)
+.I pkg-config
+will return successfully if any "-uninstalled" packages are being
+used, and return failure (false) otherwise.  (The
+PKG_CONFIG_DISABLE_UNINSTALLED environment variable keeps
+.I pkg-config
+from implicitly choosing "-uninstalled" packages, so if that variable
+is set, they will only have been used if you pass a name like
+"foo-uninstalled" on the command line explicitly.)
 .TP
 .I "--exists"
 .TP
@@ -172,10 +180,11 @@ a name like "foo-uninstalled" on the command line explicitly.)
 .TP
 .I "--max-version=VERSION"
 These options test whether the package or list of packages on the
-command line are known to \fIpkg-config\fP, and optionally 
-whether the version number of a package meets certain contraints.
-If all packages exist and meet the specified version constraints,
-\fIpkg-config\fP exits successfully. Otherwise it exits unsuccessfully.
+command line are known to \fIpkg-config\fP, and optionally whether the
+version number of a package meets certain contraints.  If all packages
+exist and meet the specified version constraints,
+.I pkg-config
+exits successfully. Otherwise it exits unsuccessfully.
 
 Rather than using the version-test options, you can simply give a version
 constraint after each package name, for example:
@@ -188,10 +197,11 @@ Remember to use \-\-print-errors if you want error messages.
 This option is available only on Windows. It causes \fIpkg-config\fP
 to output -l and -L flags in the form recognized by the Microsoft
 Visual C++ command-line compiler, \fIcl\fP. Specifically, instead of
-\fI-Lx:/some/path\fP it prints \fI/libpath:x/some/path\fP, and instead
-of \fI-lfoo\fP it prints \fIfoo.lib\fP. Note that the --libs output
-consists of flags for the linker, and should be placed on the cl
-command line after a /link switch. 
+.I-Lx:/some/path
+it prints \fI/libpath:x/some/path\fP, and instead of \fI-lfoo\fP it
+prints \fIfoo.lib\fP. Note that the --libs output consists of flags
+for the linker, and should be placed on the cl command line after a
+/link switch.
 .TP
 .I "--dont-define-prefix"
 This option is available only on Windows. It prevents \fIpkg-config\fP
@@ -217,9 +227,9 @@ List all modules found in the \fIpkg-config\fP path.
 A colon-separated (on Windows, semicolon-separated) list of
 directories to search for .pc files.  The default directory will
 always be searched after searching the path; the default is
-\fIlibdir\fP/pkgconfig:\fIdatadir\fP/pkgconfig where \fIlibdir\fP is
-the libdir where \fIpkg-config\fP and \fIdatadir\fP is the datadir
-where \fIpkg-config\fP was installed.
+.I \%libdir/\fPpkgconfig:\fIdatadir\fP/pkgconfig where \fIlibdir\fP is
+the libdir for \fIpkg-config\fP and \fIdatadir\fP is the datadir
+for \fIpkg-config\fP when it was installed.
 .TP
 .I "PKG_CONFIG_DEBUG_SPEW"
 If set, causes \fIpkg-config\fP to print all kinds of
@@ -271,7 +281,7 @@ value of \fIprefix\fP is used instead.
 .\"
 .SH AUTOCONF MACROS
 .TP
-.I "PKG_CHECK_MODULES(VARIABLE-PREFIX,MODULES[,ACTION-IF-FOUND,[ACTION-IF-NOT-FOUND]])"
+.I "PKG_CHECK_MODULES(VARIABLE-PREFIX, MODULES [,ACTION-IF-FOUND [,ACTION-IF-NOT-FOUND]])"
 
 The macro PKG_CHECK_MODULES can be used in \fIconfigure.ac\fP to 
 check whether modules exist. A typical usage would be:
@@ -283,7 +293,7 @@ This would result in MYSTUFF_LIBS and MYSTUFF_CFLAGS substitution
 variables, set to the libs and cflags for the given module list. 
 If a module is missing or has the wrong version, by default configure
 will abort with a message. To replace the default action, 
-specify an ACTION-IF-NOT-FOUND. PKG_CHECK_MODULES will not print any
+specify an \%ACTION-IF-NOT-FOUND. \%PKG_CHECK_MODULES will not print any
 error messages if you specify your own ACTION-IF-NOT-FOUND.
 However, it will set the variable MYSTUFF_PKG_ERRORS, which you can 
 use to display what went wrong.
@@ -311,7 +321,7 @@ PKG_CHECK_EXISTS manually.
 .SH METADATA FILE SYNTAX
 To add a library to the set of packages \fIpkg-config\fP knows about,
 simply install a \fI.pc\fP file. You should install this file to 
-\fIlibdir\fP/pkgconfig.
+.I libdir\fP/pkgconfig.
 .PP
 Here is an example file:
 .nf
@@ -404,8 +414,9 @@ add those automatically.
 This line should list any private libraries in use.  Private libraries
 are libraries which are not exposed through your library, but are
 needed in the case of static linking. This differs from
-\fIRequires.private:\fP in that it references libraries that do not have
-package files installed.
+.I Requires.private
+in that it references libraries that do not have package files
+installed.
 .TP
 .I "Cflags:"
 This line should list the compile flags specific to your package. 
@@ -414,12 +425,14 @@ add those automatically.
 .\"
 .SH AUTHOR
 
-\fIpkg-config\fP was written by James Henstridge, rewritten by Martijn
-van Beers, and rewritten again by Havoc Pennington. Tim Janik, Owen
-Taylor, and Raja Harinath submitted suggestions and some code.
-\fIgnome-config\fP was written by Miguel de Icaza, Raja Harinath and
-various hackers in the GNOME team.  It was inspired by Owen Taylor's
-\fIgtk-config\fP program.
+.I pkg-config
+was written by James Henstridge, rewritten by Martijn van Beers, and
+rewritten again by Havoc Pennington. Tim Janik, Owen Taylor, and Raja
+Harinath submitted suggestions and some code.
+.I gnome-config
+was written by Miguel de Icaza, Raja Harinath and various hackers in
+the GNOME team.  It was inspired by Owen Taylor's \fIgtk-config\fP
+program.
 .\"
 .SH BUGS
 
@@ -427,4 +440,5 @@ various hackers in the GNOME team.  It was inspired by Owen Taylor's
 = well.  Stick with one.
 
 Bugs can be reported at http://bugs.freedesktop.org/ under the
-\fIpkg-config\fP component.
+.I pkg-config
+component.
