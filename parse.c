@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2006-2009 Tollef Fog Heen <tfheen@err.no>
+ * Copyright (C) 2006-2010 Tollef Fog Heen <tfheen@err.no>
  * Copyright (C) 2001, 2002, 2005-2006 Red Hat Inc.
  * 
  * This program is free software; you can redistribute it and/or
@@ -849,12 +849,12 @@ parse_cflags (Package *pkg, const char *str, const char *path)
       char *start;
 
       start = arg;
-      p = start;      
+      p = start;
 
       if (p[0] == '-' &&
           p[1] == 'I')
         {
-          char *libname;          
+          char *libname;
               
           p += 2;
           while (*p && isspace ((guchar)*p))
@@ -870,13 +870,15 @@ parse_cflags (Package *pkg, const char *str, const char *path)
                                            g_strconcat ("-I", libname, NULL));
 
           g_free (libname);
-        }
-      else
-        {
+        } else {
           if (*arg != '\0')
             pkg->other_cflags = g_slist_prepend (pkg->other_cflags,
                                                  g_strdup (arg));
-        }
+	  if (strcmp("-idirafter", arg) == 0) {
+	      char *n = trim_string(argv[++i]);
+	      pkg->other_cflags = g_slist_prepend(pkg->other_cflags, n);
+	  }
+      }
 
       g_free (arg);
       
