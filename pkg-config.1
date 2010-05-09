@@ -33,6 +33,7 @@ pkg-config \- Return metainformation about installed libraries
 [\-\-libs-only-l] [\-\-cflags-only-I]
 [\-\-variable=VARIABLENAME]
 [\-\-define-variable=VARIABLENAME=VARIABLEVALUE]
+[\-\-print-variables]
 [\-\-uninstalled]
 [\-\-exists] [\-\-atleast-version=VERSION] [\-\-exact-version=VERSION]
 [\-\-max-version=VERSION] [\-\-list\-all] [LIBRARIES...]
@@ -157,6 +158,10 @@ can say:
                --variable=prefix glib-2.0
   /foo
 .fi
+.TP
+.I "--print-variables"
+Returns a list of all variables defined in the package.
+
 .TP
 .I "--uninstalled"
 Normally if you request the package "foo" and the package

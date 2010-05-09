@@ -163,6 +163,14 @@ pkg_uninstalled (Package *pkg)
   return FALSE;
 }
 
+void
+print_hashtable_key (gpointer key,
+                     gpointer value,
+                     gpointer user_data)
+{
+  printf("%s\n", (gchar*)key);
+}
+
 int
 main (int argc, char **argv)
 {
@@ -186,6 +194,7 @@ main (int argc, char **argv)
   static char *required_max_version = NULL;
   static char *required_pkgconfig_version = NULL;
   static int want_silence_errors = 0;
+  static int want_variable_list = 0;
   int result;
   GString *str;
   GSList *packages = NULL;
@@ -233,6 +242,8 @@ main (int argc, char **argv)
       "set variable NAME to VALUE", "NAME=VALUE" },
     { "exists", 0, POPT_ARG_NONE, &want_exists, 0,
       "return 0 if the module(s) exist" },
+    { "print-variables", 0, POPT_ARG_NONE, &want_variable_list, 0,
+      "output list of variables defined by the module" },
     { "uninstalled", 0, POPT_ARG_NONE, &want_uninstalled, 0,
       "return 0 if the uninstalled version of one or more module(s) or their dependencies will be used" },
     { "atleast-version", 0, POPT_ARG_STRING, &required_atleast_version, 0,
@@ -348,7 +359,8 @@ main (int argc, char **argv)
       want_other_libs ||
       want_I_cflags ||
       want_other_cflags ||
-      want_list)
+      want_list ||
+      want_variable_list)
     {
       debug_spew ("Error printing enabled by default due to use of --version, --libs, --cflags, --libs-only-l, --libs-only-L, --libs-only-other, --cflags-only-I, --cflags-only-other or --list. Value of --silence-errors: %d\n", want_silence_errors);
 
@@ -504,6 +516,23 @@ main (int argc, char **argv)
 
     if (failed) {
       return 1;
+    }
+
+  if (want_variable_list)
+    {
+      GSList *tmp;
+      gchar  *str;
+      tmp = packages;
+      while (tmp != NULL)
+        {
+          Package *pkg = tmp->data;
+          g_hash_table_foreach(pkg->vars,
+                               &print_hashtable_key,
+                               NULL);
+          tmp = g_slist_next (tmp);
+          if (tmp) printf ("\n");
+        }
+      need_newline = FALSE;
     }
 
   }
