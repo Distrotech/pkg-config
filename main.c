@@ -189,6 +189,9 @@ main (int argc, char **argv)
   static int want_uninstalled = 0;
   static char *variable_name = NULL;
   static int want_exists = 0;
+  static int want_provides = 0;
+  static int want_requires = 0;
+  static int want_requires_private = 0;
   static char *required_atleast_version = NULL;
   static char *required_exact_version = NULL;
   static char *required_max_version = NULL;
@@ -264,6 +267,12 @@ main (int argc, char **argv)
       "given on the command line)" },
     { "errors-to-stdout", 0, POPT_ARG_NONE, &want_stdout_errors, 0,
       "print errors from --print-errors to stdout not stderr" },
+    { "print-provides", 0, POPT_ARG_NONE, &want_provides, 0,
+      "print which packages the package provides" },
+    { "print-requires", 0, POPT_ARG_NONE, &want_requires, 0,
+      "print which packages the package requires" },
+    { "print-requires-private", 0, POPT_ARG_NONE, &want_requires_private, 0,
+      "print which packages the package requires for static linking" },
 #ifdef G_OS_WIN32
     { "dont-define-prefix", 0, POPT_ARG_NONE, &dont_define_prefix, 0,
       "don't try to override the value of prefix for each .pc file found with "
@@ -391,13 +400,14 @@ main (int argc, char **argv)
    * libs are requested */
 
   if (want_I_cflags || want_other_cflags || want_cflags ||
+      want_requires_private ||
       (want_static_lib_list && (want_libs || want_l_libs || want_L_libs)))
     enable_requires_private();
 
   /* ignore Requires if no Cflags or Libs are requested */
 
   if (!want_I_cflags && !want_other_cflags && !want_cflags &&
-      !want_libs && !want_l_libs && !want_L_libs)
+      !want_libs && !want_l_libs && !want_L_libs && !want_requires)
     disable_requires();
 
   if (want_my_version)
@@ -583,6 +593,74 @@ main (int argc, char **argv)
         }
     }
 
+ if (want_provides)
+   {
+     GSList *tmp;
+     tmp = packages;
+     while (tmp != NULL)
+       {
+         Package *pkg = tmp->data;
+         char *key;
+         key = pkg->key;
+         while (*key == '/')
+           key++;
+         if (strlen(key) > 0)
+           printf ("%s = %s\n", key, pkg->version);
+         tmp = g_slist_next (tmp);
+       }
+   }
+
+  if (want_requires)
+    {
+      GSList *pkgtmp;
+      for (pkgtmp = packages; pkgtmp != NULL; pkgtmp = g_slist_next (pkgtmp))
+        {
+          Package *pkg = pkgtmp->data;
+          GSList *reqtmp;
+
+          /* process Requires: */
+          for (reqtmp = pkg->requires; reqtmp != NULL; reqtmp = g_slist_next (reqtmp))
+            {
+              Package *deppkg = reqtmp->data;
+              RequiredVersion *req;
+              req = g_hash_table_lookup(pkg->required_versions, deppkg->key);
+              if ((req == NULL) || (req->comparison == ALWAYS_MATCH))
+                printf ("%s\n", deppkg->key);
+              else
+                printf ("%s %s %s\n", deppkg->key,
+                  comparison_to_str(req->comparison),
+                  req->version);
+            }
+        }
+    }
+  if (want_requires_private)
+    {
+      GSList *pkgtmp;
+      for (pkgtmp = packages; pkgtmp != NULL; pkgtmp = g_slist_next (pkgtmp))
+        {
+          Package *pkg = pkgtmp->data;
+          GSList *reqtmp;
+          /* process Requires.private: */
+          for (reqtmp = pkg->requires_private; reqtmp != NULL; reqtmp = g_slist_next (reqtmp))
+            {
+
+              Package *deppkg = reqtmp->data;
+              RequiredVersion *req;
+
+              if (g_slist_find (pkg->requires, reqtmp->data))
+                continue;
+
+              req = g_hash_table_lookup(pkg->required_versions, deppkg->key);
+              if ((req == NULL) || (req->comparison == ALWAYS_MATCH))
+                printf ("%s\n", deppkg->key);
+              else
+                printf ("%s %s %s\n", deppkg->key,
+                  comparison_to_str(req->comparison),
+                  req->version);
+            }
+        }
+    }
+  
   if (required_exact_version)
     {
       Package *pkg = packages->data;
