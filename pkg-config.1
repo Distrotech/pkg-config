@@ -37,6 +37,7 @@ pkg-config \- Return metainformation about installed libraries
 [\-\-uninstalled]
 [\-\-exists] [\-\-atleast-version=VERSION] [\-\-exact-version=VERSION]
 [\-\-max-version=VERSION] [\-\-list\-all] [LIBRARIES...]
+[\-\-print-provides] [\-\-print-requires] [\-\-print-requires-private] [LIBRARIES...]
 .SH DESCRIPTION
 
 The \fIpkg-config\fP program is used to retrieve information about
@@ -225,6 +226,15 @@ output.
 .TP
 .I "--list-all"
 List all modules found in the \fIpkg-config\fP path.
+.TP
+-I "--print-provdes"
+List all modules the given packages provides.
+.TP
+.I "--print-requires"
+List all modules the given packages requires.
+.TP
+.I "--print-requires-private"
+List all modules the given packages requires for static linking (see --static).
 .\"
 .SH ENVIRONMENT VARIABLES
 .TP
