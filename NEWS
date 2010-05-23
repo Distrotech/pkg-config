@@ -1,3 +1,24 @@
+pkg-config 0.24
+===
+ - Fix up bug in PKG_CONFIG_SYSROOT handling which mangled non-I and
+   non-L arguments
+ - Put /usr/lib/pkgconfig and /usr/share/pkgconfig into the default
+   search path when no prefix is passed to configure.
+ - Portability fixes for Windows and NetBSD
+ - Various man page updates
+ - Add logging support to log how pkg-config is being called.
+ - Skip Requires.private unless we need them for Cflags
+ - Add a variable, pc_path to the compiled-in pkg-config package that
+   you can query for the compiled-in PKG_CONFIG_PC_PATH.
+ - Various updates to pkg.m4.
+ - Update rpmvercmp with bugfixes from upstream.
+ - Add introductory guide to pkg-config, thanks to Dan Nicholson for
+   the patch.
+ - Add listing of variables in a package
+ - Make it possible to use external popt.
+ - Add --print-provides and --print-requires(-private) options
+ - Add support for paths containing whitespace and shell metacharacters
+
 pkg-config 0.23
 ===
  - Add support for setting sysroot through PKG_CONFIG_SYSROOT_DIR in
