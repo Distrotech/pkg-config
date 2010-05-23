@@ -3,7 +3,7 @@ included_glib_includes = @GLIB_CFLAGS@
 pkg_config_LDADD=@GLIB_LIBS@
 else
 GLIB_SUBDIR = glib-1.2.10
-included_glib_includes = -I./glib-1.2.10
+included_glib_includes = -I$(top_srcdir)/glib-1.2.10 -I$(top_builddir)/glib-1.2.10
 pkg_config_LDADD=glib-1.2.10/libglib.la
 endif
 
@@ -11,7 +11,7 @@ if USE_INSTALLED_POPT
 pkg_config_LDADD += $(POPT_LIBS)
 else
 pkg_config_LDADD += popt/libpopt.la
-popt_includes = -I./popt
+popt_includes = -I$(top_srcdir)/popt
 POPT_SUBDIR = popt
 endif
 
@@ -36,6 +36,4 @@ pkg_config_SOURCES= \
 	pkg.c \
 	parse.h \
 	parse.c \
-	main.c \
-	findme.c \
-	findme.h
+	main.c

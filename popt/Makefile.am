@@ -5,4 +5,6 @@ libpopt_la_SOURCES = \
 	poptconfig.c \
 	popthelp.c \
 	poptint.h \
-	poptparse.c
+	poptparse.c \
+	findme.c \
+	findme.h
