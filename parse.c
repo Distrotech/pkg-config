@@ -633,6 +633,31 @@ parse_conflicts (Package *pkg, const char *str, const char *path)
   g_free (trimmed);
 }
 
+static char *strdup_escape_shell(const char *s)
+{
+	size_t r_s = strlen(s)+10, c = 0;
+	char *r = g_malloc(r_s);
+	while (s[0]) {
+		if ((s[0] < '+') ||
+		    (s[0] > '9' && s[0] < '@') ||
+		    (s[0] > 'Z' && s[0] < '^') ||
+		    (s[0] == '`') ||
+		    (s[0] > 'z')) {
+			r[c] = '\\';
+			c++;
+		}
+		r[c] = *s;
+		c++;
+		if (c+2 >= r_s) {
+			r_s *= 2;
+			r = g_realloc(r, r_s);
+		}
+		s++;
+	}
+	r[c] = 0;
+	return r;
+}
+
 static void _do_parse_libs (Package *pkg, int argc, char **argv)
 {
   int i;
@@ -649,12 +674,11 @@ static void _do_parse_libs (Package *pkg, int argc, char **argv)
   i = 0;
   while (i < argc)
     {
-      char *arg = trim_string (argv[i]);
+      char *tmp = trim_string (argv[i]);
+      char *arg = strdup_escape_shell(tmp);
       char *p;
-      char *start;
-
-      start = arg;
-      p = start;      
+      p = arg;
+      g_free(tmp);
 
       if (p[0] == '-' &&
           p[1] == 'l' &&
@@ -662,43 +686,23 @@ static void _do_parse_libs (Package *pkg, int argc, char **argv)
               flag. */
 	  (strncmp(p, "-lib:", 5) != 0))
         {
-          char *libname;          
-              
           p += 2;
           while (*p && isspace ((guchar)*p))
             ++p;
-              
-          start = p;
-          while (*p && !isspace ((guchar)*p))
-            ++p;
 
-          libname = g_strndup (start, p - start);
-          
           pkg->l_libs = g_slist_prepend (pkg->l_libs,
-                                         g_strconcat (l_flag, libname, lib_suffix, NULL));
+                                         g_strconcat (l_flag, p, lib_suffix, NULL));
 
-          g_free (libname);
         }
       else if (p[0] == '-' &&
                p[1] == 'L')
         {
-          char *libname;          
-          
           p += 2;
           while (*p && isspace ((guchar)*p))
             ++p;
-              
-          start = p;
-          while (*p && !isspace ((guchar)*p))
-            ++p;
-
-          libname = g_strndup (start, p - start);
-          
-          pkg->L_libs = g_slist_prepend (pkg->L_libs,
-					 g_strconcat (L_flag, libname, NULL));
-
-          g_free (libname);
-        }
+	  pkg->L_libs = g_slist_prepend (pkg->L_libs,
+					 g_strconcat (L_flag, p, NULL));
+	}
       else if (strcmp("-framework",p) == 0 && i+1 < argc)
         {
           /* Mac OS X has a -framework Foo which is really one option,
@@ -706,12 +710,14 @@ static void _do_parse_libs (Package *pkg, int argc, char **argv)
            * -framework Bar being changed into -framework Foo Bar
            * later
           */
-          gchar *framework = trim_string (argv[i+1]);
+          gchar *framework, *tmp = trim_string (argv[i+1]);
 
+	  framework = strdup_escape_shell(tmp);
           pkg->other_libs = g_slist_prepend (pkg->other_libs,
                                              g_strconcat(arg, " ", framework, NULL));
           i++;
           g_free(framework);
+          g_free(tmp);
         }
       else
         {
@@ -721,7 +727,7 @@ static void _do_parse_libs (Package *pkg, int argc, char **argv)
         }
 
       g_free (arg);
-      
+
       ++i;
     }
 
@@ -756,7 +762,6 @@ parse_libs (Package *pkg, const char *str, const char *path)
 
       exit (1);
     }
-
   _do_parse_libs(pkg, argc, argv);
 
   g_free (trimmed);
@@ -844,39 +849,30 @@ parse_cflags (Package *pkg, const char *str, const char *path)
   i = 0;
   while (i < argc)
     {
-      char *arg = trim_string (argv[i]);
-      char *p;
-      char *start;
-
-      start = arg;
-      p = start;
+      char *tmp = trim_string (argv[i]);
+      char *arg = strdup_escape_shell(tmp);
+      char *p = arg;
+      g_free(tmp);
 
       if (p[0] == '-' &&
           p[1] == 'I')
         {
-          char *libname;
-              
           p += 2;
           while (*p && isspace ((guchar)*p))
             ++p;
-              
-          start = p;
-          while (*p && !isspace ((guchar)*p))
-            ++p;
 
-          libname = g_strndup (start, p - start);
-          
           pkg->I_cflags = g_slist_prepend (pkg->I_cflags,
-                                           g_strconcat ("-I", libname, NULL));
+                                           g_strconcat ("-I", p, NULL));
 
-          g_free (libname);
         } else {
           if (*arg != '\0')
             pkg->other_cflags = g_slist_prepend (pkg->other_cflags,
                                                  g_strdup (arg));
 	  if (strcmp("-idirafter", arg) == 0) {
-	      char *n = trim_string(argv[++i]);
+              tmp = trim_string(argv[++i]);
+	      char *n = strdup_escape_shell(tmp);
 	      pkg->other_cflags = g_slist_prepend(pkg->other_cflags, n);
+	      g_free(tmp);
 	  }
       }
 
