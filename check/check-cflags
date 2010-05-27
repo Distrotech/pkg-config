@@ -11,5 +11,9 @@ set -e
 
 ARGS="--cflags simple"
 RESULT=""
-
 run_test
+
+ARGS="--cflags fields-blank"
+RESULT=""
+run_test
+

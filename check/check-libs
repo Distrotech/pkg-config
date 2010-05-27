@@ -15,5 +15,8 @@ if [ "$list_indirect_deps" = "yes" ]; then
 else
     RESULT="-lsimple"
 fi
+run_test
 
+ARGS="--libs fields-blank"
+RESULT=""
 run_test
