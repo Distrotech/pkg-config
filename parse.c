@@ -742,7 +742,7 @@ parse_libs (Package *pkg, const char *str, const char *path)
   
   char *trimmed;
   char **argv = NULL;
-  int argc;
+  int argc = 0;
   int result;
   
   if (pkg->libs_num > 0)
@@ -754,15 +754,19 @@ parse_libs (Package *pkg, const char *str, const char *path)
   
   trimmed = trim_and_sub (pkg, str, path);
 
-  result = poptParseArgvString (trimmed, &argc, &argv);
-
-  if (result < 0)
+  if (trimmed && *trimmed)
     {
-      verbose_error ("Couldn't parse Libs field into an argument vector: %s\n",
-               poptStrerror (result));
+      result = poptParseArgvString (trimmed, &argc, &argv);
 
-      exit (1);
+      if (result < 0)
+        {
+          verbose_error ("Couldn't parse Libs field into an argument vector: %s\n",
+                         poptStrerror (result));
+
+          exit (1);
+        }
     }
+
   _do_parse_libs(pkg, argc, argv);
 
   g_free (trimmed);
@@ -787,7 +791,7 @@ parse_libs_private (Package *pkg, const char *str, const char *path)
   
   char *trimmed;
   char **argv = NULL;
-  int argc;
+  int argc = 0;
   int result;
   
   if (pkg->libs_private_num > 0)
@@ -799,14 +803,17 @@ parse_libs_private (Package *pkg, const char *str, const char *path)
   
   trimmed = trim_and_sub (pkg, str, path);
 
-  result = poptParseArgvString (trimmed, &argc, &argv);
-
-  if (result < 0)
+  if (trimmed && *trimmed)
     {
-      verbose_error ("Couldn't parse Libs.private field into an argument vector: %s\n",
-               poptStrerror (result));
+      result = poptParseArgvString (trimmed, &argc, &argv);
 
-      exit (1);
+      if (result < 0)
+        {
+          verbose_error ("Couldn't parse Libs.private field into an argument vector: %s\n",
+                         poptStrerror (result));
+
+          exit (1);
+        }
     }
 
   _do_parse_libs(pkg, argc, argv);
@@ -824,7 +831,7 @@ parse_cflags (Package *pkg, const char *str, const char *path)
   
   char *trimmed;
   char **argv = NULL;
-  int argc;
+  int argc = 0;
   int result;
   int i;
   
@@ -837,14 +844,17 @@ parse_cflags (Package *pkg, const char *str, const char *path)
   
   trimmed = trim_and_sub (pkg, str, path);
 
-  result = poptParseArgvString (trimmed, &argc, &argv);
-
-  if (result < 0)
+  if (trimmed && *trimmed)
     {
-      verbose_error ("Couldn't parse Cflags field into an argument vector: %s\n",
-                     poptStrerror (result));
+      result = poptParseArgvString (trimmed, &argc, &argv);
 
-      exit (1);
+      if (result < 0)
+        {
+          verbose_error ("Couldn't parse Cflags field into an argument vector: %s\n",
+                         poptStrerror (result));
+
+          exit (1);
+        }
     }
 
   i = 0;
