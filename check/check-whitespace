@@ -11,10 +11,10 @@ set -e
 
 # expect cflags from whitespace
 ARGS="--cflags whitespace"
-RESULT="-I/usr/white\\ space/include -Iinclude\\ dir -Iother\\ include\\ dir"
+RESULT="-Dlala=misc -I/usr/white\\ space/include -Iinclude\\ dir -Iother\\ include\\ dir"
 run_test
 
 # expect libs from whitespace
 ARGS="--libs whitespace"
-RESULT="-L/usr/white\\ space/lib -lfoo\\ bar -lbar\\ baz"
+RESULT="-r:foo -L/usr/white\\ space/lib -lfoo\\ bar -lbar\\ baz"
 run_test
