@@ -5,7 +5,6 @@
 *.so
 .deps/
 .libs/
-COPYING
 INSTALL
 Makefile
 Makefile.in

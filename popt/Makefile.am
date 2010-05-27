@@ -8,3 +8,5 @@ libpopt_la_SOURCES = \
 	poptparse.c \
 	findme.c \
 	findme.h
+
+EXTRA_DIST = COPYING
