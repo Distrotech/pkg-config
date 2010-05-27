@@ -274,7 +274,7 @@ Don't strip -L/usr/lib out of libs
 .TP
 .I "PKG_CONFIG_SYSROOT_DIR"
 Modify -I and -L to use the directories located in target sysroot.
-this option is usefull when crosscompiling package that use pkg-config
+this option is useful when crosscompiling package that use pkg-config
 to determine CFLAGS anf LDFLAGS. -I and -L are modified to point to 
 the new system root. this means that a -I/usr/include/libfoo will
 become -I/var/target/usr/include/libfoo with a PKG_CONFIG_SYSROOT_DIR
@@ -283,6 +283,15 @@ equal to /var/target (same rule apply to -L)
 .I "PKG_CONFIG_LIBDIR"
 Replaces the default \fIpkg-config\fP search directory, usually \fI/usr/lib/pkgconfig\fP
 .\"
+.SH QUERYING PKG-CONFIG'S DEFAULTS
+.I pkg-config\fP can be used to query itself for the default search path, version number and other information, for instance using:
+.nf
+  $ pkg-config --variable pc_path pkg-config
+.fi
+or
+.nf
+  $ pkg-config --modversion pkg-config
+.fi
 .SH WINDOWS SPECIALITIES
 If a .pc file is found in a directory that matches the usual
 conventions (i.e., ends with \\lib\\pkgconfig or \\share\\pkgconfig),
