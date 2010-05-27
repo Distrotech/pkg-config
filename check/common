@@ -13,10 +13,12 @@ export PKG_CONFIG_PATH
 export LC_ALL=C
 
 run_test () {
+    set +e
     ${pkgconfig} $ARGS >/dev/null 2>&1
     R=$?
     if [ "$R" -ne "${EXPECT_RETURN:-0}" ]; then
-	echo "${pkgconfig} $ARGS exited with $R (expected $EXPECT_RETURN)"
+	${pkgconfig} --print-errors $ARGS
+	echo "${pkgconfig} $ARGS exited with $R (expected ${EXPECT_RETURN:-0})" 1>&2
         exit 1
     fi
 
