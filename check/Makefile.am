@@ -5,6 +5,7 @@ TESTS = check-cflags check-libs check-define-variable	\
 
 EXTRA_DIST = $(TESTS) common simple.pc requires-test.pc public-dep.pc	\
 	private-dep.pc includedir.pc missing-requires-private.pc \
-	missing-requires.pc idirafter.pc conflicts-test.pc whitespace.pc
+	missing-requires.pc idirafter.pc conflicts-test.pc whitespace.pc \
+	fields-blank.pc
 
 DISTCLEANFILES = config.sh
