@@ -1,3 +1,16 @@
+pkg-config 0.25
+===
+
+ - 0.24 included a too strict whitespace/shell metacharacter filter
+   leading to some legal characters like = and : being escaped in the
+   output.  This has been fixed.
+ - when building with newer and external libpopt, it would be confused
+   over being asked to split an empty string, leading to errors with
+   packages that included empty fields in their .pc files.
+ - Make the COPYING file explicitly GPLv2.  The COPYING file in 0.24
+   was inadvertently GPLv3 rather than the correct GPLv2.
+ - Minor changes to documentation
+
 pkg-config 0.24
 ===
  - Fix up bug in PKG_CONFIG_SYSROOT handling which mangled non-I and
