@@ -1,0 +1,15 @@
+To update the glib snapshot, first clone a copy of the glib repo.
+
+	$ git clone git://git.gnome.org/glib
+
+Use the update-glib.sh script to grab a checkout from your local repo.
+
+	$ ./glib-patches/update-glib.sh ../glib
+
+If you've updated to a new glib version, add a new patch (or refresh
+the current patches) in glib-patches, update the default tag value in
+update-glib.sh and commit the changes.
+
+The idea is that all changes are committed and you can build directly
+from the pkg-config repo without manipulating the glib snapshot
+anymore.
