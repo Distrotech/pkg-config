@@ -1,6 +1,7 @@
 /* 
  * Copyright (C) 2006-2011 Tollef Fog Heen <tfheen@err.no>
  * Copyright (C) 2001, 2002, 2005-2006 Red Hat Inc.
+ * Copyright (C) 2010 Dan Nicholson <dbn.lists@gmail.com>
  * 
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -28,7 +29,6 @@
 #include <string.h>
 #include <stdlib.h>
 #include <ctype.h>
-#include <popt.h>
 #ifdef HAVE_SYS_WAIT_H
 #include <sys/wait.h>
 #endif
@@ -743,7 +743,7 @@ parse_libs (Package *pkg, const char *str, const char *path)
   char *trimmed;
   char **argv = NULL;
   int argc = 0;
-  int result;
+  GError *error = NULL;
   
   if (pkg->libs_num > 0)
     {
@@ -754,23 +754,18 @@ parse_libs (Package *pkg, const char *str, const char *path)
   
   trimmed = trim_and_sub (pkg, str, path);
 
-  if (trimmed && *trimmed)
+  if (trimmed && *trimmed &&
+      !g_shell_parse_argv (trimmed, &argc, &argv, &error))
     {
-      result = poptParseArgvString (trimmed, &argc, &argv);
-
-      if (result < 0)
-        {
-          verbose_error ("Couldn't parse Libs field into an argument vector: %s\n",
-                         poptStrerror (result));
-
-          exit (1);
-        }
+      verbose_error ("Couldn't parse Libs field into an argument vector: %s\n",
+                     error ? error->message : "unknown");
+      exit (1);
     }
 
   _do_parse_libs(pkg, argc, argv);
 
   g_free (trimmed);
-  g_free (argv);
+  g_strfreev (argv);
   pkg->libs_num++;
 }
 
@@ -792,7 +787,7 @@ parse_libs_private (Package *pkg, const char *str, const char *path)
   char *trimmed;
   char **argv = NULL;
   int argc = 0;
-  int result;
+  GError *error = NULL;
   
   if (pkg->libs_private_num > 0)
     {
@@ -803,22 +798,17 @@ parse_libs_private (Package *pkg, const char *str, const char *path)
   
   trimmed = trim_and_sub (pkg, str, path);
 
-  if (trimmed && *trimmed)
+  if (trimmed && *trimmed &&
+      !g_shell_parse_argv (trimmed, &argc, &argv, &error))
     {
-      result = poptParseArgvString (trimmed, &argc, &argv);
-
-      if (result < 0)
-        {
-          verbose_error ("Couldn't parse Libs.private field into an argument vector: %s\n",
-                         poptStrerror (result));
-
-          exit (1);
-        }
+      verbose_error ("Couldn't parse Libs.private field into an argument vector: %s\n",
+                     error ? error->message : "unknown");
+      exit (1);
     }
 
   _do_parse_libs(pkg, argc, argv);
 
-  g_free (argv);
+  g_strfreev (argv);
   g_free (trimmed);
 
   pkg->libs_private_num++;
@@ -832,7 +822,7 @@ parse_cflags (Package *pkg, const char *str, const char *path)
   char *trimmed;
   char **argv = NULL;
   int argc = 0;
-  int result;
+  GError *error = NULL;
   int i;
   
   if (pkg->I_cflags || pkg->other_cflags)
@@ -844,17 +834,12 @@ parse_cflags (Package *pkg, const char *str, const char *path)
   
   trimmed = trim_and_sub (pkg, str, path);
 
-  if (trimmed && *trimmed)
+  if (trimmed && *trimmed &&
+      !g_shell_parse_argv (trimmed, &argc, &argv, &error))
     {
-      result = poptParseArgvString (trimmed, &argc, &argv);
-
-      if (result < 0)
-        {
-          verbose_error ("Couldn't parse Cflags field into an argument vector: %s\n",
-                         poptStrerror (result));
-
-          exit (1);
-        }
+      verbose_error ("Couldn't parse Cflags field into an argument vector: %s\n",
+                     error ? error->message : "unknown");
+      exit (1);
     }
 
   i = 0;
@@ -894,7 +879,7 @@ parse_cflags (Package *pkg, const char *str, const char *path)
       ++i;
     }
 
-  g_free (argv);
+  g_strfreev (argv);
   g_free (trimmed);
 }
 
@@ -1056,7 +1041,7 @@ parse_line (Package *pkg, const char *untrimmed, const char *path,
 		prefix[prefix_len - share_pkgconfig_len] = '\0';
 	      
 	      /* Turn backslashes into slashes or
-	       * poptParseArgvString() will eat them when ${prefix}
+	       * g_shell_parse_argv() will eat them when ${prefix}
 	       * has been expanded in parse_libs().
 	       */
 	      q = prefix;

@@ -153,7 +153,7 @@ scan_dir (const char *dirname)
     {
       gchar *p;
       /* Turn backslashes into slashes or
-       * poptParseArgvString() will eat them when ${prefix}
+       * g_shell_parse_argv() will eat them when ${prefix}
        * has been expanded in parse_libs().
        */
       p = dirname;
