@@ -15,7 +15,7 @@ popt_includes = -I$(top_srcdir)/popt
 POPT_SUBDIR = popt
 endif
 
-SUBDIRS = $(GLIB_SUBDIR) $(POPT_SUBDIR) check
+SUBDIRS = $(GLIB_SUBDIR) $(POPT_SUBDIR) . check
 
 m4dir = $(datadir)/aclocal
 m4_DATA = pkg.m4
