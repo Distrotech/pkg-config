@@ -24,7 +24,6 @@
 #include "pkg.h"
 #include "parse.h"
 
-#include <popt.h>
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
@@ -95,49 +94,41 @@ verbose_error (const char *format, ...)
   g_free (str);
 }
 
-#define DEFINE_VARIABLE 1
-
-static void
-popt_callback (poptContext con,
-               enum poptCallbackReason reason,
-               const struct poptOption * opt,
-               const char * arg, void * data)
+static gboolean
+define_variable_cb (const char *opt, const char *arg, gpointer data,
+                    GError **error)
 {
-  debug_spew ("Option --%s seen\n", opt->longName);
+  char *varname;
+  char *varval;
+  char *tmp;
 
-  if (opt->val == DEFINE_VARIABLE)
+  tmp = g_strdup (arg);
+
+  varname = tmp;
+  while (*varname && isspace ((guchar)*varname))
+    ++varname;
+
+  varval = varname;
+  while (*varval && *varval != '=' && *varval != ' ')
+    ++varval;
+
+  while (*varval && (*varval == '=' || *varval == ' '))
     {
-      char *varname;
-      char *varval;
-      char *tmp;
-
-      tmp = g_strdup (arg);
-
-      varname = tmp;
-      while (*varname && isspace ((guchar)*varname))
-        ++varname;
-
-      varval = varname;
-      while (*varval && *varval != '=' && *varval != ' ')
-        ++varval;
-
-      while (*varval && (*varval == '=' || *varval == ' '))
-        {
-          *varval = '\0';
-          ++varval;
-        }
-
-      if (*varval == '\0')
-        {
-          fprintf (stderr, "--define-variable argument does not have a value for the variable\n");
-
-          exit (1);
-        }
-
-      define_global_variable (varname, varval);
-
-      g_free (tmp);
+      *varval = '\0';
+      ++varval;
     }
+
+  if (*varval == '\0')
+    {
+      fprintf (stderr, "--define-variable argument does not have a value "
+               "for the variable\n");
+      exit (1);
+    }
+
+  define_global_variable (varname, varval);
+
+  g_free (tmp);
+  return TRUE;
 }
 
 static gboolean
@@ -205,81 +196,81 @@ main (int argc, char **argv)
   char *pcbuilddir;
   gboolean need_newline;
   FILE *log = NULL;
-  const char *pkgname;
+  GError *error = NULL;
+  GOptionContext *opt_context;
 
-  poptContext opt_context;
-
-  struct poptOption options_table[] = {
-    { NULL, 0, POPT_ARG_CALLBACK, popt_callback, 0, NULL, NULL },
-    { "version", 0, POPT_ARG_NONE, &want_my_version, 0,
-      "output version of pkg-config" },
-    { "modversion", 0, POPT_ARG_NONE, &want_version, 0,
-      "output version for package" },
-    { "atleast-pkgconfig-version", 0, POPT_ARG_STRING, &required_pkgconfig_version, 0,
+  GOptionEntry options_table[] = {
+    { "version", 0, 0, G_OPTION_ARG_NONE, &want_my_version,
+      "output version of pkg-config", NULL },
+    { "modversion", 0, 0, G_OPTION_ARG_NONE, &want_version,
+      "output version for package", NULL },
+    { "atleast-pkgconfig-version", 0, 0, G_OPTION_ARG_STRING,
+      &required_pkgconfig_version,
       "require given version of pkg-config", "VERSION" },
-    { "libs", 0, POPT_ARG_NONE, &want_libs, 0,
-      "output all linker flags" },
-    { "static", 0, POPT_ARG_NONE, &want_static_lib_list, 0,
-      "output linker flags for static linking" },
-    { "short-errors", 0, POPT_ARG_NONE, &want_short_errors, 0,
-      "print short errors" },
-    { "libs-only-l", 0, POPT_ARG_NONE, &want_l_libs, 0,
-      "output -l flags" },
-    { "libs-only-other", 0, POPT_ARG_NONE, &want_other_libs, 0,
-      "output other libs (e.g. -pthread)" },
-    { "libs-only-L", 0, POPT_ARG_NONE, &want_L_libs, 0,
-      "output -L flags" },
-    { "cflags", 0, POPT_ARG_NONE, &want_cflags, 0,
-      "output all pre-processor and compiler flags" },
-    { "cflags-only-I", 0, POPT_ARG_NONE, &want_I_cflags, 0,
-      "output -I flags" },
-    { "cflags-only-other", 0, POPT_ARG_NONE, &want_other_cflags, 0,
-      "output cflags not covered by the cflags-only-I option"},
-    { "variable", 0, POPT_ARG_STRING, &variable_name, 0,
+    { "libs", 0, 0, G_OPTION_ARG_NONE, &want_libs,
+      "output all linker flags", NULL },
+    { "static", 0, 0, G_OPTION_ARG_NONE, &want_static_lib_list,
+      "output linker flags for static linking", NULL },
+    { "short-errors", 0, 0, G_OPTION_ARG_NONE, &want_short_errors,
+      "print short errors", NULL },
+    { "libs-only-l", 0, 0, G_OPTION_ARG_NONE, &want_l_libs,
+      "output -l flags", NULL },
+    { "libs-only-other", 0, 0, G_OPTION_ARG_NONE, &want_other_libs,
+      "output other libs (e.g. -pthread)", NULL },
+    { "libs-only-L", 0, 0, G_OPTION_ARG_NONE, &want_L_libs,
+      "output -L flags", NULL },
+    { "cflags", 0, 0, G_OPTION_ARG_NONE, &want_cflags,
+      "output all pre-processor and compiler flags", NULL },
+    { "cflags-only-I", 0, 0, G_OPTION_ARG_NONE, &want_I_cflags,
+      "output -I flags", NULL },
+    { "cflags-only-other", 0, 0, G_OPTION_ARG_NONE, &want_other_cflags,
+      "output cflags not covered by the cflags-only-I option", NULL },
+    { "variable", 0, 0, G_OPTION_ARG_STRING, &variable_name,
       "get the value of variable named NAME", "NAME" },
-    { "define-variable", 0, POPT_ARG_STRING, NULL, DEFINE_VARIABLE,
+    { "define-variable", 0, 0, G_OPTION_ARG_CALLBACK, &define_variable_cb,
       "set variable NAME to VALUE", "NAME=VALUE" },
-    { "exists", 0, POPT_ARG_NONE, &want_exists, 0,
-      "return 0 if the module(s) exist" },
-    { "print-variables", 0, POPT_ARG_NONE, &want_variable_list, 0,
-      "output list of variables defined by the module" },
-    { "uninstalled", 0, POPT_ARG_NONE, &want_uninstalled, 0,
-      "return 0 if the uninstalled version of one or more module(s) or their dependencies will be used" },
-    { "atleast-version", 0, POPT_ARG_STRING, &required_atleast_version, 0,
+    { "exists", 0, 0, G_OPTION_ARG_NONE, &want_exists,
+      "return 0 if the module(s) exist", NULL },
+    { "print-variables", 0, 0, G_OPTION_ARG_NONE, &want_variable_list,
+      "output list of variables defined by the module", NULL },
+    { "uninstalled", 0, 0, G_OPTION_ARG_NONE, &want_uninstalled,
+      "return 0 if the uninstalled version of one or more module(s) "
+      "or their dependencies will be used", NULL },
+    { "atleast-version", 0, 0, G_OPTION_ARG_STRING, &required_atleast_version,
       "return 0 if the module is at least version VERSION", "VERSION" },
-    { "exact-version", 0, POPT_ARG_STRING, &required_exact_version, 0,
+    { "exact-version", 0, 0, G_OPTION_ARG_STRING, &required_exact_version,
       "return 0 if the module is at exactly version VERSION", "VERSION" },
-    { "max-version", 0, POPT_ARG_STRING, &required_max_version, 0,
+    { "max-version", 0, 0, G_OPTION_ARG_STRING, &required_max_version,
       "return 0 if the module is at no newer than version VERSION", "VERSION" },
-    { "list-all", 0, POPT_ARG_NONE, &want_list, 0,
-      "list all known packages" },
-    { "debug", 0, POPT_ARG_NONE, &want_debug_spew, 0,
-      "show verbose debug information" },
-    { "print-errors", 0, POPT_ARG_NONE, &want_verbose_errors, 0,
+    { "list-all", 0, 0, G_OPTION_ARG_NONE, &want_list,
+      "list all known packages", NULL },
+    { "debug", 0, 0, G_OPTION_ARG_NONE, &want_debug_spew,
+      "show verbose debug information", NULL },
+    { "print-errors", 0, 0, G_OPTION_ARG_NONE, &want_verbose_errors,
       "show verbose information about missing or conflicting packages,"
-      "default if --cflags or --libs given on the command line" },
-    { "silence-errors", 0, POPT_ARG_NONE, &want_silence_errors, 0,
+      "default if --cflags or --libs given on the command line", NULL },
+    { "silence-errors", 0, 0, G_OPTION_ARG_NONE, &want_silence_errors,
       "be silent about errors (default unless --cflags or --libs"
-      "given on the command line)" },
-    { "errors-to-stdout", 0, POPT_ARG_NONE, &want_stdout_errors, 0,
-      "print errors from --print-errors to stdout not stderr" },
-    { "print-provides", 0, POPT_ARG_NONE, &want_provides, 0,
-      "print which packages the package provides" },
-    { "print-requires", 0, POPT_ARG_NONE, &want_requires, 0,
-      "print which packages the package requires" },
-    { "print-requires-private", 0, POPT_ARG_NONE, &want_requires_private, 0,
-      "print which packages the package requires for static linking" },
+      "given on the command line)", NULL },
+    { "errors-to-stdout", 0, 0, G_OPTION_ARG_NONE, &want_stdout_errors,
+      "print errors from --print-errors to stdout not stderr", NULL },
+    { "print-provides", 0, 0, G_OPTION_ARG_NONE, &want_provides,
+      "print which packages the package provides", NULL },
+    { "print-requires", 0, 0, G_OPTION_ARG_NONE, &want_requires,
+      "print which packages the package requires", NULL },
+    { "print-requires-private", 0, 0, G_OPTION_ARG_NONE, &want_requires_private,
+      "print which packages the package requires for static linking", NULL },
 #ifdef G_OS_WIN32
-    { "dont-define-prefix", 0, POPT_ARG_NONE, &dont_define_prefix, 0,
+    { "dont-define-prefix", 0, 0, G_OPTION_ARG_NONE, &dont_define_prefix,
       "don't try to override the value of prefix for each .pc file found with "
-      "a guesstimated value based on the location of the .pc file" },
-    { "prefix-variable", 0, POPT_ARG_STRING, &prefix_variable, 0,
-      "set the name of the variable that pkg-config automatically sets", "PREFIX" },
-    { "msvc-syntax", 0, POPT_ARG_NONE, &msvc_syntax, 0,
-      "output -l and -L flags for the Microsoft compiler (cl)" },
+      "a guesstimated value based on the location of the .pc file", NULL },
+    { "prefix-variable", 0, 0, G_OPTION_ARG_STRING, &prefix_variable,
+      "set the name of the variable that pkg-config automatically sets",
+      "PREFIX" },
+    { "msvc-syntax", 0, 0, G_OPTION_ARG_NONE, &msvc_syntax,
+      "output -l and -L flags for the Microsoft compiler (cl)", NULL },
 #endif
-    POPT_AUTOHELP
-    { NULL, 0, 0, NULL, 0 }
+    { NULL, 0, 0, 0, NULL, NULL, NULL }
   };
 
   /* This is here so that we get debug spew from the start,
@@ -334,15 +325,12 @@ main (int argc, char **argv)
       disable_uninstalled = TRUE;
     }
 
-  opt_context = poptGetContext (NULL, argc, argv,
-                                options_table, 0);
-
-  result = poptGetNextOpt (opt_context);
-  if (result != -1)
+  /* Parse options */
+  opt_context = g_option_context_new (NULL);
+  g_option_context_add_main_entries (opt_context, options_table, NULL);
+  if (!g_option_context_parse(opt_context, &argc, &argv, &error))
     {
-      fprintf(stderr, "%s: %s\n",
-	      poptBadOption(opt_context, POPT_BADOPTION_NOALIAS),
-	      poptStrerror(result));
+      fprintf (stderr, "%s\n", error->message);
       return 1;
     }
 
@@ -428,18 +416,18 @@ main (int argc, char **argv)
       return 0;
     }
 
+  /* Collect packages from remaining args */
   str = g_string_new ("");
-  while (1)
+  while (argc > 1)
     {
-      pkgname = poptGetArg (opt_context);
-      if (pkgname == NULL)
-	break;
+      argc--;
+      argv++;
 
-      g_string_append (str, pkgname);
+      g_string_append (str, *argv);
       g_string_append (str, " ");
     }
 
-  poptFreeContext (opt_context);
+  g_option_context_free (opt_context);
 
   g_strstrip (str->str);
 
