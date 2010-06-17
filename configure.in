@@ -7,6 +7,8 @@ AM_MAINTAINER_MODE
 AM_CONFIG_HEADER(config.h)
 
 AM_PROG_LIBTOOL
+dnl when using libtool 2.x create libtool early, because it's used in configure
+m4_ifdef([LT_OUTPUT], [LT_OUTPUT])
 
 AC_PROG_CC
 

@@ -15,6 +15,7 @@ config.guess
 config.h
 config.h.in
 config.log
+config.lt
 config.status
 config.sub
 configure
