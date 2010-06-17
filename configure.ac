@@ -144,28 +144,11 @@ fi
 AC_SUBST(GLIB_LIBS)
 AC_SUBST(GLIB_CFLAGS)
 
-AC_ARG_WITH([installed-popt],
-  [AS_HELP_STRING([--with-installed-popt], [use installed popt library])],
-  [with_installed_popt="$withval"],
-  [with_installed_popt=no])
-if test "x$with_installed_popt" = xyes; then
-  _save_libs="$LIBS"
-  AC_CHECK_LIB([popt], [poptGetContext], [:],
-    [AC_MSG_ERROR([could not link to installed popt library])])
-  LIBS="$_save_libs"
-  POPT_LIBS=-lpopt
-else
-  POPT_LIBS=""
-fi
-AC_SUBST([POPT_LIBS])
-AM_CONDITIONAL([USE_INSTALLED_POPT], [test "x$with_installed_popt" = xyes])
-
 AC_FUNC_ALLOCA
 
 AC_CHECK_FUNCS(setresuid setreuid,break)
 AC_CHECK_HEADERS([dirent.h unistd.h sys/wait.h malloc.h])
 
 AC_OUTPUT([Makefile
-	   popt/Makefile
 	   check/Makefile
 	   check/config.sh])

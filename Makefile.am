@@ -4,19 +4,11 @@ if INTERNAL_GLIB
 GLIB_SUBDIR = glib
 endif
 
-if USE_INSTALLED_POPT
-pkg_config_LDADD += $(POPT_LIBS)
-else
-pkg_config_LDADD += popt/libpopt.la
-popt_includes = -I$(top_srcdir)/popt
-POPT_SUBDIR = popt
-endif
-
-SUBDIRS = $(GLIB_SUBDIR) $(POPT_SUBDIR) . check
+SUBDIRS = $(GLIB_SUBDIR) . check
 
 # normally we'd want glib to be part of DIST_SUBDIRS unconditionally,
 # but distclean gets broken unless we always run glib's configure
-DIST_SUBDIRS = $(GLIB_SUBDIR) popt . check
+DIST_SUBDIRS = $(GLIB_SUBDIR) . check
 
 m4dir = $(datadir)/aclocal
 m4_DATA = pkg.m4
@@ -34,15 +26,13 @@ INCLUDES= \
 	-DPKG_CONFIG_PC_PATH="\"$(subst /,\/,$(pc_path))\"" \
 	-DPKG_CONFIG_SYSTEM_INCLUDE_PATH="\"$(subst /,\/,$(system_include_path))\"" \
 	-DPKG_CONFIG_SYSTEM_LIBRARY_PATH="\"$(subst /,\/,$(system_library_path))\"" \
-	@GLIB_CFLAGS@ \
-	$(popt_includes)
+	@GLIB_CFLAGS@
 else
 INCLUDES= \
 	-DPKG_CONFIG_PC_PATH="\"$(pc_path)\"" \
 	-DPKG_CONFIG_SYSTEM_INCLUDE_PATH="\"$(system_include_path)\"" \
 	-DPKG_CONFIG_SYSTEM_LIBRARY_PATH="\"$(system_library_path)\"" \
-	@GLIB_CFLAGS@ \
-	$(popt_includes)
+	@GLIB_CFLAGS@
 endif
 
 pkg_config_SOURCES= \
@@ -55,7 +45,7 @@ pkg_config_SOURCES= \
 # Since we can't always have glib in DIST_SUBDIRS, we need to make sure
 # glib is configured when we want to run dist. Unfortunately, there's no
 # DIST_CONFIGURE_FLAGS.
-DISTCHECK_CONFIGURE_FLAGS = --with-installed-popt --with-internal-glib
+DISTCHECK_CONFIGURE_FLAGS = --with-internal-glib
 if !INTERNAL_GLIB
 dist-hook:
 	@echo "error: --with-internal-glib is required to include glib in dist"
