@@ -20,11 +20,7 @@
 #ifndef PKG_CONFIG_PKG_H
 #define PKG_CONFIG_PKG_H
 
-#ifdef USE_INSTALLED_GLIB
 #include <glib.h>
-#else
-#include "glib-1.2.10/glib.h"
-#endif
 
 #ifdef G_OS_WIN32
 /* No hardcoded paths in the binary, thanks */
