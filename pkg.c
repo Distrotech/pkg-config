@@ -279,7 +279,7 @@ file_readable (const char *path)
 
 
 static Package *
-internal_get_package (const char *name, gboolean warn, gboolean check_compat)
+internal_get_package (const char *name, gboolean warn)
 {
   Package *pkg = NULL;
   const char *location;
@@ -307,7 +307,7 @@ internal_get_package (const char *name, gboolean warn, gboolean check_compat)
 
           un = g_strconcat (name, "-uninstalled", NULL);
 
-          pkg = internal_get_package (un, FALSE, FALSE);
+          pkg = internal_get_package (un, FALSE);
 
           g_free (un);
           
@@ -321,19 +321,6 @@ internal_get_package (const char *name, gboolean warn, gboolean check_compat)
       location = g_hash_table_lookup (locations, name);
     }
   
-  if (location == NULL && check_compat)
-    {
-      pkg = get_compat_package (name);
-
-      if (pkg)
-        {
-          debug_spew ("Returning values for '%s' from a legacy -config script\n",
-                      name);
-          
-          return pkg;
-        }
-    }
-      
   if (location == NULL)
     {
       if (warn)
@@ -394,13 +381,13 @@ internal_get_package (const char *name, gboolean warn, gboolean check_compat)
 Package *
 get_package (const char *name)
 {
-  return internal_get_package (name, TRUE, TRUE);
+  return internal_get_package (name, TRUE);
 }
 
 Package *
 get_package_quiet (const char *name)
 {
-  return internal_get_package (name, FALSE, TRUE);
+  return internal_get_package (name, FALSE);
 }
 
 static GSList*
