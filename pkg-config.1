@@ -55,10 +55,10 @@ retrieves information about packages from special metadata
 files. These files are named after the package, and has a
 .I .pc
 extension.  On most systems, \fIpkg-config\fP looks in
-.I/usr/lib/pkgconfig, /usr/share/pkgconfig, /usr/local/lib/pkgconfig
+.I /usr/lib/pkgconfig, /usr/share/pkgconfig, /usr/local/lib/pkgconfig
 and
-.I/usr/local/share/pkgconfig
- for these files.  It will additionally look in the colon-separated
+.I /usr/local/share/pkgconfig
+for these files.  It will additionally look in the colon-separated
 (on Windows, semicolon-separated) list of directories specified by the
 PKG_CONFIG_PATH environment variable.
 .PP
@@ -151,7 +151,7 @@ can say:
 .TP
 .I "--define-variable=VARIABLENAME=VARIABLEVALUE"
 This sets a global value for a variable, overriding the value in any
-.I.pc
+.I .pc
 files. Most packages define the variable "prefix", for example, so you
 can say:
 .nf
@@ -187,7 +187,7 @@ is set, they will only have been used if you pass a name like
 .I "--max-version=VERSION"
 These options test whether the package or list of packages on the
 command line are known to \fIpkg-config\fP, and optionally whether the
-version number of a package meets certain contraints.  If all packages
+version number of a package meets certain constraints.  If all packages
 exist and meet the specified version constraints,
 .I pkg-config
 exits successfully. Otherwise it exits unsuccessfully.
@@ -203,7 +203,7 @@ Remember to use \-\-print-errors if you want error messages.
 This option is available only on Windows. It causes \fIpkg-config\fP
 to output -l and -L flags in the form recognized by the Microsoft
 Visual C++ command-line compiler, \fIcl\fP. Specifically, instead of
-.I-Lx:/some/path
+.I -Lx:/some/path
 it prints \fI/libpath:x/some/path\fP, and instead of \fI-lfoo\fP it
 prints \fIfoo.lib\fP. Note that the --libs output consists of flags
 for the linker, and should be placed on the cl command line after a
@@ -274,8 +274,8 @@ Don't strip -L/usr/lib out of libs
 .TP
 .I "PKG_CONFIG_SYSROOT_DIR"
 Modify -I and -L to use the directories located in target sysroot.
-this option is useful when crosscompiling package that use pkg-config
-to determine CFLAGS anf LDFLAGS. -I and -L are modified to point to 
+this option is useful when cross-compiling packages that use pkg-config
+to determine CFLAGS and LDFLAGS. -I and -L are modified to point to 
 the new system root. this means that a -I/usr/include/libfoo will
 become -I/var/target/usr/include/libfoo with a PKG_CONFIG_SYSROOT_DIR
 equal to /var/target (same rule apply to -L)
