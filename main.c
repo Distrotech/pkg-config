@@ -747,11 +747,7 @@ main (int argc, char **argv)
     }
 
   if (need_newline)
-#ifdef G_OS_WIN32
-    printf ("\r\n");
-#else
     printf ("\n");
-#endif
 
   return 0;
 }
