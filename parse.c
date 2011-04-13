@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2006-2010 Tollef Fog Heen <tfheen@err.no>
+ * Copyright (C) 2006-2011 Tollef Fog Heen <tfheen@err.no>
  * Copyright (C) 2001, 2002, 2005-2006 Red Hat Inc.
  * 
  * This program is free software; you can redistribute it and/or
@@ -880,8 +880,10 @@ parse_cflags (Package *pkg, const char *str, const char *path)
             pkg->other_cflags = g_slist_prepend (pkg->other_cflags,
                                                  g_strdup (arg));
 	  if (strcmp("-idirafter", arg) == 0) {
-              tmp = trim_string(argv[++i]);
-	      char *n = strdup_escape_shell(tmp);
+	      char *n;
+
+	      tmp = trim_string(argv[++i]);
+	      n = strdup_escape_shell(tmp);
 	      pkg->other_cflags = g_slist_prepend(pkg->other_cflags, n);
 	      g_free(tmp);
 	  }
