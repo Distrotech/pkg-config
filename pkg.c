@@ -744,7 +744,7 @@ verify_package (Package *pkg)
   GSList *conflicts_iter;
   GSList *system_dir_iter = NULL;
   int count;
-  const gchar *c_include_path;
+  const gchar *search_path;
 
   /* Be sure we have the required fields */
 
@@ -856,20 +856,26 @@ verify_package (Package *pkg)
   /* We make a list of system directories that gcc expects so we can remove
    * them.
    */
-#ifndef G_OS_WIN32
-  system_directories = g_slist_append (NULL, g_strdup ("/usr/include"));
-#endif
 
-  c_include_path = g_getenv ("C_INCLUDE_PATH");
-  if (c_include_path != NULL)
+  search_path = g_getenv ("PKG_CONFIG_SYSTEM_INCLUDE_PATH");
+
+  if (search_path == NULL)
     {
-      system_directories = add_env_variable_to_list (system_directories, c_include_path);
+      search_path = PKG_CONFIG_SYSTEM_INCLUDE_PATH;
     }
-  
-  c_include_path = g_getenv ("CPLUS_INCLUDE_PATH");
-  if (c_include_path != NULL)
+
+  system_directories = add_env_variable_to_list (system_directories, search_path);
+
+  search_path = g_getenv ("C_INCLUDE_PATH");
+  if (search_path != NULL)
     {
-      system_directories = add_env_variable_to_list (system_directories, c_include_path);
+      system_directories = add_env_variable_to_list (system_directories, search_path);
+    }
+
+  search_path = g_getenv ("CPLUS_INCLUDE_PATH");
+  if (search_path != NULL)
+    {
+      system_directories = add_env_variable_to_list (system_directories, search_path);
     }
 
   count = 0;
@@ -922,31 +928,52 @@ verify_package (Package *pkg)
   g_slist_foreach (system_directories, (GFunc) g_free, NULL);
   g_slist_free (system_directories);
 
-#ifdef PREFER_LIB64
-#define SYSTEM_LIBDIR "/usr/lib64"
-#else
-#define SYSTEM_LIBDIR "/usr/lib"
-#endif
+  system_directories = NULL;
+
+  search_path = g_getenv ("PKG_CONFIG_SYSTEM_LIBRARY_PATH");
+
+  if (search_path == NULL)
+    {
+      search_path = PKG_CONFIG_SYSTEM_LIBRARY_PATH;
+    }
+
+  system_directories = add_env_variable_to_list (system_directories, search_path);
+
   count = 0;
   iter = pkg->L_libs;
   while (iter != NULL)
     {
-      if (strcmp (iter->data, "-L" SYSTEM_LIBDIR) == 0 ||
-          strcmp (iter->data, "-L " SYSTEM_LIBDIR) == 0)
-        {
-          debug_spew ("Package %s has -L" SYSTEM_LIBDIR " in Libs\n",
-                      pkg->name);
-          if (g_getenv ("PKG_CONFIG_ALLOW_SYSTEM_LIBS") == NULL)
-            {              
-              iter->data = NULL;
-              ++count;
-              debug_spew ("Removing -L" SYSTEM_LIBDIR " from libs for %s\n", pkg->key);
-            }
-        }
+      GSList *system_dir_iter = system_directories;
 
+      while (system_dir_iter != NULL)
+        {
+          gboolean is_system = FALSE;
+          const char *linker_arg = iter->data;
+          const char *system_libpath = system_dir_iter->data;
+
+          if (strncmp (linker_arg, "-L ", 3) == 0 &&
+              strcmp (linker_arg + 3, system_libpath) == 0)
+            is_system = TRUE;
+          else if (strncmp (linker_arg, "-L", 2) == 0 &&
+              strcmp (linker_arg + 2, system_libpath) == 0)
+            is_system = TRUE;
+          if (is_system)
+            {
+              debug_spew ("Package %s has -L %s in Libs\n",
+                          pkg->name, system_libpath);
+              if (g_getenv ("PKG_CONFIG_ALLOW_SYSTEM_LIBS") == NULL)
+                {
+                  iter->data = NULL;
+                  ++count;
+                  debug_spew ("Removing -L %s from libs for %s\n", system_libpath, pkg->key);
+                  break;
+                }
+            }
+          system_dir_iter = system_dir_iter->next;
+        }
       iter = iter->next;
     }
-#undef SYSTEM_LIBDIR
+  g_slist_free (system_directories);
 
   while (count)
     {

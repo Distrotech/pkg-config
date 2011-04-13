@@ -34,6 +34,31 @@ fi
 
 PKG_CONFIG_FIND_PC_PATH
 
+AC_MSG_CHECKING([for --with-system-include-path])
+AC_ARG_WITH(system_include_path,
+ [  --with-system-include-path    Avoid -I flags that add the given directories ],
+ [ system_include_path="$withval" ],
+ [ system_include_path="/usr/include" ])
+ AC_MSG_RESULT([$system_include_path])
+ AC_SUBST([system_include_path])
+
+AC_MSG_CHECKING([for --with-system-library-path])
+AC_ARG_WITH(system_library_path,
+ [  --with-system-library-path    Avoid -L flags that add the given directories ],
+ [ system_library_path="$withval" ],
+ [
+case "$libdir" in
+*lib64)
+  system_library_path="/usr/lib64:/usr/lib"
+  ;;
+*)
+  system_library_path="/usr/lib"
+  ;;
+esac
+])
+ AC_MSG_RESULT([$system_library_path])
+ AC_SUBST([system_library_path])
+
 #
 # Code taken from gtk+-2.0's configure.in.
 #
@@ -91,11 +116,6 @@ case "$host" in
   ;;
 esac
 AC_MSG_RESULT([$native_win32])
-
-case "$libdir" in
-*lib64) AC_DEFINE(PREFER_LIB64,1,[Define if your native architecture defines libdir to be $prefix/lib64 instead of $prefix/lib.]) ;;
-*) : ;;
-esac
 
 if test "x$GLIB_CFLAGS" = "x" && test "x$GLIB_LIBS" = "x"; then
    AC_CHECK_PROGS([PKG_CONFIG], [pkg-config], [])
