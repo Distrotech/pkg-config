@@ -638,7 +638,9 @@ static char *strdup_escape_shell(const char *s)
 	size_t r_s = strlen(s)+10, c = 0;
 	char *r = g_malloc(r_s);
 	while (s[0]) {
-		if ((s[0] < '+') ||
+		if ((s[0] < '$') ||
+		    (s[0] > '$' && s[0] < '(') ||
+		    (s[0] > ')' && s[0] < '+') ||
 		    (s[0] > ':' && s[0] < '=') ||
 		    (s[0] > '=' && s[0] < '@') ||
 		    (s[0] > 'Z' && s[0] < '^') ||

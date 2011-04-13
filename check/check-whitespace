@@ -11,7 +11,7 @@ set -e
 
 # expect cflags from whitespace
 ARGS="--cflags whitespace"
-RESULT="-Dlala=misc -I/usr/white\\ space/include -Iinclude\\ dir -Iother\\ include\\ dir"
+RESULT='-Dlala=misc -I/usr/white\ space/include -I$(top_builddir) -Iinclude\ dir -Iother\ include\ dir'
 run_test
 
 # expect libs from whitespace
