@@ -366,8 +366,11 @@ Libs.private: -lm
 Cflags: -I${includedir}/glib-2.0 -I${libdir}/glib/include 
 .fi
 .PP
-You would normally generate the file using configure, of course, so
-that the prefix, etc. are set to the proper values.
+You would normally generate the file using configure, so that the
+prefix, etc. are set to the proper values.  The GNU Autoconf manual
+recommends generating files like .pc files at build time rather than
+configure time, so when you build the .pc file is a matter of taste
+and preference.
 .PP
 Files have two kinds of line: keyword lines start with a keyword plus
 a colon, and variable definitions start with an alphanumeric string
