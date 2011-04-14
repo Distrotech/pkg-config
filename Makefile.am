@@ -21,12 +21,21 @@ EXTRA_DIST = $(m4_DATA) $(man_MANS) README.win32
 bin_PROGRAMS = pkg-config
 AM_CFLAGS=@WARN_CFLAGS@
 
+if NATIVE_WIN32
+INCLUDES= \
+	-DPKG_CONFIG_PC_PATH="\"$(subst /,\/,$(pc_path))\"" \
+	-DPKG_CONFIG_SYSTEM_INCLUDE_PATH="\"$(subst /,\/,$(system_include_path))\"" \
+	-DPKG_CONFIG_SYSTEM_LIBRARY_PATH="\"$(subst /,\/,$(system_library_path))\"" \
+	@GLIB_CFLAGS@ \
+	$(popt_includes)
+else
 INCLUDES= \
 	-DPKG_CONFIG_PC_PATH="\"$(pc_path)\"" \
 	-DPKG_CONFIG_SYSTEM_INCLUDE_PATH="\"$(system_include_path)\"" \
 	-DPKG_CONFIG_SYSTEM_LIBRARY_PATH="\"$(system_library_path)\"" \
 	@GLIB_CFLAGS@ \
 	$(popt_includes)
+endif
 
 pkg_config_SOURCES= \
 	pkg.h \

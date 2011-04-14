@@ -107,7 +107,7 @@ AC_DEFINE_UNQUOTED(ENABLE_INDIRECT_DEPS, `test $use_indirect_deps = no; echo $?`
 AC_SUBST(use_indirect_deps)
 
 AC_MSG_CHECKING([for Win32])
-case "$host" in
+case "$build" in
   *-*-mingw*)
     native_win32=yes
   ;;
@@ -116,6 +116,7 @@ case "$host" in
   ;;
 esac
 AC_MSG_RESULT([$native_win32])
+AM_CONDITIONAL(NATIVE_WIN32, [test "x$native_win32" = xyes])
 
 if test "x$GLIB_CFLAGS" = "x" && test "x$GLIB_LIBS" = "x"; then
    AC_CHECK_PROGS([PKG_CONFIG], [pkg-config], [])
