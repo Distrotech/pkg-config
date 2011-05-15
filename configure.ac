@@ -2,7 +2,6 @@
 AC_INIT(pkg-config.1)
 
 AM_INIT_AUTOMAKE(pkg-config, 0.26)
-AM_MAINTAINER_MODE
 
 AM_CONFIG_HEADER(config.h)
 
