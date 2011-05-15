@@ -67,6 +67,10 @@ defined to be the name of the metadata file, minus the \fI.pc\fP
 extension. If a library can install multiple versions simultaneously,
 it must give each version its own name (for example, GTK 1.2 might
 have the package name "gtk+" while GTK 2.0 has "gtk+-2.0").
+.PP
+In addition to specifying a package name on the command line, the full
+path to a given \fI.pc\fP file may be given instead. This allows a
+user to directly query a particular \fI.pc\fP file.
 .\"
 .SH OPTIONS
 The following options are supported:
