@@ -203,13 +203,17 @@ scan_dir (const char *dirname)
               filename[dirnamelen] = G_DIR_SEPARATOR;
               strcpy (filename + dirnamelen + 1, dent->d_name);
               
-              g_hash_table_insert (locations, pkgname, filename);
-              g_hash_table_insert (path_positions, pkgname,
-                                   GINT_TO_POINTER (scanned_dir_count));
-              
-              debug_spew ("Will find package '%s' in file '%s'\n",
-                          pkgname, filename);
-            }
+	      if (g_file_test(filename, G_FILE_TEST_IS_REGULAR) == TRUE) {
+		  g_hash_table_insert (locations, pkgname, filename);
+		  g_hash_table_insert (path_positions, pkgname,
+				       GINT_TO_POINTER (scanned_dir_count));
+		  debug_spew ("Will find package '%s' in file '%s'\n",
+			      pkgname, filename);
+	      } else {
+		  debug_spew ("Ignoring '%s' while looking for '%s'; not a "
+			      "regular file.\n", pkgname, filename);
+	      }
+	    }
         }
       else
         {
