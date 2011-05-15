@@ -1,3 +1,19 @@
+pkg-config 0.26
+===
+
+ - Build system fixes
+ - More tests
+ - pkg.m4 fixups which makes autoconf 2.66 happier.
+ - Drop support for legacy -config scripts.  Those should already be
+   gone and cause problems in cross-compilation environments.
+ - Drop embedded glib
+ - Fix up pkg.m4 to handle the case of --exists working and --cflags
+   or --libs failing.
+ - Various documentation updates
+ - Allow $() through without escaping it.
+ - Add --with-system-include-path instead of hard-coding
+   /usr/include.
+
 pkg-config 0.25
 ===
 
