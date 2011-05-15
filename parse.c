@@ -617,8 +617,6 @@ parse_requires_private (Package *pkg, const char *str, const char *path)
 static void
 parse_conflicts (Package *pkg, const char *str, const char *path)
 {
-  GSList *parsed;
-  GSList *iter;
   char *trimmed;
   
   if (pkg->conflicts)
@@ -1177,55 +1175,4 @@ parse_package_file (const char *path, gboolean ignore_requires,
   pkg->other_libs = g_slist_reverse (pkg->other_libs);
   
   return pkg;
-}
-
-static char *
-backticks (const char *command)
-{
-  FILE *f;
-  char buf[4096];
-  size_t len;
-  int status;
-  
-  f = popen (command, "r");
-
-  if (f == NULL)
-    return NULL;
-  
-  len = fread (buf, 1, 4090, f);
-
-  if (ferror (f))
-    {
-      pclose (f);
-      return NULL;
-    }
-  
-  buf[len] = '\0';
-
-  status = pclose (f);
-
-  return g_strdup (buf);
-}
-
-static gboolean
-try_command (const char *command)
-{
-  int status;
-  char *munged;
-
-#ifdef G_OS_WIN32
-  munged = g_strdup_printf ("%s > NUL", command);
-#else
-  munged = g_strdup_printf ("%s > /dev/null 2>&1", command);
-#endif
-  
-  status = system (munged);
-
-  g_free (munged);
-  
-#ifdef G_OS_WIN32
-  return status == 0;
-#else
-  return WIFEXITED(status) && (WEXITSTATUS(status) == 0);
-#endif
 }

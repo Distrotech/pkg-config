@@ -203,13 +203,9 @@ main (int argc, char **argv)
   GSList *packages = NULL;
   char *search_path;
   char *pcbuilddir;
-  const char *pkglibdir;
-  char **search_dirs;
-  char **iter;
   gboolean need_newline;
   FILE *log = NULL;
   const char *pkgname;
-  Package *pkg;
 
   poptContext opt_context;
 
@@ -531,7 +527,6 @@ main (int argc, char **argv)
   if (want_variable_list)
     {
       GSList *tmp;
-      gchar  *str;
       tmp = packages;
       while (tmp != NULL)
         {

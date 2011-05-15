@@ -263,21 +263,6 @@ package_init ()
     }
 }
 
-static gboolean
-file_readable (const char *path)
-{
-  FILE *f = fopen (path, "r");
-
-  if (f != NULL)
-    {
-      fclose (f);
-      return TRUE;
-    }
-  else
-    return FALSE;
-}
-
-
 static Package *
 internal_get_package (const char *name, gboolean warn)
 {
@@ -571,22 +556,6 @@ spew_package_list (const char *name,
   debug_spew ("\n");
 }
 
-static void
-spew_string_list (const char *name,
-                  GSList     *list)
-{
-  GSList *tmp;
-
-  debug_spew (" %s: ", name);
-  
-  tmp = list;
-  while (tmp != NULL)
-    {
-      debug_spew (" %s ", tmp->data);
-      tmp = tmp->next;
-    }
-  debug_spew ("\n");
-}
 
 static GSList*
 packages_sort_by_path_position (GSList *list)
@@ -697,24 +666,6 @@ fill_list (GSList *packages, GetListFunc func,
     }
 
   g_slist_free (expanded);
-}
-
-static gint
-compare_req_version_names (gconstpointer a, gconstpointer b)
-{
-  const RequiredVersion *ver_a = a;
-  const RequiredVersion *ver_b = b;
-
-  return strcmp (ver_a->name, ver_b->name);
-}
-
-static gint
-compare_package_keys (gconstpointer a, gconstpointer b)
-{
-  const Package *pkg_a = a;
-  const Package *pkg_b = b;
-
-  return strcmp (pkg_a->key, pkg_b->key);
 }
 
 static GSList *
@@ -1030,7 +981,6 @@ static char*
 get_multi_merged (GSList *pkgs, GetListFunc func, gboolean in_path_order,
 		  gboolean include_private)
 {
-  GSList *tmp;
   GSList *dups_list = NULL;
   GSList *list;
   char *retval;
@@ -1052,7 +1002,6 @@ static char*
 get_multi_merged_from_back (GSList *pkgs, GetListFunc func,
 			    gboolean in_path_order, gboolean include_private)
 {
-  GSList *tmp;
   GSList *dups_list = NULL;
   GSList *list;
   char *retval;
