@@ -43,3 +43,4 @@ pkg_config_SOURCES= \
 	parse.h \
 	parse.c \
 	main.c
+DISTCHECK_CONFIGURE_FLAGS = --with-installed-popt
