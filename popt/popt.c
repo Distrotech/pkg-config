@@ -297,6 +297,8 @@ int poptGetNextOpt(poptContext con) {
     int singleDash;
 
     while (!done) {
+	longArg = NULL;
+
 	while (!con->os->nextCharArg && con->os->next == con->os->argc 
 		&& con->os > con->optionStack)
 	    con->os--;
