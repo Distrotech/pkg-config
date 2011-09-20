@@ -123,7 +123,7 @@ if test "x$GLIB_CFLAGS" = "x" && test "x$GLIB_LIBS" = "x"; then
       GLIB_CFLAGS=`$PKG_CONFIG --cflags glib-2.0`
       GLIB_LIBS=`$PKG_CONFIG --libs glib-2.0`
    else
-      AC_MSG_ERROR([pkg-config and glib-2.0 not found, please set GLIB_CFLAGS and GLIB_LIBS to the correct values])]
+      AC_MSG_ERROR([pkg-config and glib-2.0 not found, please set GLIB_CFLAGS and GLIB_LIBS to the correct values])
    fi
 fi
 AC_SUBST(GLIB_LIBS)
