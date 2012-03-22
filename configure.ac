@@ -117,14 +117,29 @@ esac
 AC_MSG_RESULT([$native_win32])
 AM_CONDITIONAL(NATIVE_WIN32, [test "x$native_win32" = xyes])
 
-if test "x$GLIB_CFLAGS" = "x" && test "x$GLIB_LIBS" = "x"; then
-   AC_CHECK_PROGS([PKG_CONFIG], [pkg-config], [])
-   if test -n $PKG_CONFIG && $PKG_CONFIG --exists glib-2.0; then
+AC_ARG_WITH([internal-glib],
+  [AS_HELP_STRING([--with-internal-glib], [use internal glib])],
+  [with_internal_glib="$withval"],
+  [with_internal_glib=no])
+AM_CONDITIONAL([INTERNAL_GLIB], [test "x$with_internal_glib" = xyes])
+if test "x$with_internal_glib" = xyes; then
+  GLIB_CFLAGS='-I$(top_srcdir)/glib -I$(top_srcdir)/glib/glib \
+    -I$(top_builddir)/glib/glib'
+  GLIB_LIBS='$(top_builddir)/glib/glib/libglib-2.0.la'
+  AC_CONFIG_SUBDIRS([glib])
+else
+  if test "x$GLIB_CFLAGS" = "x" && test "x$GLIB_LIBS" = "x"; then
+    AC_CHECK_PROGS([PKG_CONFIG], [pkg-config], [])
+    if test -n $PKG_CONFIG && $PKG_CONFIG --exists glib-2.0; then
       GLIB_CFLAGS=`$PKG_CONFIG --cflags glib-2.0`
       GLIB_LIBS=`$PKG_CONFIG --libs glib-2.0`
-   else
-      AC_MSG_ERROR([pkg-config and glib-2.0 not found, please set GLIB_CFLAGS and GLIB_LIBS to the correct values])
-   fi
+    else
+      AC_MSG_ERROR(m4_normalize([pkg-config and glib-2.0 not found, please set
+                                 GLIB_CFLAGS and GLIB_LIBS to the correct
+                                 values or pass --with-internal-glib to
+                                 configure]))
+    fi
+  fi
 fi
 AC_SUBST(GLIB_LIBS)
 AC_SUBST(GLIB_CFLAGS)

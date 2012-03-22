@@ -1,5 +1,9 @@
 pkg_config_LDADD=@GLIB_LIBS@
 
+if INTERNAL_GLIB
+GLIB_SUBDIR = glib
+endif
+
 if USE_INSTALLED_POPT
 pkg_config_LDADD += $(POPT_LIBS)
 else
@@ -43,4 +47,4 @@ pkg_config_SOURCES= \
 	parse.h \
 	parse.c \
 	main.c
-DISTCHECK_CONFIGURE_FLAGS = --with-installed-popt
+DISTCHECK_CONFIGURE_FLAGS = --with-installed-popt --with-internal-glib
