@@ -457,19 +457,6 @@ dnl
 dnl gettext support
 dnl
 
-ALL_LINGUAS="`grep -v '^#' "$srcdir/po/LINGUAS" | tr '\n' ' '`"
-AC_SUBST([CONFIG_STATUS_DEPENDENCIES],['$(top_srcdir)/po/LINGUAS'])
-GLIB_GNU_GETTEXT
-
-if test "$gt_cv_have_gettext" != "yes" ; then
-  AC_MSG_ERROR([
-*** You must have either have gettext support in your C library, or use the 
-*** GNU gettext library. (http://www.gnu.org/software/gettext/gettext.html
-])
-fi
-
-LIBS="$INTLLIBS $LIBS"
-
 GETTEXT_PACKAGE=glib20
 AC_SUBST(GETTEXT_PACKAGE)
 AC_DEFINE_UNQUOTED(GETTEXT_PACKAGE, ["$GETTEXT_PACKAGE"], 
@@ -2555,35 +2542,6 @@ if test $cross_compiling = yes; then
   fi
 fi
 
-dnl **************************
-dnl *** Checks for gtk-doc ***
-dnl **************************
-
-GTK_DOC_CHECK([1.15], [--flavour no-tmpl])
-
-AC_ARG_ENABLE(man,
-              [AC_HELP_STRING([--enable-man],
-                              [regenerate man pages from Docbook [default=no]])],enable_man=yes,
-              enable_man=no)
-
-if test "${enable_man}" != no; then
-dnl
-dnl Check for xsltproc
-dnl
-AC_PATH_PROG([XSLTPROC], [xsltproc])
-  if test -z "$XSLTPROC"; then
-    enable_man=no
-  fi
-
-  dnl check for DocBook DTD and stylesheets in the local catalog.
-  JH_CHECK_XML_CATALOG([-//OASIS//DTD DocBook XML V4.1.2//EN],
-     [DocBook XML DTD V4.1.2],,enable_man=no)
-  JH_CHECK_XML_CATALOG([http://docbook.sourceforge.net/release/xsl/current/manpages/docbook.xsl],
-     [DocBook XSL Stylesheets],,enable_man=no)
-fi
-
-AM_CONDITIONAL(ENABLE_MAN, test x$enable_man != xno)
-
 dnl
 dnl Tracing
 dnl
@@ -3484,87 +3442,22 @@ AC_SUBST(gio_INCLUDES)
 
 
 AC_CONFIG_FILES([
-glib-2.0.pc
-gmodule-2.0.pc
-gmodule-export-2.0.pc
-gmodule-no-export-2.0.pc
-gthread-2.0.pc
-gobject-2.0.pc
-gio-2.0.pc
-gio-unix-2.0.pc
-gio-windows-2.0.pc
-glib-zip
-glib-gettextize
 Makefile
-build/Makefile
-build/win32/Makefile
-build/win32/dirent/Makefile
-build/win32/vs9/Makefile
-build/win32/vs10/Makefile
 glib/Makefile
-glib/glib.stp
 glib/libcharset/Makefile
 glib/gnulib/Makefile
 glib/pcre/Makefile
 glib/update-pcre/Makefile
-glib/tests/Makefile
-gmodule/Makefile
-gmodule/gmoduleconf.h
-gobject/Makefile
-gobject/gobject.stp
-gobject/glib-mkenums
-gobject/tests/Makefile
-gthread/Makefile
-gio/Makefile
-gio/gdbus-2.0/codegen/Makefile
-gio/gdbus-2.0/codegen/config.py
-gio/xdgmime/Makefile
-gio/inotify/Makefile
-gio/fen/Makefile
-gio/fam/Makefile
-gio/win32/Makefile
-gio/tests/Makefile
-gio/tests/gdbus-object-manager-example/Makefile
-po/Makefile.in
-docs/Makefile
-docs/reference/Makefile
-docs/reference/glib/Makefile
-docs/reference/glib/version.xml
-docs/reference/gobject/Makefile
-docs/reference/gobject/version.xml
-docs/reference/gio/Makefile
-docs/reference/gio/gdbus-object-manager-example/Makefile
-docs/reference/gio/version.xml
-tests/Makefile
-tests/gobject/Makefile
-tests/refcount/Makefile
 m4macros/Makefile
 ])
-
-AC_CONFIG_COMMANDS([chmod-scripts],
-[chmod 0755 glib-zip
-chmod 0755 glib-gettextize
-chmod 0755 gobject/glib-mkenums])
 
 # we want to invoke this macro solely so that the config.status script
 # and automake generated makefiles know about these generated files.
 # They are only needed to distcheck the package
 if false; then
   AC_CONFIG_FILES([
-    INSTALL
     README
-    config.h.win32
-    glib/glibconfig.h.win32
-    glib/makefile.msc
     glib/glib.rc
-    gmodule/makefile.msc
-    gmodule/gmodule.rc
-    gobject/makefile.msc
-    gobject/gobject.rc
-    gthread/makefile.msc
-    gthread/gthread.rc
-    gio/gio.rc
-    tests/makefile.msc
   ])
 fi
 

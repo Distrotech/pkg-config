@@ -17,6 +17,3 @@ libgnulib_la_SOURCES = 	\
 	printf.c \
 	printf.h \
 	g-gnulib.h
-
-
-EXTRA_DIST += makefile.msc

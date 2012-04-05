@@ -35,9 +35,9 @@ else
 MAYBE_PCRE = pcre 
 endif
 
-SUBDIRS = libcharset $(PRINTF_SUBDIR) $(MAYBE_PCRE) update-pcre . tests
+SUBDIRS = libcharset $(PRINTF_SUBDIR) $(MAYBE_PCRE) update-pcre .
 
-DIST_SUBDIRS = libcharset gnulib pcre update-pcre tests
+DIST_SUBDIRS = libcharset gnulib pcre update-pcre
 
 AM_CPPFLAGS = 				\
 	$(glib_INCLUDES) 		\
@@ -53,7 +53,6 @@ glib.def: glib.symbols
 if OS_LINUX
 if HAVE_GNUC_VISIBILITY
 TESTS_ENVIRONMENT = GLIB_DEBUG_FLAGS="$(GLIB_DEBUG_FLAGS)"
-TESTS = abicheck.sh
 endif
 endif
 
@@ -66,12 +65,10 @@ MIRRORING_TAB_SOURCE = 				\
 # The compilation of GRegex can be disabled, but the source files must
 # be distributed.
 EXTRA_DIST += 			\
-	makefile.msc.in		\
 	glib.rc.in		\
 	gen-iswide-table.py	\
 	gen-unicode-tables.pl	\
 	gen-script-table.pl	\
-	glibconfig.h.win32.in	\
 	abicheck.sh		\
 	glib.symbols		\
 	gregex.c		\
@@ -86,8 +83,6 @@ CLEANFILES= libglib-gdb.py
 
 # These may be in the builddir too
 BUILT_EXTRA_DIST = 		\
-	makefile.msc		\
-	glibconfig.h.win32	\
 	glib.rc
 
 lib_LTLIBRARIES = libglib-2.0.la
@@ -116,7 +111,6 @@ deprecated_sources = \
 
 libglib_2_0_la_SOURCES = 	\
 	$(deprecated_sources)	\
-	glib_probes.d		\
 	garray.c		\
 	gasyncqueue.c		\
 	gasyncqueueprivate.h	\
@@ -382,24 +376,6 @@ libglib_2_0_la_LDFLAGS = $(GLIB_LINK_FLAGS) \
 
 INSTALL_PROGS=
 
-if ENABLE_DTRACE
-glib_probes.h: glib_probes.d Makefile
-	$(AM_V_GEN) $(DTRACE) -C -h -s $< -o $@.tmp
-	@$(SED) -e "s,define STAP_HAS_SEMAPHORES 1,undef STAP_HAS_SEMAPHORES," < $@.tmp > $@ && rm -f $@.tmp
-glib_probes.o: glib_probes.d Makefile
-	$(AM_V_GEN) $(DTRACE) -G -s $< -o $@
-BUILT_SOURCES += glib_probes.h glib_probes.o
-CLEANFILES += glib_probes.h glib_probes.h.tmp
-libglib_2_0_la_LIBADD += glib_probes.o
-endif
-
-if ENABLE_SYSTEMTAP
-tapset_in_files = glib.stp.in
-tapsetdir   = @ABS_TAPSET_DIR@
-tapset_DATA = $(tapset_in_files:.stp.in=.stp)
-EXTRA_DIST += $(tapset_in_files)
-endif
-
 gspawn-win32-helper-console.c:
 	echo '#define HELPER_CONSOLE' >$@
 	echo '#include "gspawn-win32-helper.c"' >>$@
@@ -461,7 +437,7 @@ endif
 glib-2.0.lib: libglib-2.0.la glib.def
 	lib -machine:@LIB_EXE_MACHINE_FLAG@ -name:libglib-2.0-$(LT_CURRENT_MINUS_AGE).dll -def:$(builddir)/glib.def -out:$@
 
-dist-hook: $(BUILT_EXTRA_DIST) ../build/win32/vs9/glib.vcproj ../build/win32/vs10/glib.vcxproj ../build/win32/vs10/glib.vcxproj.filters
+dist-hook: $(BUILT_EXTRA_DIST)
 	files='$(BUILT_EXTRA_DIST)'; \
 	for f in $$files; do \
 	  if test -f $$f; then d=.; else d=$(srcdir); fi; \
