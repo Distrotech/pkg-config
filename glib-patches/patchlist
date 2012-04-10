@@ -1,1 +1,3 @@
 glib-only.patch
+no-installed-files.patch
+

@@ -1,0 +1,130 @@
+diff --git a/glib/glib/Makefile.am b/glib/glib/Makefile.am
+index 6fb3a34..e0ace06 100644
+--- a/glib/glib/Makefile.am
++++ b/glib/glib/Makefile.am
+@@ -16,7 +16,7 @@ CLEANFILES =
+ DISTCLEANFILES += glibconfig-stamp glibconfig.h
+ BUILT_SOURCES += glibconfig-stamp
+ configexecincludedir = $(libdir)/glib-2.0/include
+-nodist_configexecinclude_HEADERS = glibconfig.h
++nodist_noinst_HEADERS = glibconfig.h
+ glibconfig-stamp: ../config.status
+ 	$(AM_V_GEN) cd $(top_builddir) && \
+ 	  $(SHELL) ./config.status glib/glibconfig.h
+@@ -85,7 +85,7 @@ CLEANFILES= libglib-gdb.py
+ BUILT_EXTRA_DIST = 		\
+ 	glib.rc
+ 
+-lib_LTLIBRARIES = libglib-2.0.la
++noinst_LTLIBRARIES = libglib-2.0.la
+ 
+ if OS_WIN32_AND_DLL_COMPILATION
+ if MS_LIB_AVAILABLE
+@@ -228,13 +228,13 @@ EXTRA_libglib_2_0_la_SOURCES = \
+ 	gwin32.c
+ 
+ glibincludedir=$(includedir)/glib-2.0
+-glibinclude_HEADERS =   \
++noinst_HEADERS =   \
+ 	glib-unix.h     \
+ 	glib-object.h	\
+ 	glib.h
+ 
+ deprecatedincludedir=$(includedir)/glib-2.0/glib/deprecated
+-deprecatedinclude_HEADERS = \
++noinst_HEADERS += \
+ 	deprecated/gallocator.h		\
+ 	deprecated/gcache.h		\
+ 	deprecated/gcompletion.h	\
+@@ -243,7 +243,7 @@ deprecatedinclude_HEADERS = \
+ 	deprecated/gthread.h
+ 
+ glibsubincludedir=$(includedir)/glib-2.0/glib
+-glibsubinclude_HEADERS = \
++noinst_HEADERS += \
+ 	galloca.h	\
+ 	garray.h	\
+ 	gasyncqueue.h	\
+@@ -325,15 +325,6 @@ CLEANFILES += glib-public-headers.txt
+ 
+ all-local: glib-public-headers.txt
+ 
+-install-data-local: install-ms-lib install-def-file
+-	@if test -f $(glibincludedir)/glist.h ; then					\
+-	  echo "*** Old headers found in $(glibincludedir). You should remove the" ;	\
+-	  echo "*** contents of this directory and type 'make install' again." ;	\
+-	  false ;									\
+-	fi
+-
+-uninstall-local: uninstall-ms-lib uninstall-def-file uninstall-gdb
+-
+ if PLATFORM_WIN32
+ no_undefined = -no-undefined
+ endif
+@@ -371,7 +362,6 @@ libglib_2_0_la_DEPENDENCIES = libcharset/libcharset.la $(printf_la) @GIO@ @GSPAW
+ 
+ libglib_2_0_la_LDFLAGS = $(GLIB_LINK_FLAGS) \
+ 	 $(glib_win32_res_ldflag) \
+-	-version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE) \
+ 	-export-dynamic $(no_undefined) $(export_symbols)
+ 
+ INSTALL_PROGS=
+@@ -405,7 +395,7 @@ endif
+ glib-win32-res.o: glib.rc
+ 	$(WINDRES) glib.rc $@
+ 
+-bin_PROGRAMS	 = ${INSTALL_PROGS}
++noinst_PROGRAMS	 = ${INSTALL_PROGS}
+ 
+ if OS_UNIX
+ 
+@@ -414,24 +404,12 @@ gtester_SOURCES	 = gtester.c
+ gtester_LDADD	 = libglib-2.0.la 
+ 
+ auto_config_binscripts = gtester-report
+-bin_SCRIPTS = ${auto_config_binscripts}
++noinst_SCRIPTS = ${auto_config_binscripts}
+ EXTRA_DIST += ${auto_config_binscripts}
+ 
+ CONFIGVARS = \
+ 	"bindir"    	: "${bindir}",		\
+ 	"glib-version"  : "${GLIB_VERSION}"
+-
+-install-exec-hook:
+-	for sf in ${auto_config_binscripts} ; do \
+-	  mv -f "$(DESTDIR)$(bindir)/$$sf" "$(DESTDIR)$(bindir)/$$sf".tmp \
+-	  && sed < "$(DESTDIR)$(bindir)/$$sf".tmp > "$(DESTDIR)$(bindir)/$$sf" \
+-	    -e '1,24s|^ *#@PKGINSTALL_CONFIGVARS_IN24LINES@|  ${CONFIGVARS}|' \
+-	    -e '1,1s|#! /usr/bin/env python\([0-9]\+\(\.[0-9]\+\)\?\)\?|#!${PYTHON}|' \
+-	  || exit $$? ; \
+-	  chmod a+x $(DESTDIR)$(bindir)/$$sf ; \
+-	  rm -f "$(DESTDIR)$(bindir)/$$sf".tmp ; \
+-	done
+-
+ endif
+ 
+ glib-2.0.lib: libglib-2.0.la glib.def
+@@ -481,22 +459,7 @@ dist-hook: $(BUILT_EXTRA_DIST)
+ 
+ # install gdb scripts
+ gdbdir = $(datadir)/glib-2.0/gdb
+-dist_gdb_SCRIPTS = glib.py
++dist_noinst_SCRIPTS = glib.py
+ 
+ libglib-gdb.py: libglib-gdb.py.in
+ 	$(AM_V_GEN) $(SED) -e "s|\@datadir\@|$(datadir)|" $(srcdir)/libglib-gdb.py.in > $(builddir)/libglib-gdb.py
+-
+-
+-install-data-hook: libglib-gdb.py
+-	mkdir -p $(DESTDIR)$(datadir)/gdb/auto-load$(ABS_GLIB_RUNTIME_LIBDIR)
+-	$(INSTALL) $(builddir)/libglib-gdb.py $(DESTDIR)$(datadir)/gdb/auto-load$(ABS_GLIB_RUNTIME_LIBDIR)/libglib-2.0.so.0.$(LT_CURRENT).$(LT_REVISION)-gdb.py
+-if HAVE_GLIB_RUNTIME_LIBDIR
+-	mkdir -p $(DESTDIR)$(libdir)/$(GLIB_RUNTIME_LIBDIR)
+-	mv $(DESTDIR)$(libdir)/libglib-2.0.so.0 $(DESTDIR)$(libdir)/$(GLIB_RUNTIME_LIBDIR)
+-	mv $(DESTDIR)$(libdir)/libglib-2.0.so.0.$(LT_CURRENT).$(LT_REVISION) $(DESTDIR)$(libdir)/$(GLIB_RUNTIME_LIBDIR)
+-	rm -f $(DESTDIR)$(libdir)/libglib-2.0.so
+-	ln -s $(GLIB_RUNTIME_LIBDIR)/libglib-2.0.so.0.$(LT_CURRENT).$(LT_REVISION) $(DESTDIR)$(libdir)/libglib-2.0.so
+-endif
+-
+-uninstall-gdb:
+-	-rm -r $(DESTDIR)$(datadir)/gdb
