@@ -30,14 +30,9 @@ PRINTF_SUBDIR = gnulib
 printf_la = gnulib/libgnulib.la
 endif 
 
-if USE_SYSTEM_PCRE
-else
-MAYBE_PCRE = pcre 
-endif
+SUBDIRS = libcharset $(PRINTF_SUBDIR) .
 
-SUBDIRS = libcharset $(PRINTF_SUBDIR) $(MAYBE_PCRE) update-pcre .
-
-DIST_SUBDIRS = libcharset gnulib pcre update-pcre
+DIST_SUBDIRS = libcharset gnulib
 
 AM_CPPFLAGS = 				\
 	$(glib_INCLUDES) 		\
@@ -62,8 +57,6 @@ MIRRORING_TAB_SOURCE = 				\
 	glib-mirroring-tab/packtab.h		\
 	glib-mirroring-tab/packtab.c
 
-# The compilation of GRegex can be disabled, but the source files must
-# be distributed.
 EXTRA_DIST += 			\
 	glib.rc.in		\
 	gen-iswide-table.py	\
@@ -71,8 +64,6 @@ EXTRA_DIST += 			\
 	gen-script-table.pl	\
 	abicheck.sh		\
 	glib.symbols		\
-	gregex.c		\
-	gregex.h		\
 	win_iconv.c		\
 	libglib-gdb.py.in	\
 	docs.c			\
@@ -162,7 +153,6 @@ libglib_2_0_la_SOURCES = 	\
 	gqsort.c		\
 	gqueue.c		\
 	grand.c			\
-	gregex.c		\
 	gscanner.c		\
 	gscripttable.h		\
 	gsequence.c		\
@@ -288,7 +278,6 @@ noinst_HEADERS += \
 	gquark.h	\
 	gqueue.h	\
 	grand.h		\
-	gregex.h	\
 	gscanner.h	\
 	gsequence.h	\
 	gshell.h	\
@@ -347,14 +336,6 @@ install-def-file:
 uninstall-def-file:
 
 export_symbols = $(LIBTOOL_EXPORT_OPTIONS)
-endif
-
-if USE_SYSTEM_PCRE
-pcre_lib = $(PCRE_LIBS)
-pcre_inc = $(PCRE_CFLAGS)
-else
-pcre_lib = pcre/libpcre.la
-pcre_inc =
 endif
 
 libglib_2_0_la_LIBADD = libcharset/libcharset.la $(printf_la) @GIO@ @GSPAWN@ @PLATFORMDEP@ @ICONV_LIBS@ @G_LIBS_EXTRA@ $(pcre_lib) $(G_THREAD_LIBS_EXTRA) $(G_THREAD_LIBS_FOR_GTHREAD)

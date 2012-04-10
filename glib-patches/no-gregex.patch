@@ -1,0 +1,160 @@
+diff --git a/glib/configure.ac b/glib/configure.ac
+index 8970f2c..41780cd 100644
+--- a/glib/configure.ac
++++ b/glib/configure.ac
+@@ -2431,64 +2431,6 @@ AC_RUN_IFELSE([AC_LANG_SOURCE([[
+   [broken_poll="no (cross compiling)"])
+ AC_MSG_RESULT($broken_poll)
+ 
+-dnl *********************
+-dnl *** GRegex checks ***
+-dnl *********************
+-
+-PCRE_REQUIRED_VERSION=8.11
+-
+-# Check if we should use the internal or the system-supplied pcre
+-AC_ARG_WITH(pcre,
+-            [AC_HELP_STRING([--with-pcre=@<:@internal/system@:>@],
+-                            [whether to use system PCRE [default=internal]])])
+-
+-AM_CONDITIONAL(USE_SYSTEM_PCRE, [test "x$with_pcre" = xsystem])
+-
+-if test "x$with_pcre" = xsystem; then
+-  PKG_CHECK_MODULES(PCRE,
+-                    libpcre >= $PCRE_REQUIRED_VERSION)
+-  AC_CACHE_CHECK([for Unicode support in PCRE],glib_cv_pcre_has_unicode,[
+-                  glib_save_CFLAGS="$CFLAGS"
+-                  glib_save_LIBS="$LIBS"
+-                  CFLAGS="$CFLAGS $PCRE_CFLAGS" LIBS="$PCRE_LIBS"
+-                  AC_TRY_RUN([#include <pcre.h>
+-                              int main () {
+-                                int support;
+-                                pcre_config (PCRE_CONFIG_UTF8, &support);
+-                                if (!support)
+-                                  return 1;
+-                                pcre_config (PCRE_CONFIG_UNICODE_PROPERTIES, &support);
+-                                if (!support)
+-                                  return 1;
+-                                return 0;
+-                              }],
+-                  glib_cv_pcre_has_unicode=yes,
+-                  glib_cv_pcre_has_unicode=no,
+-                  glib_cv_pcre_has_unicode=yes)
+-                  CFLAGS="$glib_save_CFLAGS"
+-                  LIBS="$glib_save_LIBS"
+-      ])
+-  if test "$glib_cv_pcre_has_unicode" = "no"; then
+-    AC_MSG_ERROR([*** The system-supplied PCRE does not support Unicode properties or UTF-8.])
+-  fi
+-  AC_SUBST(PCRE_CFLAGS)
+-  AC_SUBST(PCRE_LIBS)
+-  AC_DEFINE(USE_SYSTEM_PCRE, [], [using the system-supplied PCRE library])
+-  PCRE_REQUIRES=libpcre
+-  AC_SUBST(PCRE_REQUIRES)
+-else
+-  # If using gcc 4 pass -Wno-pointer-sign when compiling the internal PCRE
+-  if test x"$GCC" = xyes; then
+-    AC_MSG_CHECKING([whether compiler understands -Wno-pointer-sign])
+-    save_CFLAGS="$CFLAGS"
+-    CFLAGS="$CFLAGS -Wno-pointer-sign"
+-    AC_TRY_COMPILE([],[],[PCRE_WARN_CFLAGS="$PCRE_WARN_CFLAGS -Wno-pointer-sign"
+-                          AC_MSG_RESULT(yes)],[AC_MSG_RESULT(no)])
+-    CFLAGS="$save_CFLAGS"
+-  fi
+-fi
+-AC_SUBST(PCRE_WARN_CFLAGS)
+-
+ dnl **********************
+ dnl *** Win32 API libs ***
+ dnl **********************
+@@ -3446,8 +3388,6 @@ Makefile
+ glib/Makefile
+ glib/libcharset/Makefile
+ glib/gnulib/Makefile
+-glib/pcre/Makefile
+-glib/update-pcre/Makefile
+ m4macros/Makefile
+ ])
+ 
+diff --git a/glib/glib/Makefile.am b/glib/glib/Makefile.am
+index e0ace06..005b9b2 100644
+--- a/glib/glib/Makefile.am
++++ b/glib/glib/Makefile.am
+@@ -30,14 +30,9 @@ PRINTF_SUBDIR = gnulib
+ printf_la = gnulib/libgnulib.la
+ endif 
+ 
+-if USE_SYSTEM_PCRE
+-else
+-MAYBE_PCRE = pcre 
+-endif
+-
+-SUBDIRS = libcharset $(PRINTF_SUBDIR) $(MAYBE_PCRE) update-pcre .
++SUBDIRS = libcharset $(PRINTF_SUBDIR) .
+ 
+-DIST_SUBDIRS = libcharset gnulib pcre update-pcre
++DIST_SUBDIRS = libcharset gnulib
+ 
+ AM_CPPFLAGS = 				\
+ 	$(glib_INCLUDES) 		\
+@@ -62,8 +57,6 @@ MIRRORING_TAB_SOURCE = 				\
+ 	glib-mirroring-tab/packtab.h		\
+ 	glib-mirroring-tab/packtab.c
+ 
+-# The compilation of GRegex can be disabled, but the source files must
+-# be distributed.
+ EXTRA_DIST += 			\
+ 	glib.rc.in		\
+ 	gen-iswide-table.py	\
+@@ -71,8 +64,6 @@ EXTRA_DIST += 			\
+ 	gen-script-table.pl	\
+ 	abicheck.sh		\
+ 	glib.symbols		\
+-	gregex.c		\
+-	gregex.h		\
+ 	win_iconv.c		\
+ 	libglib-gdb.py.in	\
+ 	docs.c			\
+@@ -162,7 +153,6 @@ libglib_2_0_la_SOURCES = 	\
+ 	gqsort.c		\
+ 	gqueue.c		\
+ 	grand.c			\
+-	gregex.c		\
+ 	gscanner.c		\
+ 	gscripttable.h		\
+ 	gsequence.c		\
+@@ -288,7 +278,6 @@ noinst_HEADERS += \
+ 	gquark.h	\
+ 	gqueue.h	\
+ 	grand.h		\
+-	gregex.h	\
+ 	gscanner.h	\
+ 	gsequence.h	\
+ 	gshell.h	\
+@@ -349,14 +338,6 @@ uninstall-def-file:
+ export_symbols = $(LIBTOOL_EXPORT_OPTIONS)
+ endif
+ 
+-if USE_SYSTEM_PCRE
+-pcre_lib = $(PCRE_LIBS)
+-pcre_inc = $(PCRE_CFLAGS)
+-else
+-pcre_lib = pcre/libpcre.la
+-pcre_inc =
+-endif
+-
+ libglib_2_0_la_LIBADD = libcharset/libcharset.la $(printf_la) @GIO@ @GSPAWN@ @PLATFORMDEP@ @ICONV_LIBS@ @G_LIBS_EXTRA@ $(pcre_lib) $(G_THREAD_LIBS_EXTRA) $(G_THREAD_LIBS_FOR_GTHREAD)
+ libglib_2_0_la_DEPENDENCIES = libcharset/libcharset.la $(printf_la) @GIO@ @GSPAWN@ @PLATFORMDEP@ $(glib_win32_res) $(glib_def)
+ 
+diff --git a/glib/glib/glib.h b/glib/glib/glib.h
+index 77abf23..1ba1f47 100644
+--- a/glib/glib/glib.h
++++ b/glib/glib/glib.h
+@@ -71,7 +71,6 @@
+ #include <glib/gquark.h>
+ #include <glib/gqueue.h>
+ #include <glib/grand.h>
+-#include <glib/gregex.h>
+ #include <glib/gscanner.h>
+ #include <glib/gsequence.h>
+ #include <glib/gshell.h>

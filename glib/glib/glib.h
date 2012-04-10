@@ -71,7 +71,6 @@
 #include <glib/gquark.h>
 #include <glib/gqueue.h>
 #include <glib/grand.h>
-#include <glib/gregex.h>
 #include <glib/gscanner.h>
 #include <glib/gsequence.h>
 #include <glib/gshell.h>
