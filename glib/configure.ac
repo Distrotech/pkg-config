@@ -277,8 +277,6 @@ AC_PROG_INSTALL
 
 AC_SYS_LARGEFILE
 
-PKG_PROG_PKG_CONFIG(0.16)
-
 if test "x$enable_debug" = "xyes"; then
   if test x$cflags_set != xset ; then
       case " $CFLAGS " in
@@ -435,23 +433,6 @@ fi
 
 AC_MSG_RESULT($enable_iconv_cache)
 
-
-dnl
-dnl zlib support
-dnl
-PKG_CHECK_MODULES([ZLIB], [zlib], [found_zlib=yes], [found_zlib=no])
-if test "x$found_zlib" = "xno" ; then
-  AC_CHECK_LIB(z, inflate, [AC_CHECK_HEADER(zlib.h, found_zlib=yes)])
-  if test "x$found_zlib" = "xno" ; then
-    AC_MSG_ERROR([*** Working zlib library and headers not found ***])
-  fi
-  ZLIB_LIBS='-lz'
-  AC_SUBST(ZLIB_LIBS)
-fi
-
-PKG_CHECK_MODULES(LIBFFI, [libffi >= 3.0.0])
-AC_SUBST(LIBFFI_CFLAGS)
-AC_SUBST(LIBFFI_LIBS)
 
 dnl
 dnl gettext support
@@ -3312,12 +3293,7 @@ AC_CHECK_ALIGNOF([unsigned long])
 # Check for libdbus1 - Optional - is only used in the GDBus test cases
 #
 # 1.2.14 required for dbus_message_set_serial
-PKG_CHECK_MODULES(DBUS1,
-                  dbus-1 >= 1.2.14,
-                  [AC_DEFINE(HAVE_DBUS1, 1, [Define if dbus-1 is available]) have_dbus1=yes],
-                  have_dbus1=no)
-AC_SUBST(DBUS1_CFLAGS)
-AC_SUBST(DBUS1_LIBS)
+have_dbus1=no
 AM_CONDITIONAL(HAVE_DBUS1, [test "x$have_dbus1" = "xyes"])
 
 dnl

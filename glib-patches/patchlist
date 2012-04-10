@@ -2,3 +2,4 @@ glib-only.patch
 no-installed-files.patch
 foreign-automake.patch
 no-gregex.patch
+no-pkg-config.patch
