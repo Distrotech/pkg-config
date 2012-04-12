@@ -48,3 +48,13 @@ pkg_config_SOURCES= \
 	parse.c \
 	main.c
 DISTCHECK_CONFIGURE_FLAGS = --with-installed-popt --with-internal-glib
+
+# Override the normal dist so that we can make sure the glib subdir is
+# configured first. Otherwise it will just bomb entering the directory.
+dist dist-all: check-glib-Makefile
+	@$(MAKE) $(AM_MAKEFLAGS) dist-gzip
+check-glib-Makefile:
+	@if test ! -f glib/Makefile; then \
+	  echo $(SHELL) $(top_srcdir)/configure --with-internal-glib; \
+	  $(SHELL) $(top_srcdir)/configure --with-internal-glib; \
+	fi
