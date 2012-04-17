@@ -3,25 +3,6 @@
 .\" (C) Red Hat, Inc. based on gnome-config man page (C) Miguel de Icaza (miguel@gnu.org)
 .\"
 .
-.\" Macros to disable groff line adjustment warnings that we can't easily
-.\" fix in the text.
-.ie \n(.g \{\
-.  de DW
-.    nr .oldwarn \n[.warn]
-.    warn 0
-.  .
-.  de EW
-.    warn \n[.oldwarn]
-.  .
-.\}
-.el \
-.\{ \
-.  de DW
-.  .
-.  de EW
-.  .
-.\}
-.
 .TH pkg-config 1
 .SH NAME
 pkg-config \- Return metainformation about installed libraries
