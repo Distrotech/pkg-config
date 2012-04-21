@@ -32,11 +32,14 @@ For more info, there's even a man page, try 'man pkg-config'
 
 Building
 ========
-To build pkg-config, you need glib installed already.  Note that glib
-build-depends on pkg-config, but you can just set the corresponding
-environment variables (ZLIB_LIBS, ZLIB_CFLAGS are the only needed ones
-when this is written) to build it.  
+pkg-config depends on glib.  Note that glib build-depends on pkg-config,
+but you can just set the corresponding environment variables (ZLIB_LIBS,
+ZLIB_CFLAGS are the only needed ones when this is written) to build it.
 
 pkg-config also either needs an earlier version of itself to find glib
 or you need to set GLIB_CFLAGS and GLIB_LIBS to the correct values for
 where it's installed in your system.
+
+If this requirement is too cumbersome, a bundled copy of a recent glib
+stable release is included. Pass --with-internal-glib to configure to
+use this copy.
