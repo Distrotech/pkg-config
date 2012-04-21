@@ -469,6 +469,26 @@ main (int argc, char **argv)
         Package *req;
         RequiredVersion *ver = iter->data;
 
+	/* override requested versions with cmdline options */
+	if (required_exact_version)
+	  {
+	    g_free (ver->version);
+	    ver->comparison = EQUAL;
+	    ver->version = g_strdup (required_exact_version);
+	  }
+	else if (required_atleast_version)
+	  {
+	    g_free (ver->version);
+	    ver->comparison = GREATER_THAN_EQUAL;
+	    ver->version = g_strdup (required_atleast_version);
+	  }
+	else if (required_max_version)
+	  {
+	    g_free (ver->version);
+	    ver->comparison = LESS_THAN_EQUAL;
+	    ver->version = g_strdup (required_max_version);
+	  }
+
         if (want_short_errors)
           req = get_package_quiet (ver->name);
         else
@@ -656,34 +676,6 @@ main (int argc, char **argv)
         }
     }
   
-  if (required_exact_version)
-    {
-      Package *pkg = packages->data;
-
-      if (compare_versions (pkg->version, required_exact_version) == 0)
-        return 0;
-      else
-        return 1;
-    }
-  else if (required_atleast_version)
-    {
-      Package *pkg = packages->data;
-
-      if (compare_versions (pkg->version, required_atleast_version) >= 0)
-        return 0;
-      else
-        return 1;
-    }
-  else if (required_max_version)
-    {
-      Package *pkg = packages->data;
-
-      if (compare_versions (pkg->version, required_max_version) <= 0)
-        return 0;
-      else
-        return 1;
-    }
-
   /* Print all flags; then print a newline at the end. */
   need_newline = FALSE;
 
