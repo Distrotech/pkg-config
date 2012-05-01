@@ -1,8 +1,8 @@
 diff --git a/glib/configure.ac b/glib/configure.ac
-index 41780cd..4cfd8fa 100644
+index 3bba0fd..d551832 100644
 --- a/glib/configure.ac
 +++ b/glib/configure.ac
-@@ -277,8 +277,6 @@ AC_PROG_INSTALL
+@@ -294,8 +294,6 @@ AC_PROG_INSTALL
  
  AC_SYS_LARGEFILE
  
@@ -11,7 +11,7 @@ index 41780cd..4cfd8fa 100644
  if test "x$enable_debug" = "xyes"; then
    if test x$cflags_set != xset ; then
        case " $CFLAGS " in
-@@ -437,23 +435,6 @@ AC_MSG_RESULT($enable_iconv_cache)
+@@ -454,23 +452,6 @@ AC_MSG_RESULT($enable_iconv_cache)
  
  
  dnl
@@ -35,7 +35,36 @@ index 41780cd..4cfd8fa 100644
  dnl gettext support
  dnl
  
-@@ -3312,12 +3293,7 @@ AC_CHECK_ALIGNOF([unsigned long])
+@@ -1799,28 +1780,6 @@ dnl   failure. try libattr
+ fi
+ AC_SUBST(XATTR_LIBS)
+ 
+-dnl ************************
+-dnl *** check for libelf ***
+-dnl ************************
+-
+-PKG_CHECK_MODULES([LIBELF], [libelf], [have_libelf=yes], [have_libelf=maybe])
+-
+-if test $have_libelf = maybe; then
+-  AC_CHECK_LIB([elf], [elf_begin], , [have_libelf=no])
+-  AC_CHECK_LIB([elf], [elf_getshdrstrndx], , [have_libelf=no])
+-  AC_CHECK_LIB([elf], [elf_getshdrnum], , [have_libelf=no])
+-  AC_CHECK_HEADER([libelf.h], , [have_libelf=no])
+-
+-  if test $have_libelf != no; then
+-    LIBELF_LIBS=-lelf
+-    have_libelf = yes
+-  fi
+-fi
+-
+-if test $have_libelf = yes; then
+-  AC_DEFINE(HAVE_LIBELF, 1, [Define if libelf is available])
+-fi
+-
+ dnl ****************************************
+ dnl *** platform dependent source checks ***
+ dnl ****************************************
+@@ -3355,12 +3314,7 @@ AC_CHECK_ALIGNOF([unsigned long])
  # Check for libdbus1 - Optional - is only used in the GDBus test cases
  #
  # 1.2.14 required for dbus_message_set_serial

@@ -4,7 +4,7 @@ GIT=${GIT-git}
 PATCH=${PATCH-patch}
 SED=${SED-sed}
 repo=
-tag=2.32.0
+tag=2.32.2
 commit=n
 
 usage()

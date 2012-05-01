@@ -31,8 +31,8 @@ m4_define(glib_configure_ac)
 
 m4_define([glib_major_version], [2])
 m4_define([glib_minor_version], [32])
-m4_define([glib_micro_version], [0])
-m4_define([glib_interface_age], [0])
+m4_define([glib_micro_version], [2])
+m4_define([glib_interface_age], [2])
 m4_define([glib_binary_age],
           [m4_eval(100 * glib_minor_version + glib_micro_version)])
 m4_define([glib_version],
@@ -175,11 +175,23 @@ AC_TRY_CPP([
 
 AC_MSG_RESULT([$glib_have_carbon])
 
+glib_have_cocoa=no
+AC_MSG_CHECKING([for Mac OS X Cocoa support])
+AC_TRY_CPP([
+#include <Cocoa/Cocoa.h>
+#ifdef GNUSTEP_BASE_VERSION
+#error "Detected GNUstep, not Cocoa"
+#endif
+], glib_have_cocoa=yes)
+
+AC_MSG_RESULT([$glib_have_cocoa])
+
 AM_CONDITIONAL(OS_WIN32, [test "$glib_native_win32" = "yes"])
 AM_CONDITIONAL(OS_WIN32_X64, [test "$LIB_EXE_MACHINE_FLAG" = "X64"])
 AM_CONDITIONAL(OS_UNIX, [test "$glib_native_win32" != "yes"])
 AM_CONDITIONAL(OS_LINUX, [test "$glib_os_linux" = "yes"])
 AM_CONDITIONAL(OS_CARBON, [test "$glib_have_carbon" = "yes"])
+AM_CONDITIONAL(OS_COCOA, [test "$glib_have_cocoa" = "yes"])
 
 if test "$glib_native_win32" = "yes"; then
   AC_CHECK_TOOL(WINDRES, windres, no)
@@ -208,6 +220,11 @@ AC_SUBST(LIBTOOL_EXPORT_OPTIONS)
 if test "x$glib_have_carbon" = "xyes"; then
   AC_DEFINE(HAVE_CARBON, 1, [define to 1 if Carbon is available])
   LDFLAGS="$LDFLAGS -framework Carbon"
+fi
+
+if test "x$glib_have_cocoa" = "xyes"; then
+  AC_DEFINE(HAVE_COCOA, 1, [define to 1 if Cocoa is available])
+  LDFLAGS="$LDFLAGS -framework Foundation"
 fi
 
 gl_GLIBC21
@@ -1763,17 +1780,6 @@ dnl   failure. try libattr
 fi
 AC_SUBST(XATTR_LIBS)
 
-dnl ************************
-dnl *** check for libelf ***
-dnl ************************
-
-AC_CHECK_LIB([elf], [elf_begin], have_libelf=yes, have_libelf=no)
-if test $have_libelf = yes; then
-  AC_DEFINE(HAVE_LIBELF, 1, [Define if libelf is available])
-  ELF_LIBS=-lelf
-fi
-AC_SUBST(ELF_LIBS)
-
 dnl ****************************************
 dnl *** platform dependent source checks ***
 dnl ****************************************
@@ -3214,7 +3220,17 @@ g_pollhup=$glib_cv_value_POLLHUP
 g_pollerr=$glib_cv_value_POLLERR
 g_pollnval=$glib_cv_value_POLLNVAL
 
-g_af_unix=$glib_cv_value_AF_UNIX
+# If a family is not found on the system, define that family to
+# a negative value, picking a different one for each undefined
+# family (-1 for AF_UNIX, -2 for the next one, -3 ...)
+# This is needed because glib-mkenums doesn't handle optional
+# values in enums, and thus we have to have all existing values
+# defined in the enum.
+if test "x$glib_cv_value_AF_UNIX" != "x"; then
+  g_af_unix=$glib_cv_value_AF_UNIX
+else
+  g_af_unix=-1
+fi
 g_af_inet=$glib_cv_value_AF_INET
 g_af_inet6=$glib_cv_value_AF_INET6
 
@@ -3286,8 +3302,13 @@ $ac_cv_sizeof___int64)
   ;;
 esac
 
-AC_CHECK_ALIGNOF([guint32], [typedef unsigned $gint32 guint32;])
-AC_CHECK_ALIGNOF([guint64], typedef unsigned $gint64 guint64;)
+AC_CHECK_TYPE([guint32],,,[typedef unsigned $gint32 guint32;])
+AC_CHECK_ALIGNOF([guint32], [AC_INCLUDES_DEFAULT
+typedef unsigned $gint32 guint32;])
+AC_CHECK_TYPE([guint64],,,[typedef unsigned $gint64 guint64;])
+AC_CHECK_ALIGNOF([guint64], [AC_INCLUDES_DEFAULT
+typedef unsigned $gint64 guint64;])
+AC_CHECK_TYPE([unsigned long])
 AC_CHECK_ALIGNOF([unsigned long])
 
 # Check for libdbus1 - Optional - is only used in the GDBus test cases

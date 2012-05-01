@@ -1412,7 +1412,7 @@ g_test_add_vtable (const char       *testpath,
     return;
 
   suite = g_test_get_root();
-  segments = g_strsplit (testpath, G_DIR_SEPARATOR_S, -1);
+  segments = g_strsplit (testpath, "/", -1);
   for (ui = 0; segments[ui] != NULL; ui++)
     {
       const char *seg = segments[ui];
@@ -1471,7 +1471,7 @@ g_test_fail (void)
 
 /**
  * g_test_add_func:
- * @testpath:   Slash-separated test case path name for the test.
+ * @testpath:   /-separated test case path name for the test.
  * @test_func:  The test function to invoke for this test.
  *
  * Create a new test case, similar to g_test_create_case(). However
@@ -1503,7 +1503,7 @@ g_test_add_func (const char *testpath,
 
 /**
  * g_test_add_data_func:
- * @testpath:   Slash-separated test case path name for the test.
+ * @testpath:   /-separated test case path name for the test.
  * @test_data:  Test data argument for the test function.
  * @test_func:  The test function to invoke for this test.
  *
@@ -1954,8 +1954,8 @@ g_assertion_message_error (const char     *domain,
 
 /**
  * g_strcmp0:
- * @str1: a C string or %NULL
- * @str2: another C string or %NULL
+ * @str1: (allow-none): a C string or %NULL
+ * @str2: (allow-none): another C string or %NULL
  *
  * Compares @str1 and @str2 like strcmp(). Handles %NULL 
  * gracefully by sorting it before non-%NULL strings.
@@ -2482,7 +2482,7 @@ g_test_log_buffer_new (void)
 }
 
 /**
- * g_test_log_buffer_free
+ * g_test_log_buffer_free:
  *
  * Internal function for gtester to free test log messages, no ABI guarantees provided.
  */
@@ -2497,7 +2497,7 @@ g_test_log_buffer_free (GTestLogBuffer *tbuffer)
 }
 
 /**
- * g_test_log_buffer_push
+ * g_test_log_buffer_push:
  *
  * Internal function for gtester to decode test log messages, no ABI guarantees provided.
  */

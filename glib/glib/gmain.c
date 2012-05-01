@@ -191,7 +191,8 @@ typedef struct _GSourceCallback GSourceCallback;
 typedef enum
 {
   G_SOURCE_READY = 1 << G_HOOK_FLAG_USER_SHIFT,
-  G_SOURCE_CAN_RECURSE = 1 << (G_HOOK_FLAG_USER_SHIFT + 1)
+  G_SOURCE_CAN_RECURSE = 1 << (G_HOOK_FLAG_USER_SHIFT + 1),
+  G_SOURCE_BLOCKED = 1 << (G_HOOK_FLAG_USER_SHIFT + 2)
 } GSourceFlags;
 
 typedef struct _GMainWaiter GMainWaiter;
@@ -313,8 +314,7 @@ struct _GSourcePrivate
 #define G_THREAD_SELF g_thread_self ()
 
 #define SOURCE_DESTROYED(source) (((source)->flags & G_HOOK_FLAG_ACTIVE) == 0)
-#define SOURCE_BLOCKED(source) (((source)->flags & G_HOOK_FLAG_IN_CALL) != 0 && \
-		                ((source)->flags & G_SOURCE_CAN_RECURSE) == 0)
+#define SOURCE_BLOCKED(source) (((source)->flags & G_SOURCE_BLOCKED) != 0)
 
 #define SOURCE_UNREF(source, context)                       \
    G_STMT_START {                                           \
@@ -618,7 +618,7 @@ static GPrivate thread_context_stack = G_PRIVATE_INIT (free_context_stack);
 
 /**
  * g_main_context_push_thread_default:
- * @context: a #GMainContext, or %NULL for the global default context
+ * @context: (allow-none): a #GMainContext, or %NULL for the global default context
  *
  * Acquires @context and sets it as the thread-default context for the
  * current thread. This will cause certain asynchronous operations
@@ -677,7 +677,7 @@ g_main_context_push_thread_default (GMainContext *context)
 
 /**
  * g_main_context_pop_thread_default:
- * @context: a #GMainContext object, or %NULL
+ * @context: (allow-none): a #GMainContext object, or %NULL
  *
  * Pops @context off the thread-default context stack (verifying that
  * it was on the top of the stack).
@@ -1049,7 +1049,7 @@ g_source_get_id (GSource *source)
  * Gets the #GMainContext with which the source is associated.
  * Calling this function on a destroyed source is an error.
  * 
- * Return value: (transfer none): the #GMainContext with which the
+ * Return value: (transfer none) (allow-none): the #GMainContext with which the
  *               source is associated, or %NULL if the context has not
  *               yet been added to a source.
  **/
@@ -1313,7 +1313,7 @@ static GSourceCallbackFuncs g_source_callback_funcs = {
  * @source: the source
  * @func: a callback function
  * @data: the data to pass to callback function
- * @notify: a function to call when @data is no longer in use, or %NULL.
+ * @notify: (allow-none): a function to call when @data is no longer in use, or %NULL.
  * 
  * Sets the callback function for a source. The callback for a source is
  * called from the source's dispatch function.
@@ -1699,7 +1699,7 @@ g_source_unref (GSource *source)
 
 /**
  * g_main_context_find_source_by_id:
- * @context: a #GMainContext (if %NULL, the default context will be used)
+ * @context: (allow-none): a #GMainContext (if %NULL, the default context will be used)
  * @source_id: the source ID, as returned by g_source_get_id(). 
  * 
  * Finds a #GSource given a pair of context and ID.
@@ -1735,7 +1735,7 @@ g_main_context_find_source_by_id (GMainContext *context,
 
 /**
  * g_main_context_find_source_by_funcs_user_data:
- * @context: a #GMainContext (if %NULL, the default context will be used).
+ * @context: (allow-none): a #GMainContext (if %NULL, the default context will be used).
  * @funcs: the @source_funcs passed to g_source_new().
  * @user_data: the user data from the callback.
  * 
@@ -2067,7 +2067,7 @@ g_get_monotonic_time (void)
    *    32bit msec counter, updated each ~15msec, wraps in ~50 days
    * - GetTickCount64 (GTC64)
    *    Same as GetTickCount, but extended to 64bit, so no wrap
-   *    Only availible in Vista or later
+   *    Only available in Vista or later
    * - timeGetTime (TGT)
    *    similar to GetTickCount by default: 15msec, 50 day wrap.
    *    available in winmm.dll (thus known as the multimedia timers)
@@ -2094,7 +2094,7 @@ g_get_monotonic_time (void)
    * However this seems quite complicated, so we're not doing this right now.
    *
    * The approach we take instead is to use the TGT timer, extending it to 64bit
-   * either by using the GTC64 value, or if that is not availible, a process local
+   * either by using the GTC64 value, or if that is not available, a process local
    * time epoch that we increment when we detect a timer wrap (assumes that we read
    * the time at least once every 50 days).
    *
@@ -2426,11 +2426,23 @@ block_source (GSource *source)
 
   g_return_if_fail (!SOURCE_BLOCKED (source));
 
+  source->flags |= G_SOURCE_BLOCKED;
+
   tmp_list = source->poll_fds;
   while (tmp_list)
     {
       g_main_context_remove_poll_unlocked (source->context, tmp_list->data);
       tmp_list = tmp_list->next;
+    }
+
+  if (source->priv && source->priv->child_sources)
+    {
+      tmp_list = source->priv->child_sources;
+      while (tmp_list)
+	{
+	  block_source (tmp_list->data);
+	  tmp_list = tmp_list->next;
+	}
     }
 }
 
@@ -2440,14 +2452,26 @@ unblock_source (GSource *source)
 {
   GSList *tmp_list;
   
-  g_return_if_fail (!SOURCE_BLOCKED (source)); /* Source already unblocked */
+  g_return_if_fail (SOURCE_BLOCKED (source)); /* Source already unblocked */
   g_return_if_fail (!SOURCE_DESTROYED (source));
   
+  source->flags &= ~G_SOURCE_BLOCKED;
+
   tmp_list = source->poll_fds;
   while (tmp_list)
     {
       g_main_context_add_poll_unlocked (source->context, source->priority, tmp_list->data);
       tmp_list = tmp_list->next;
+    }
+
+  if (source->priv && source->priv->child_sources)
+    {
+      tmp_list = source->priv->child_sources;
+      while (tmp_list)
+	{
+	  unblock_source (tmp_list->data);
+	  tmp_list = tmp_list->next;
+	}
     }
 }
 
@@ -2527,8 +2551,7 @@ g_main_dispatch (GMainContext *context)
 	  if (!was_in_call)
 	    source->flags &= ~G_HOOK_FLAG_IN_CALL;
 
-	  if ((source->flags & G_SOURCE_CAN_RECURSE) == 0 &&
-	      !SOURCE_DESTROYED (source))
+	  if (SOURCE_BLOCKED (source) && !SOURCE_DESTROYED (source))
 	    unblock_source (source);
 	  
 	  /* Note: this depends on the fact that we can't switch
@@ -3131,7 +3154,7 @@ g_main_context_iterate (GMainContext *context,
 
 /**
  * g_main_context_pending:
- * @context: a #GMainContext (if %NULL, the default context will be used)
+ * @context: (allow-none): a #GMainContext (if %NULL, the default context will be used)
  *
  * Checks if any sources have pending events for the given context.
  * 
@@ -3154,7 +3177,7 @@ g_main_context_pending (GMainContext *context)
 
 /**
  * g_main_context_iteration:
- * @context: a #GMainContext (if %NULL, the default context will be used) 
+ * @context: (allow-none): a #GMainContext (if %NULL, the default context will be used) 
  * @may_block: whether the call may block.
  * 
  * Runs a single iteration for the given main loop. This involves
@@ -3474,7 +3497,7 @@ g_main_context_poll (GMainContext *context,
 
 /**
  * g_main_context_add_poll:
- * @context: a #GMainContext (or %NULL for the default context)
+ * @context: (allow-none): a #GMainContext (or %NULL for the default context)
  * @fd: a #GPollFD structure holding information about a file
  *      descriptor to watch.
  * @priority: the priority for this file descriptor which should be
@@ -3934,7 +3957,7 @@ g_timeout_source_new_seconds (guint interval)
  *             (1/1000ths of a second)
  * @function: function to call
  * @data:     data to pass to @function
- * @notify:   function to call when the timeout is removed, or %NULL
+ * @notify: (allow-none): function to call when the timeout is removed, or %NULL
  * 
  * Sets a function to be called at regular intervals, with the given
  * priority.  The function is called repeatedly until it returns
@@ -4032,7 +4055,7 @@ g_timeout_add (guint32        interval,
  * @interval: the time between calls to the function, in seconds
  * @function: function to call
  * @data:     data to pass to @function
- * @notify:   function to call when the timeout is removed, or %NULL
+ * @notify: (allow-none): function to call when the timeout is removed, or %NULL
  *
  * Sets a function to be called at regular intervals, with @priority.
  * The function is called repeatedly until it returns %FALSE, at which
@@ -4513,7 +4536,7 @@ g_child_watch_source_new (GPid pid)
  * Windows a handle for a process (which doesn't have to be a child).
  * @function: function to call
  * @data:     data to pass to @function
- * @notify:   function to call when the idle is removed, or %NULL
+ * @notify: (allow-none): function to call when the idle is removed, or %NULL
  * 
  * Sets a function to be called when the child indicated by @pid 
  * exits, at the priority @priority.
@@ -4664,7 +4687,7 @@ g_idle_source_new (void)
  *            range between #G_PRIORITY_DEFAULT_IDLE and #G_PRIORITY_HIGH_IDLE.
  * @function: function to call
  * @data:     data to pass to @function
- * @notify:   function to call when the idle is removed, or %NULL
+ * @notify: (allow-none): function to call when the idle is removed, or %NULL
  * 
  * Adds a function to be called whenever there are no higher priority
  * events pending.  If the function returns %FALSE it is automatically
@@ -4784,7 +4807,7 @@ g_main_context_invoke (GMainContext *context,
  * @priority: the priority at which to run @function
  * @function: function to call
  * @data: data to pass to @function
- * @notify: a function to call when @data is no longer in use, or %NULL.
+ * @notify: (allow-none): a function to call when @data is no longer in use, or %NULL.
  *
  * Invokes a function in such a way that @context is owned during the
  * invocation of @function.
