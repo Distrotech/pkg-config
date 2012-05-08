@@ -264,6 +264,7 @@ internal_get_package (const char *name, gboolean warn)
 {
   Package *pkg = NULL;
   const char *location;
+  GSList *iter;
   
   pkg = g_hash_table_lookup (packages, name);
 
@@ -349,12 +350,64 @@ internal_get_package (const char *name, gboolean warn)
   debug_spew ("Path position of '%s' is %d\n",
               pkg->name, pkg->path_position);
   
-  verify_package (pkg);
-
-  debug_spew ("Adding '%s' to list of known packages, returning as package '%s'\n",
-              pkg->key, name);
-  
+  debug_spew ("Adding '%s' to list of known packages\n", pkg->key);
   g_hash_table_insert (packages, pkg->key, pkg);
+
+  /* pull in Requires packages */
+  for (iter = pkg->requires_entries; iter != NULL; iter = g_slist_next (iter))
+    {
+      Package *req;
+      RequiredVersion *ver = iter->data;
+
+      debug_spew ("Searching for '%s' requirement '%s'\n",
+                  pkg->name, ver->name);
+      req = internal_get_package (ver->name, warn);
+      if (req == NULL)
+        {
+          verbose_error ("Package '%s', required by '%s', not found\n",
+                         ver->name, pkg->name);
+          exit (1);
+        }
+
+      if (pkg->required_versions == NULL)
+        pkg->required_versions = g_hash_table_new (g_str_hash, g_str_equal);
+
+      g_hash_table_insert (pkg->required_versions, ver->name, ver);
+      pkg->requires = g_slist_prepend (pkg->requires, req);
+    }
+
+  /* pull in Requires.private packages */
+  for (iter = pkg->requires_private_entries; iter != NULL;
+       iter = g_slist_next (iter))
+    {
+      Package *req;
+      RequiredVersion *ver = iter->data;
+
+      debug_spew ("Searching for '%s' private requirement '%s'\n",
+                  pkg->name, ver->name);
+      req = internal_get_package (ver->name, warn);
+      if (req == NULL)
+        {
+          verbose_error ("Package '%s', required by '%s', not found\n",
+			 ver->name, pkg->name);
+          exit (1);
+        }
+
+      if (pkg->required_versions == NULL)
+        pkg->required_versions = g_hash_table_new (g_str_hash, g_str_equal);
+
+      g_hash_table_insert (pkg->required_versions, ver->name, ver);
+      pkg->requires_private = g_slist_prepend (pkg->requires_private, req);
+    }
+
+  /* make requires_private include a copy of the public requires too */
+  pkg->requires_private = g_slist_concat(g_slist_copy (pkg->requires),
+                                         pkg->requires_private);
+
+  pkg->requires = g_slist_reverse (pkg->requires);
+  pkg->requires_private = g_slist_reverse (pkg->requires_private);
+
+  verify_package (pkg);
 
   return pkg;
 }

@@ -52,7 +52,9 @@ struct _Package
   char *description;
   char *url;
   char *pcfiledir; /* directory it was loaded from */
+  GSList *requires_entries;
   GSList *requires;
+  GSList *requires_private_entries;
   GSList *requires_private;
   GSList *l_libs;
   GSList *L_libs;
