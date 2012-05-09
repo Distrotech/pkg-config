@@ -8,6 +8,7 @@ TESTS = \
 	check-define-variable \
 	check-libs-private \
 	check-requires-private \
+	check-circular-requires \
 	check-includedir \
 	check-conflicts \
 	check-missing \
@@ -45,4 +46,7 @@ EXTRA_DIST = \
 	requires-version-2.pc \
 	requires-version-3.pc \
 	non-l.pc \
-	non-l-required.pc
+	non-l-required.pc \
+	circular-1.pc \
+	circular-2.pc \
+	circular-3.pc
