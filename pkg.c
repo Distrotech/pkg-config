@@ -574,6 +574,12 @@ recursive_fill_list (Package *pkg, GetListFunc func, GSList **listp)
 {
   GSList *tmp;
 
+  /*
+   * This function should only be called to resolve Requires or
+   * Requires.private.
+   */
+  g_assert (func == get_requires || func == get_requires_private);
+
   fill_one_level (pkg, func, listp);
   
   tmp = (*func) (pkg);
