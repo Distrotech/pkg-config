@@ -92,7 +92,8 @@ rm -f \
     glib/glib/glib_probes.d \
     glib/glib/glibconfig.h.win32.in \
     glib/msvc_recommended_pragmas.h \
-    glib/win32-fixup.pl
+    glib/win32-fixup.pl \
+    glib/glib/libglib-gdb.py.in
 find glib -name 'makefile.msc*' | xargs rm -f
 find glib -name 'ChangeLog*' | xargs rm -f
 find glib -name '*.pc.in' | xargs rm -f

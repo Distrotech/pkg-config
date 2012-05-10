@@ -1,5 +1,5 @@
 diff --git a/glib/glib/Makefile.am b/glib/glib/Makefile.am
-index 6fb3a34..e0ace06 100644
+index 6fb3a34..ecb3dff 100644
 --- a/glib/glib/Makefile.am
 +++ b/glib/glib/Makefile.am
 @@ -16,7 +16,7 @@ CLEANFILES =
@@ -61,29 +61,49 @@ index 6fb3a34..e0ace06 100644
  if PLATFORM_WIN32
  no_undefined = -no-undefined
  endif
-@@ -371,7 +362,6 @@ libglib_2_0_la_DEPENDENCIES = libcharset/libcharset.la $(printf_la) @GIO@ @GSPAW
+@@ -371,11 +362,8 @@ libglib_2_0_la_DEPENDENCIES = libcharset/libcharset.la $(printf_la) @GIO@ @GSPAW
  
  libglib_2_0_la_LDFLAGS = $(GLIB_LINK_FLAGS) \
  	 $(glib_win32_res_ldflag) \
 -	-version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE) \
  	-export-dynamic $(no_undefined) $(export_symbols)
  
- INSTALL_PROGS=
-@@ -405,7 +395,7 @@ endif
+-INSTALL_PROGS=
+-
+ gspawn-win32-helper-console.c:
+ 	echo '#define HELPER_CONSOLE' >$@
+ 	echo '#include "gspawn-win32-helper.c"' >>$@
+@@ -388,50 +376,17 @@ gspawn-win64-helper-console.c:
+ 	echo '#include "gspawn-win32-helper.c"' >>$@
+ 
+ 
+-if OS_WIN32
+-if OS_WIN32_X64
+-INSTALL_PROGS += gspawn-win64-helper gspawn-win64-helper-console
+-gspawn_win64_helper_LDADD = libglib-2.0.la
+-gspawn_win64_helper_LDFLAGS = -mwindows
+-gspawn_win64_helper_console_LDADD = libglib-2.0.la
+-else
+-INSTALL_PROGS += gspawn-win32-helper gspawn-win32-helper-console
+-gspawn_win32_helper_LDADD = libglib-2.0.la
+-gspawn_win32_helper_LDFLAGS = -mwindows
+-gspawn_win32_helper_console_LDADD = libglib-2.0.la
+-endif
+-endif
+-
  glib-win32-res.o: glib.rc
  	$(WINDRES) glib.rc $@
  
 -bin_PROGRAMS	 = ${INSTALL_PROGS}
-+noinst_PROGRAMS	 = ${INSTALL_PROGS}
- 
+-
  if OS_UNIX
  
-@@ -414,24 +404,12 @@ gtester_SOURCES	 = gtester.c
- gtester_LDADD	 = libglib-2.0.la 
- 
+-INSTALL_PROGS	+= gtester
+-gtester_SOURCES	 = gtester.c
+-gtester_LDADD	 = libglib-2.0.la 
+-
  auto_config_binscripts = gtester-report
 -bin_SCRIPTS = ${auto_config_binscripts}
-+noinst_SCRIPTS = ${auto_config_binscripts}
  EXTRA_DIST += ${auto_config_binscripts}
  
  CONFIGVARS = \
@@ -104,15 +124,17 @@ index 6fb3a34..e0ace06 100644
  endif
  
  glib-2.0.lib: libglib-2.0.la glib.def
-@@ -481,22 +459,7 @@ dist-hook: $(BUILT_EXTRA_DIST)
- 
- # install gdb scripts
- gdbdir = $(datadir)/glib-2.0/gdb
+@@ -478,25 +433,3 @@ dist-hook: $(BUILT_EXTRA_DIST)
+ 	done >libglib.vs10.sourcefiles.filters
+ 	$(CPP) -P - <$(top_srcdir)/build/win32/vs10/glib.vcxproj.filtersin >$@	
+ 	rm libglib.vs10.sourcefiles.filters
+-
+-# install gdb scripts
+-gdbdir = $(datadir)/glib-2.0/gdb
 -dist_gdb_SCRIPTS = glib.py
-+dist_noinst_SCRIPTS = glib.py
- 
- libglib-gdb.py: libglib-gdb.py.in
- 	$(AM_V_GEN) $(SED) -e "s|\@datadir\@|$(datadir)|" $(srcdir)/libglib-gdb.py.in > $(builddir)/libglib-gdb.py
+-
+-libglib-gdb.py: libglib-gdb.py.in
+-	$(AM_V_GEN) $(SED) -e "s|\@datadir\@|$(datadir)|" $(srcdir)/libglib-gdb.py.in > $(builddir)/libglib-gdb.py
 -
 -
 -install-data-hook: libglib-gdb.py

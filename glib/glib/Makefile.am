@@ -345,8 +345,6 @@ libglib_2_0_la_LDFLAGS = $(GLIB_LINK_FLAGS) \
 	 $(glib_win32_res_ldflag) \
 	-export-dynamic $(no_undefined) $(export_symbols)
 
-INSTALL_PROGS=
-
 gspawn-win32-helper-console.c:
 	echo '#define HELPER_CONSOLE' >$@
 	echo '#include "gspawn-win32-helper.c"' >>$@
@@ -359,33 +357,12 @@ gspawn-win64-helper-console.c:
 	echo '#include "gspawn-win32-helper.c"' >>$@
 
 
-if OS_WIN32
-if OS_WIN32_X64
-INSTALL_PROGS += gspawn-win64-helper gspawn-win64-helper-console
-gspawn_win64_helper_LDADD = libglib-2.0.la
-gspawn_win64_helper_LDFLAGS = -mwindows
-gspawn_win64_helper_console_LDADD = libglib-2.0.la
-else
-INSTALL_PROGS += gspawn-win32-helper gspawn-win32-helper-console
-gspawn_win32_helper_LDADD = libglib-2.0.la
-gspawn_win32_helper_LDFLAGS = -mwindows
-gspawn_win32_helper_console_LDADD = libglib-2.0.la
-endif
-endif
-
 glib-win32-res.o: glib.rc
 	$(WINDRES) glib.rc $@
 
-noinst_PROGRAMS	 = ${INSTALL_PROGS}
-
 if OS_UNIX
 
-INSTALL_PROGS	+= gtester
-gtester_SOURCES	 = gtester.c
-gtester_LDADD	 = libglib-2.0.la 
-
 auto_config_binscripts = gtester-report
-noinst_SCRIPTS = ${auto_config_binscripts}
 EXTRA_DIST += ${auto_config_binscripts}
 
 CONFIGVARS = \
@@ -437,10 +414,3 @@ dist-hook: $(BUILT_EXTRA_DIST)
 	done >libglib.vs10.sourcefiles.filters
 	$(CPP) -P - <$(top_srcdir)/build/win32/vs10/glib.vcxproj.filtersin >$@	
 	rm libglib.vs10.sourcefiles.filters
-
-# install gdb scripts
-gdbdir = $(datadir)/glib-2.0/gdb
-dist_noinst_SCRIPTS = glib.py
-
-libglib-gdb.py: libglib-gdb.py.in
-	$(AM_V_GEN) $(SED) -e "s|\@datadir\@|$(datadir)|" $(srcdir)/libglib-gdb.py.in > $(builddir)/libglib-gdb.py
