@@ -9,7 +9,8 @@ pkg-config \- Return metainformation about installed libraries
 .SH SYNOPSIS
 .PP
 .B pkg-config
-[\-\-modversion] [\-\-help] [\-\-print-errors] [\-\-silence-errors] 
+[\-\-modversion] [\-\-version] [\-\-help] [\-\-print-errors]
+[\-\-silence-errors] [\-\-errors-to-stdout] [\-\-debug]
 [\-\-cflags] [\-\-libs] [\-\-libs-only-L]
 [\-\-libs-only-l] [\-\-cflags-only-I]
 [\-\-variable=VARIABLENAME]
@@ -65,6 +66,11 @@ exits successfully. If one or more libraries is unknown,
 .I pkg-config
 exits with a nonzero code, and the contents of stdout are undefined.
 .TP
+.I "--version"
+Displays the version of
+.I pkg-config
+and terminates.
+.TP
 .I "--help"
 Displays a help message and terminates.
 .TP
@@ -93,6 +99,11 @@ environment variable overrides this option.
 .TP
 .I "--errors-to-stdout"
 If printing errors, print them to stdout rather than the default stderr
+.TP
+.I "--debug"
+Print debugging information. This is slightly different than the
+PKG_CONFIG_DEBUG_SPEW environment variable, which also enable
+"--print-errors".
 
 .PP
 The following options are used to compile and link programs:
