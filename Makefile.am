@@ -51,4 +51,13 @@ pkg_config_SOURCES= \
 	parse.h \
 	parse.c \
 	main.c
+
+# Since we can't always have glib in DIST_SUBDIRS, we need to make sure
+# glib is configured when we want to run dist. Unfortunately, there's no
+# DIST_CONFIGURE_FLAGS.
 DISTCHECK_CONFIGURE_FLAGS = --with-installed-popt --with-internal-glib
+if !INTERNAL_GLIB
+dist-hook:
+	@echo "error: --with-internal-glib is required to include glib in dist"
+	@exit 1
+endif
