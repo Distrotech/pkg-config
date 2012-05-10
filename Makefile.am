@@ -14,6 +14,10 @@ endif
 
 SUBDIRS = $(GLIB_SUBDIR) $(POPT_SUBDIR) . check
 
+# normally we'd want glib to be part of DIST_SUBDIRS unconditionally,
+# but distclean gets broken unless we always run glib's configure
+DIST_SUBDIRS = $(GLIB_SUBDIR) popt . check
+
 m4dir = $(datadir)/aclocal
 m4_DATA = pkg.m4
 
