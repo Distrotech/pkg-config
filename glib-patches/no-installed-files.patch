@@ -1,5 +1,5 @@
 diff --git a/glib/glib/Makefile.am b/glib/glib/Makefile.am
-index 6fb3a34..ecb3dff 100644
+index 6fb3a34..1cf80a2 100644
 --- a/glib/glib/Makefile.am
 +++ b/glib/glib/Makefile.am
 @@ -16,7 +16,7 @@ CLEANFILES =
@@ -11,7 +11,18 @@ index 6fb3a34..ecb3dff 100644
  glibconfig-stamp: ../config.status
  	$(AM_V_GEN) cd $(top_builddir) && \
  	  $(SHELL) ./config.status glib/glibconfig.h
-@@ -85,7 +85,7 @@ CLEANFILES= libglib-gdb.py
+@@ -74,18 +74,15 @@ EXTRA_DIST += 			\
+ 	gregex.c		\
+ 	gregex.h		\
+ 	win_iconv.c		\
+-	libglib-gdb.py.in	\
+ 	docs.c			\
+ 	gconstructor.h		\
+ 	$(MIRRORING_TAB_SOURCE)
+ 
+-CLEANFILES= libglib-gdb.py
+-
+ # These may be in the builddir too
  BUILT_EXTRA_DIST = 		\
  	glib.rc
  
@@ -20,7 +31,7 @@ index 6fb3a34..ecb3dff 100644
  
  if OS_WIN32_AND_DLL_COMPILATION
  if MS_LIB_AVAILABLE
-@@ -228,13 +228,13 @@ EXTRA_libglib_2_0_la_SOURCES = \
+@@ -228,13 +225,13 @@ EXTRA_libglib_2_0_la_SOURCES = \
  	gwin32.c
  
  glibincludedir=$(includedir)/glib-2.0
@@ -36,7 +47,7 @@ index 6fb3a34..ecb3dff 100644
  	deprecated/gallocator.h		\
  	deprecated/gcache.h		\
  	deprecated/gcompletion.h	\
-@@ -243,7 +243,7 @@ deprecatedinclude_HEADERS = \
+@@ -243,7 +240,7 @@ deprecatedinclude_HEADERS = \
  	deprecated/gthread.h
  
  glibsubincludedir=$(includedir)/glib-2.0/glib
@@ -45,7 +56,7 @@ index 6fb3a34..ecb3dff 100644
  	galloca.h	\
  	garray.h	\
  	gasyncqueue.h	\
-@@ -325,15 +325,6 @@ CLEANFILES += glib-public-headers.txt
+@@ -325,15 +322,6 @@ CLEANFILES += glib-public-headers.txt
  
  all-local: glib-public-headers.txt
  
@@ -61,7 +72,7 @@ index 6fb3a34..ecb3dff 100644
  if PLATFORM_WIN32
  no_undefined = -no-undefined
  endif
-@@ -371,11 +362,8 @@ libglib_2_0_la_DEPENDENCIES = libcharset/libcharset.la $(printf_la) @GIO@ @GSPAW
+@@ -371,11 +359,8 @@ libglib_2_0_la_DEPENDENCIES = libcharset/libcharset.la $(printf_la) @GIO@ @GSPAW
  
  libglib_2_0_la_LDFLAGS = $(GLIB_LINK_FLAGS) \
  	 $(glib_win32_res_ldflag) \
@@ -73,7 +84,7 @@ index 6fb3a34..ecb3dff 100644
  gspawn-win32-helper-console.c:
  	echo '#define HELPER_CONSOLE' >$@
  	echo '#include "gspawn-win32-helper.c"' >>$@
-@@ -388,50 +376,17 @@ gspawn-win64-helper-console.c:
+@@ -388,50 +373,17 @@ gspawn-win64-helper-console.c:
  	echo '#include "gspawn-win32-helper.c"' >>$@
  
  
@@ -124,7 +135,7 @@ index 6fb3a34..ecb3dff 100644
  endif
  
  glib-2.0.lib: libglib-2.0.la glib.def
-@@ -478,25 +433,3 @@ dist-hook: $(BUILT_EXTRA_DIST)
+@@ -478,25 +430,3 @@ dist-hook: $(BUILT_EXTRA_DIST)
  	done >libglib.vs10.sourcefiles.filters
  	$(CPP) -P - <$(top_srcdir)/build/win32/vs10/glib.vcxproj.filtersin >$@	
  	rm libglib.vs10.sourcefiles.filters

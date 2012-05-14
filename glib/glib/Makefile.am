@@ -65,12 +65,9 @@ EXTRA_DIST += 			\
 	abicheck.sh		\
 	glib.symbols		\
 	win_iconv.c		\
-	libglib-gdb.py.in	\
 	docs.c			\
 	gconstructor.h		\
 	$(MIRRORING_TAB_SOURCE)
-
-CLEANFILES= libglib-gdb.py
 
 # These may be in the builddir too
 BUILT_EXTRA_DIST = 		\
