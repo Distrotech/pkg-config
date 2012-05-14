@@ -43,3 +43,11 @@ where it's installed in your system.
 If this requirement is too cumbersome, a bundled copy of a recent glib
 stable release is included. Pass --with-internal-glib to configure to
 use this copy.
+
+If you're cross-compiling and you need to build the bundled glib, refer
+to the glib documentation for cross-compiling glib. In short, this will
+require setting some autoconf cache variables in cases where glib would
+need to run a program to determine the correct value. See the glib
+documentation:
+
+http://developer.gnome.org/glib/stable/glib-cross-compiling.html
