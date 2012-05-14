@@ -580,16 +580,10 @@ recursive_fill_list (Package *pkg, GetListFunc func, GSList **listp)
    */
   g_assert (func == get_requires || func == get_requires_private);
 
-  fill_one_level (pkg, func, listp);
-  
-  tmp = (*func) (pkg);
+  for (tmp = (*func) (pkg); tmp != NULL; tmp = g_slist_next (tmp))
+    recursive_fill_list (tmp->data, func, listp);
 
-  while (tmp != NULL)
-    {
-      recursive_fill_list (tmp->data, func, listp);
-
-      tmp = g_slist_next (tmp);
-    }
+  *listp = g_slist_prepend (*listp, pkg);
 }
 
 static void
@@ -603,7 +597,6 @@ fill_list (GSList *packages, GetListFunc func,
   tmp = packages;
   while (tmp != NULL)
     {
-      expanded = g_slist_append (expanded, tmp->data);
       recursive_fill_list (tmp->data,
 			   include_private ? get_requires_private : get_requires,
 			   &expanded);
@@ -727,7 +720,6 @@ verify_package (Package *pkg)
   /* Make sure we didn't drag in any conflicts via Requires
    * (inefficient algorithm, who cares)
    */
-  
   recursive_fill_list (pkg, get_requires_private, &requires);
   conflicts = get_conflicts (pkg);
 

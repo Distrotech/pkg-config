@@ -4,6 +4,7 @@ TESTS_ENVIRONMENT = PKG_CONFIG='$(TESTS_PKG_CONFIG)' $(TESTS_SHELL)
 TESTS = \
 	check-cflags \
 	check-libs \
+	check-non-l-flags \
 	check-define-variable \
 	check-libs-private \
 	check-requires-private \
@@ -42,4 +43,6 @@ EXTRA_DIST = \
 	other.pc \
 	requires-version-1.pc \
 	requires-version-2.pc \
-	requires-version-3.pc
+	requires-version-3.pc \
+	non-l.pc \
+	non-l-required.pc

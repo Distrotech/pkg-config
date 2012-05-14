@@ -5,21 +5,21 @@ set -e
 . ${srcdir}/common
 
 # expect cflags from requires-test and public-dep
-RESULT="-I/requires-test/include -I/private-dep/include -I/public-dep/include"
+RESULT="-I/requires-test/include -I/public-dep/include -I/private-dep/include"
 run_test --cflags requires-test
 
 # still expect those cflags for static linking case
-RESULT="-I/requires-test/include -I/private-dep/include -I/public-dep/include"
+RESULT="-I/requires-test/include -I/public-dep/include -I/private-dep/include"
 run_test --static --cflags requires-test
 
 # expect libs for just requires-test and public-dep
 if [ "$list_indirect_deps" = "yes" ]; then
-    RESULT="-L/requires-test/lib -L/private-dep/lib -L/public-dep/lib -lrequires-test -lprivate-dep -lpublic-dep"
+    RESULT="-L/requires-test/lib -L/public-dep/lib -L/private-dep/lib -lrequires-test -lpublic-dep -lprivate-dep"
 else
     RESULT="-L/requires-test/lib -L/public-dep/lib -lrequires-test -lpublic-dep"
 fi
 run_test --libs requires-test
 
 # expect libs for requires-test, public-dep and private-dep in static case
-RESULT="-L/requires-test/lib -L/private-dep/lib -L/public-dep/lib -lrequires-test -lprivate-dep -lpublic-dep"
+RESULT="-L/requires-test/lib -L/public-dep/lib -L/private-dep/lib -lrequires-test -lpublic-dep -lprivate-dep"
 run_test --static --libs requires-test
