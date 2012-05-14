@@ -14,7 +14,7 @@ ${AUTORECONF-autoreconf} -iv || exit $?
 cd $ORIGDIR
 
 if [ -z "$NOCONFIGURE" ] && [ "$1" != --no-configure ]; then
-    "$srcdir"/configure --enable-maintainer-mode "$@"
+    "$srcdir"/configure "$@"
     echo 
     echo "Now type 'make' to compile $PROJECT."
 else
