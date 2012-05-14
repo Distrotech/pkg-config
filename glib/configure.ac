@@ -2447,30 +2447,6 @@ int error = EILSEQ;
 ], have_eilseq=yes, have_eilseq=no);
 AC_MSG_RESULT($have_eilseq)
 
-dnl ******************************************************************
-dnl *** If we are cross-compiling, look for glib-genmarshal and    ***
-dnl *** glib-compile-schemas in PATH                               ***
-dnl ******************************************************************
-
-AM_CONDITIONAL(CROSS_COMPILING, test $cross_compiling = yes)
-
-if test $cross_compiling = yes; then
-  AC_PATH_PROG(GLIB_GENMARSHAL, glib-genmarshal, no)
-  if test x$GLIB_GENMARSHAL = xno; then
-    AC_MSG_ERROR(Could not find a glib-genmarshal in your PATH)
-  fi
-
-  AC_PATH_PROG(GLIB_COMPILE_SCHEMAS, glib-compile-schemas, no)
-  if test x$GLIB_COMPILE_SCHEMAS = xno; then
-    AC_MSG_ERROR(Could not find a glib-compile-schemas in your PATH)
-  fi
-
-  AC_PATH_PROG(GLIB_COMPILE_RESOURCES, glib-compile-resources, no)
-  if test x$GLIB_COMPILE_RESOURCES = xno; then
-    AC_MSG_ERROR(Could not find a glib-compile-resources in your PATH)
-  fi
-fi
-
 dnl
 dnl Tracing
 dnl
