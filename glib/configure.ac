@@ -1692,37 +1692,6 @@ int main() { return 0; } ]])],
 
 AM_CONDITIONAL(HAVE_FEN, [test "$fen_support" = "yes"])
 
-dnl ****************************
-dnl *** Checks for FAM (GIO) ***
-dnl ****************************
-
-should_disable_fam=no
-
-AC_ARG_ENABLE(fam,
-              AC_HELP_STRING([--disable-fam],
-                             [don't use fam for file system monitoring]),
-                         [
-                                if test "x$enable_fam" = "xno"; then
-                                        should_disable_fam=yes
-                                fi
-                         ]
-                         )
-fam_support=no
-FAM_LIBS=
-if test "x$should_disable_fam" = "xno"; then
-AC_CHECK_LIB(fam, FAMOpen,
-  [AC_CHECK_HEADERS(fam.h,
-    [AC_DEFINE(HAVE_FAM, [], [Define if we have FAM])
-     AC_CHECK_LIB(fam, FAMNoExists,
-     		  AC_DEFINE(HAVE_FAM_NO_EXISTS, [], [Define if we have FAMNoExists in fam]))
-     FAM_LIBS="-lfam"]
-     fam_support=yes,
-    AC_MSG_WARN(*** FAM support will not be built (header files not found) ***))],
-  AC_MSG_WARN(*** FAM support will not be built (FAM library not found) ***))
-AC_SUBST(FAM_LIBS)
-fi
-AM_CONDITIONAL(HAVE_FAM, [test "$fam_support" = "yes"])
-
 
 dnl *****************************
 dnl *** Check for xattr (GIO) ***
