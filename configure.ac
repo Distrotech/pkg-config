@@ -11,13 +11,15 @@ m4_ifdef([LT_OUTPUT], [LT_OUTPUT])
 
 AC_PROG_CC
 
-AC_DEFUN([PKG_CONFIG_FIND_PC_PATH],
-[
+dnl
+dnl Default pkg-config search path
+dnl
 AC_MSG_CHECKING([for default search path for .pc files])
-AC_ARG_WITH(pc_path,
- [  --with-pc-path          Override the default search path for .pc files ],
- [ pc_path="$withval" ],
- [
+AC_ARG_WITH([pc_path],
+  [AS_HELP_STRING([--with-pc-path],
+    [default search path for .pc files])],
+  [pc_path="$withval"],
+  [
 # This is slightly wrong, but hopefully causes less confusion than
 # people being unable to find their .pc files in the standard location.
 if test "${prefix}" = "NONE"; then
@@ -26,26 +28,30 @@ else
 	pc_path='${libdir}/pkgconfig:${datadir}/pkgconfig'
 fi
 ])
- AC_MSG_RESULT([$pc_path])
- AC_SUBST([pc_path])
+AC_MSG_RESULT([$pc_path])
+AC_SUBST([pc_path])
 
-])
+dnl
+dnl System default -I paths
+dnl
+AC_MSG_CHECKING([for system include path to avoid -I flags])
+AC_ARG_WITH([system_include_path],
+  [AS_HELP_STRING([--with-system-include-path],
+    [avoid -I flags from the given path])],
+  [system_include_path="$withval"],
+  [system_include_path="/usr/include"])
+AC_MSG_RESULT([$system_include_path])
+AC_SUBST([system_include_path])
 
-PKG_CONFIG_FIND_PC_PATH
-
-AC_MSG_CHECKING([for --with-system-include-path])
-AC_ARG_WITH(system_include_path,
- [  --with-system-include-path    Avoid -I flags that add the given directories ],
- [ system_include_path="$withval" ],
- [ system_include_path="/usr/include" ])
- AC_MSG_RESULT([$system_include_path])
- AC_SUBST([system_include_path])
-
-AC_MSG_CHECKING([for --with-system-library-path])
-AC_ARG_WITH(system_library_path,
- [  --with-system-library-path    Avoid -L flags that add the given directories ],
- [ system_library_path="$withval" ],
- [
+dnl
+dnl System default -L paths
+dnl
+AC_MSG_CHECKING([for system library path to avoid -L flags])
+AC_ARG_WITH([system_library_path],
+  [AS_HELP_STRING([--with-system-library-path],
+    [avoid -L flags from the given path])],
+  [system_library_path="$withval"],
+  [
 case "$libdir" in
 *lib64)
   system_library_path="/usr/lib64:/usr/lib"
@@ -55,8 +61,8 @@ case "$libdir" in
   ;;
 esac
 ])
- AC_MSG_RESULT([$system_library_path])
- AC_SUBST([system_library_path])
+AC_MSG_RESULT([$system_library_path])
+AC_SUBST([system_library_path])
 
 #
 # Code taken from gtk+-2.0's configure.in.
