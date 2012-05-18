@@ -189,7 +189,6 @@ main (int argc, char **argv)
   static char *required_pkgconfig_version = NULL;
   static int want_silence_errors = 0;
   static int want_variable_list = 0;
-  int result;
   GString *str;
   GSList *packages = NULL;
   char *search_path;
