@@ -240,7 +240,7 @@ add_virtual_pkgconfig_package (void)
 
   if (pkg->vars == NULL)
     pkg->vars = g_hash_table_new (g_str_hash, g_str_equal);
-  g_hash_table_insert (pkg->vars, "pc_path", PKG_CONFIG_PC_PATH);
+  g_hash_table_insert (pkg->vars, "pc_path", pkg_config_pc_path);
 
   debug_spew ("Adding virtual 'pkg-config' package to list of known packages\n");
   g_hash_table_insert (packages, pkg->key, pkg);

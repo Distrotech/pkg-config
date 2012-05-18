@@ -39,6 +39,7 @@ static int want_debug_spew = 0;
 static int want_verbose_errors = 0;
 static int want_stdout_errors = 0;
 char *pcsysrootdir = NULL;
+char *pkg_config_pc_path = NULL;
 
 void
 debug_spew (const char *format, ...)
@@ -162,6 +163,34 @@ print_hashtable_key (gpointer key,
   printf("%s\n", (gchar*)key);
 }
 
+static void
+init_pc_path (void)
+{
+#ifdef G_OS_WIN32
+  char *instdir, *lpath, *shpath;
+
+  instdir = g_win32_get_package_installation_directory_of_module (NULL);
+  if (instdir == NULL)
+    {
+      /* This only happens when GetModuleFilename() fails. If it does, that
+       * failure should be investigated and fixed.
+       */
+      debug_spew ("g_win32_get_package_installation_directory_of_module failed\n");
+      return;
+    }
+
+  lpath = g_build_filename (instdir, "lib", "pkgconfig", NULL);
+  shpath = g_build_filename (instdir, "share", "pkgconfig", NULL);
+  pkg_config_pc_path = g_strconcat (lpath, G_SEARCHPATH_SEPARATOR_S, shpath,
+                                    NULL);
+  free (instdir);
+  free (lpath);
+  free (shpath);
+#else
+  pkg_config_pc_path = PKG_CONFIG_PC_PATH;
+#endif
+}
+
 int
 main (int argc, char **argv)
 {
@@ -283,6 +312,18 @@ main (int argc, char **argv)
       debug_spew ("PKG_CONFIG_DEBUG_SPEW variable enabling debug spew\n");
     }
 
+
+  /* Get the built-in search path */
+  init_pc_path ();
+  if (pkg_config_pc_path == NULL)
+    {
+      /* Even when we override the built-in search path, we still use it later
+       * to add pc_path to the virtual pkg-config package.
+       */
+      verbose_error ("Failed to get default search path\n");
+      exit (1);
+    }
+
   search_path = getenv ("PKG_CONFIG_PATH");
   if (search_path) 
     {
@@ -294,7 +335,7 @@ main (int argc, char **argv)
     }
   else
     {
-      add_search_dirs(PKG_CONFIG_PC_PATH, G_SEARCHPATH_SEPARATOR_S);
+      add_search_dirs(pkg_config_pc_path, G_SEARCHPATH_SEPARATOR_S);
     }
 
   pcsysrootdir = getenv ("PKG_CONFIG_SYSROOT_DIR");

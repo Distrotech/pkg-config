@@ -22,17 +22,6 @@
 
 #include <glib.h>
 
-#ifdef G_OS_WIN32
-/* No hardcoded paths in the binary, thanks */
-/* It's OK to leak this */
-#undef PKG_CONFIG_PC_PATH
-#define PKG_CONFIG_PC_PATH \
-  g_strconcat (g_win32_get_package_installation_subdirectory (NULL, NULL, "lib/pkgconfig"), \
-	       ";", \
-	       g_win32_get_package_installation_subdirectory (NULL, NULL, "share/pkgconfig"), \
-	       NULL)
-#endif
-
 typedef enum
 {
   LESS_THAN,
@@ -135,6 +124,11 @@ void disable_requires_private(void);
 extern gboolean disable_uninstalled;
 
 extern char *pcsysrootdir;
+
+/* pkg-config default search path. On Windows the current pkg-config install
+ * directory is used. Otherwise, the build-time defined PKG_CONFIG_PC_PATH.
+ */
+extern char *pkg_config_pc_path;
 
 #ifdef G_OS_WIN32
 /* If TRUE, do not automatically define "prefix"  while
