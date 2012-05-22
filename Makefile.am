@@ -1,48 +1,46 @@
 ACLOCAL_AMFLAGS = ${ACLOCAL_FLAGS}
 
-pkg_config_LDADD=@GLIB_LIBS@
-
 if INTERNAL_GLIB
 GLIB_SUBDIR = glib
 endif
 
-SUBDIRS = $(GLIB_SUBDIR) . check
-
-# normally we'd want glib to be part of DIST_SUBDIRS unconditionally,
+# Normally we'd want glib to be part of DIST_SUBDIRS unconditionally,
 # but distclean gets broken unless we always run glib's configure
-DIST_SUBDIRS = $(GLIB_SUBDIR) . check
+SUBDIRS = $(GLIB_SUBDIR) . check
+DIST_SUBDIRS = $(SUBDIRS)
 
-m4dir = $(datadir)/aclocal
-m4_DATA = pkg.m4
-
-dist_doc_DATA = pkg-config-guide.html
-
-man_MANS = pkg-config.1
-EXTRA_DIST = $(m4_DATA) $(man_MANS) README.win32
-
-bin_PROGRAMS = pkg-config
-AM_CFLAGS=@WARN_CFLAGS@
-
+# Escape paths properly on windows
 if NATIVE_WIN32
-INCLUDES= \
+AM_CPPFLAGS = \
 	-DPKG_CONFIG_PC_PATH="\"$(subst /,\/,$(pc_path))\"" \
 	-DPKG_CONFIG_SYSTEM_INCLUDE_PATH="\"$(subst /,\/,$(system_include_path))\"" \
-	-DPKG_CONFIG_SYSTEM_LIBRARY_PATH="\"$(subst /,\/,$(system_library_path))\"" \
-	@GLIB_CFLAGS@
+	-DPKG_CONFIG_SYSTEM_LIBRARY_PATH="\"$(subst /,\/,$(system_library_path))\""
 else
-INCLUDES= \
+AM_CPPFLAGS = \
 	-DPKG_CONFIG_PC_PATH="\"$(pc_path)\"" \
 	-DPKG_CONFIG_SYSTEM_INCLUDE_PATH="\"$(system_include_path)\"" \
-	-DPKG_CONFIG_SYSTEM_LIBRARY_PATH="\"$(system_library_path)\"" \
-	@GLIB_CFLAGS@
+	-DPKG_CONFIG_SYSTEM_LIBRARY_PATH="\"$(system_library_path)\""
 endif
 
+AM_CFLAGS = \
+	$(WARN_CFLAGS) \
+	$(GLIB_CFLAGS)
+
+bin_PROGRAMS = pkg-config
+pkg_config_LDADD = $(GLIB_LIBS)
 pkg_config_SOURCES= \
 	pkg.h \
 	pkg.c \
 	parse.h \
 	parse.c \
 	main.c
+
+# Various data files
+m4dir = $(datadir)/aclocal
+dist_m4_DATA = pkg.m4
+dist_doc_DATA = pkg-config-guide.html
+dist_man_MANS = pkg-config.1
+EXTRA_DIST = README.win32
 
 # Since we can't always have glib in DIST_SUBDIRS, we need to make sure
 # glib is configured when we want to run dist. Unfortunately, there's no
