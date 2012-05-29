@@ -25,14 +25,6 @@
 #include "pkg.h"
 #include "parse.h"
 
-#ifdef HAVE_ALLOCA_H
-# include <alloca.h>
-#else
-# ifdef _AIX
-#  pragma alloca
-# endif
-#endif
-
 #ifdef HAVE_MALLOC_H
 # include <malloc.h>
 #endif
@@ -1276,8 +1268,8 @@ static int rpmvercmp(const char * a, const char * b) {
     /* easy comparison to see if versions are identical */
     if (!strcmp(a, b)) return 0;
 
-    str1 = alloca(strlen(a) + 1);
-    str2 = alloca(strlen(b) + 1);
+    str1 = g_alloca(strlen(a) + 1);
+    str2 = g_alloca(strlen(b) + 1);
 
     strcpy(str1, a);
     strcpy(str2, b);
