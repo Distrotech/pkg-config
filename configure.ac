@@ -23,9 +23,6 @@ AC_PROG_CC
 dnl Check for headers
 AC_CHECK_HEADERS([dirent.h unistd.h sys/wait.h malloc.h])
 
-dnl Check for library functions
-AC_CHECK_FUNCS(setresuid setreuid,break)
-
 
 dnl
 dnl Default pkg-config search path
