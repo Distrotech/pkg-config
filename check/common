@@ -8,8 +8,9 @@ pkgconfig=../pkg-config
 
 . ./config.sh
 
-PKG_CONFIG_PATH=$srcdir
-export PKG_CONFIG_PATH
+unset PKG_CONFIG_PATH
+PKG_CONFIG_LIBDIR=$srcdir
+export PKG_CONFIG_LIBDIR
 export LC_ALL=C
 
 run_test () {
