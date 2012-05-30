@@ -183,9 +183,9 @@ init_pc_path (void)
   shpath = g_build_filename (instdir, "share", "pkgconfig", NULL);
   pkg_config_pc_path = g_strconcat (lpath, G_SEARCHPATH_SEPARATOR_S, shpath,
                                     NULL);
-  free (instdir);
-  free (lpath);
-  free (shpath);
+  g_free (instdir);
+  g_free (lpath);
+  g_free (shpath);
 #else
   pkg_config_pc_path = PKG_CONFIG_PC_PATH;
 #endif
