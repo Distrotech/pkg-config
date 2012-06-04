@@ -1,5 +1,5 @@
 diff --git a/glib/configure.ac b/glib/configure.ac
-index 3bba0fd..d551832 100644
+index 641c0a9..9d3eb6d 100644
 --- a/glib/configure.ac
 +++ b/glib/configure.ac
 @@ -294,8 +294,6 @@ AC_PROG_INSTALL
@@ -35,7 +35,7 @@ index 3bba0fd..d551832 100644
  dnl gettext support
  dnl
  
-@@ -1799,28 +1780,6 @@ dnl   failure. try libattr
+@@ -1768,30 +1749,6 @@ dnl   failure. try libattr
  fi
  AC_SUBST(XATTR_LIBS)
  
@@ -46,14 +46,16 @@ index 3bba0fd..d551832 100644
 -PKG_CHECK_MODULES([LIBELF], [libelf], [have_libelf=yes], [have_libelf=maybe])
 -
 -if test $have_libelf = maybe; then
+-  glib_save_LIBS=$LIBS
 -  AC_CHECK_LIB([elf], [elf_begin], , [have_libelf=no])
 -  AC_CHECK_LIB([elf], [elf_getshdrstrndx], , [have_libelf=no])
 -  AC_CHECK_LIB([elf], [elf_getshdrnum], , [have_libelf=no])
 -  AC_CHECK_HEADER([libelf.h], , [have_libelf=no])
+-  LIBS=$glib_save_LIBS
 -
 -  if test $have_libelf != no; then
 -    LIBELF_LIBS=-lelf
--    have_libelf = yes
+-    have_libelf=yes
 -  fi
 -fi
 -
@@ -64,7 +66,7 @@ index 3bba0fd..d551832 100644
  dnl ****************************************
  dnl *** platform dependent source checks ***
  dnl ****************************************
-@@ -3355,12 +3314,7 @@ AC_CHECK_ALIGNOF([unsigned long])
+@@ -3326,12 +3283,7 @@ AC_CHECK_ALIGNOF([unsigned long])
  # Check for libdbus1 - Optional - is only used in the GDBus test cases
  #
  # 1.2.14 required for dbus_message_set_serial
