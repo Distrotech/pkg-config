@@ -455,6 +455,17 @@ dnl
 dnl gettext support
 dnl
 
+GLIB_GNU_GETTEXT
+
+if test "$gt_cv_have_gettext" != "yes" ; then
+  AC_MSG_ERROR([
+*** You must have either have gettext support in your C library, or use the 
+*** GNU gettext library. (http://www.gnu.org/software/gettext/gettext.html
+])
+fi
+
+LIBS="$INTLLIBS $LIBS"
+
 GETTEXT_PACKAGE=glib20
 AC_SUBST(GETTEXT_PACKAGE)
 AC_DEFINE_UNQUOTED(GETTEXT_PACKAGE, ["$GETTEXT_PACKAGE"], 

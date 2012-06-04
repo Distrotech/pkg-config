@@ -113,30 +113,19 @@ index f5c510d..95c71de 100644
  files:
  	@files=`ls $(DISTFILES) 2> /dev/null `; for p in $$files; do \
 diff --git a/glib/configure.ac b/glib/configure.ac
-index 2175867..542fe7f 100644
+index cadd925..6dc5f18 100644
 --- a/glib/configure.ac
 +++ b/glib/configure.ac
-@@ -474,19 +474,6 @@ dnl
+@@ -474,8 +474,6 @@ dnl
  dnl gettext support
  dnl
  
 -ALL_LINGUAS="`grep -v '^#' "$srcdir/po/LINGUAS" | tr '\n' ' '`"
 -AC_SUBST([CONFIG_STATUS_DEPENDENCIES],['$(top_srcdir)/po/LINGUAS'])
--GLIB_GNU_GETTEXT
--
--if test "$gt_cv_have_gettext" != "yes" ; then
--  AC_MSG_ERROR([
--*** You must have either have gettext support in your C library, or use the 
--*** GNU gettext library. (http://www.gnu.org/software/gettext/gettext.html
--])
--fi
--
--LIBS="$INTLLIBS $LIBS"
--
- GETTEXT_PACKAGE=glib20
- AC_SUBST(GETTEXT_PACKAGE)
- AC_DEFINE_UNQUOTED(GETTEXT_PACKAGE, ["$GETTEXT_PACKAGE"], 
-@@ -1724,37 +1711,6 @@ int main() { return 0; } ]])],
+ GLIB_GNU_GETTEXT
+ 
+ if test "$gt_cv_have_gettext" != "yes" ; then
+@@ -1724,37 +1722,6 @@ int main() { return 0; } ]])],
  
  AM_CONDITIONAL(HAVE_FEN, [test "$fen_support" = "yes"])
  
@@ -174,7 +163,7 @@ index 2175867..542fe7f 100644
  
  dnl *****************************
  dnl *** Check for xattr (GIO) ***
-@@ -2583,35 +2539,6 @@ if test $cross_compiling = yes; then
+@@ -2585,35 +2552,6 @@ if test $cross_compiling = yes; then
    fi
  fi
  
@@ -210,7 +199,7 @@ index 2175867..542fe7f 100644
  dnl
  dnl Tracing
  dnl
-@@ -3527,87 +3454,22 @@ AC_SUBST(gio_INCLUDES)
+@@ -3529,87 +3467,22 @@ AC_SUBST(gio_INCLUDES)
  
  
  AC_CONFIG_FILES([
