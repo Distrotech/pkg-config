@@ -150,12 +150,15 @@ AC_ARG_WITH([internal-glib],
   [with_internal_glib="$withval"],
   [with_internal_glib=no])
 AM_CONDITIONAL([INTERNAL_GLIB], [test "x$with_internal_glib" = xyes])
+AC_MSG_CHECKING([if internal glib should be used])
 if test "x$with_internal_glib" = xyes; then
+  AC_MSG_RESULT([yes])
   GLIB_CFLAGS='-I$(top_srcdir)/glib -I$(top_srcdir)/glib/glib \
     -I$(top_builddir)/glib/glib'
   GLIB_LIBS='$(top_builddir)/glib/glib/libglib-2.0.la'
   AC_CONFIG_SUBDIRS([glib])
 else
+  AC_MSG_RESULT([no])
   if test "x$GLIB_CFLAGS" = "x" && test "x$GLIB_LIBS" = "x"; then
     AC_CHECK_PROGS([PKG_CONFIG], [pkg-config], [])
     if test -n $PKG_CONFIG && $PKG_CONFIG --exists glib_module; then
