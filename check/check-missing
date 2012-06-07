@@ -10,13 +10,19 @@ fi
 # non-existent package; call should fail and cause no output
 EXPECT_RETURN=1
 RESULT=""
-ARGS="pkg-non-existent"
+ARGS="--exists pkg-non-existent"
+run_test
+
+# existing package, but with missing Requires
+EXPECT_RETURN=0
+RESULT=""
+ARGS="--exists missing-requires"
 run_test
 
 # tests below are on an existing package, but with missing Requires.private;
 # when pkg-config outputs error, the actual error text isn't checked
 # package exists
-ARGS="missing-requires-private"
+ARGS="--exists missing-requires-private"
 EXPECT_RETURN=0
 RESULT=""
 run_test
