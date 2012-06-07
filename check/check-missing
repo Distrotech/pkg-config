@@ -14,16 +14,16 @@ ARGS="--exists pkg-non-existent"
 run_test
 
 # existing package, but with missing Requires
-EXPECT_RETURN=0
+EXPECT_RETURN=1
 RESULT=""
 ARGS="--exists missing-requires"
 run_test
 
 # tests below are on an existing package, but with missing Requires.private;
 # when pkg-config outputs error, the actual error text isn't checked
-# package exists
+# package exists, but should fail since deps can't be resolved
 ARGS="--exists missing-requires-private"
-EXPECT_RETURN=0
+EXPECT_RETURN=1
 RESULT=""
 run_test
 
