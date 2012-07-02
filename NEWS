@@ -1,3 +1,31 @@
+pkg-config 0.27
+===
+
+ - Drop usage of popt for equivalent API in glib2.
+ - Add back an internal snapshot of glib2 to break circular dependency.
+   This can be used by passing --with-internal-glib to configure. On
+   Windows it may still be required to use an installed glib.
+ - Fix --exists to check for Requires and Requires.private. This ensures
+   that all necessary packages are installed prior to using --cflags,
+   --libs, etc.
+ - Various fixes for MinGW which should allow it to be used unpatched on
+   that system.
+ - New autoconf macros PKG_INSTALLDIR and PKG_NOARCH_INSTALLDIR to help
+   determine the .pc file install directory.
+ - Fix handling of --exact/atleast/max-version vs. =/>=/<=.
+ - Fix errors in man page source.
+ - Ensure testing only searches in the check directory.
+ - Bump glib requirement to 2.16 to avoid deprecated
+   g_win32_get_package_installation_subdirectory().
+ - Autotools refresh and update. The required versions now are
+   autoconf-2.62, automake-1.11 and libtool-2.2.
+ - Use g_alloca from glib instead of figuring out alloca ourselves.
+ - Remove search for setresuid & setreuid only needed for internal popt.
+ - Bugs fixed: 833, 2458, 5214, 5326, 5703, 6074, 8653, 9135, 9143,
+   9584, 10652, 11464, 14396, 17053, 23922, 28776, 29011, 29801, 31699,
+   31700, 32622, 34382, 37266, 39646, 41081, 43149, 44843, 45599, 45742,
+   48743
+
 pkg-config 0.26
 ===
 
