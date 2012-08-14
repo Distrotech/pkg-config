@@ -51,3 +51,11 @@ need to run a program to determine the correct value. See the glib
 documentation:
 
 http://developer.gnome.org/glib/stable/glib-cross-compiling.html
+
+If you need to use the bundled glib on Mac OS X, you'll most likely need
+to build for a single architecture rather than as a universal binary.
+This is because glib (as of version 2.32) does not support building for
+multiple architectures out of the box. The glib2 from MacPorts or
+Homebrew may be available as a universal binary and usable for
+pkg-config as described above. Nothing in pkg-config itself precludes
+being built as a universal binary.
