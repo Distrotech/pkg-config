@@ -1,8 +1,8 @@
 diff --git a/glib/configure.ac b/glib/configure.ac
-index d551832..da67a56 100644
+index 27a4a23..160f57d 100644
 --- a/glib/configure.ac
 +++ b/glib/configure.ac
-@@ -2447,30 +2447,6 @@ int error = EILSEQ;
+@@ -2427,30 +2427,6 @@ int error = EILSEQ;
  ], have_eilseq=yes, have_eilseq=no);
  AC_MSG_RESULT($have_eilseq)
  
@@ -30,6 +30,6 @@ index d551832..da67a56 100644
 -  fi
 -fi
 -
- dnl
- dnl Tracing
- dnl
+ dnl ************************************
+ dnl *** Enable lcov coverage reports ***
+ dnl ************************************

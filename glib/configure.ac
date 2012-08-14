@@ -2427,63 +2427,6 @@ int error = EILSEQ;
 ], have_eilseq=yes, have_eilseq=no);
 AC_MSG_RESULT($have_eilseq)
 
-dnl
-dnl Tracing
-dnl
-
-AC_ARG_ENABLE([dtrace],
-             [AS_HELP_STRING([--enable-dtrace],
-                              [include tracing support for dtrace])])
-have_dtrace=no
-AC_MSG_CHECKING([whether to include dtrace tracing support])
-if test "x$enable_dtrace" != xno; then
-  if test x$glib_have_carbon = xyes; then
-    AC_MSG_RESULT([no (not yet compatible with MacOS dtrace)])
-  else 
-    AC_MSG_RESULT([yes])
-    AC_CHECK_PROGS(DTRACE, dtrace)
-    if test -z "$DTRACE"; then
-      if test "x$enable_dtrace" = xyes; then
-        AC_MSG_ERROR([dtrace not found])
-      fi
-    else
-      AC_CHECK_HEADER([sys/sdt.h],have_dtrace=yes,
-                      [if test "x$enable_dtrace" = xyes; then
-                        AC_MSG_ERROR([dtrace support needs sys/sdt.h header])
-                       fi])
-    fi
-  fi
-else
-  AC_MSG_RESULT([no])
-fi
-if test "x$have_dtrace" = xyes; then
-  AC_DEFINE([HAVE_DTRACE], [1], [Define to 1 if using dtrace probes.])
-fi
-AM_CONDITIONAL([ENABLE_DTRACE], [test x$have_dtrace = xyes ])
-
-AC_MSG_CHECKING([whether to include systemtap tracing support])
-AC_ARG_ENABLE([systemtap],
-             [AS_HELP_STRING([--enable-systemtap],
-                              [include tracing support for systemtap])])
-have_systemtap=no
-if test "x$enable_systemtap" != xno -a "x$have_dtrace" = xyes; then
-  have_systemtap=yes
-fi
-AC_MSG_RESULT(${have_systemtap})
-
-AM_CONDITIONAL([ENABLE_SYSTEMTAP], [test x$have_systemtap = xyes])
-
-AC_ARG_WITH([tapset-install-dir],
-            AS_HELP_STRING([--with-tapset-install-dir=DIR],
-                            [path where systemtap tapsets are installed [DATADIR/systemtap/tapset]]),
-            [if test "x${withval}" = x; then
-	       ABS_TAPSET_DIR="\$(datadir)/systemtap/tapset"
-	     else
-	       ABS_TAPSET_DIR="${withval}"
-	      fi],
-	    [ABS_TAPSET_DIR="\$(datadir)/systemtap/tapset"])
-AC_SUBST(ABS_TAPSET_DIR)
-
 dnl ************************************
 dnl *** Enable lcov coverage reports ***
 dnl ************************************

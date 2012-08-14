@@ -113,7 +113,7 @@ index f5c510d..95c71de 100644
  files:
  	@files=`ls $(DISTFILES) 2> /dev/null `; for p in $$files; do \
 diff --git a/glib/configure.ac b/glib/configure.ac
-index cadd925..6dc5f18 100644
+index cadd925..f7a1632 100644
 --- a/glib/configure.ac
 +++ b/glib/configure.ac
 @@ -474,8 +474,6 @@ dnl
@@ -163,7 +163,7 @@ index cadd925..6dc5f18 100644
  
  dnl *****************************
  dnl *** Check for xattr (GIO) ***
-@@ -2585,35 +2552,6 @@ if test $cross_compiling = yes; then
+@@ -2585,92 +2552,6 @@ if test $cross_compiling = yes; then
    fi
  fi
  
@@ -196,10 +196,67 @@ index cadd925..6dc5f18 100644
 -
 -AM_CONDITIONAL(ENABLE_MAN, test x$enable_man != xno)
 -
- dnl
- dnl Tracing
- dnl
-@@ -3529,87 +3467,22 @@ AC_SUBST(gio_INCLUDES)
+-dnl
+-dnl Tracing
+-dnl
+-
+-AC_ARG_ENABLE([dtrace],
+-             [AS_HELP_STRING([--enable-dtrace],
+-                              [include tracing support for dtrace])])
+-have_dtrace=no
+-AC_MSG_CHECKING([whether to include dtrace tracing support])
+-if test "x$enable_dtrace" != xno; then
+-  if test x$glib_have_carbon = xyes; then
+-    AC_MSG_RESULT([no (not yet compatible with MacOS dtrace)])
+-  else 
+-    AC_MSG_RESULT([yes])
+-    AC_CHECK_PROGS(DTRACE, dtrace)
+-    if test -z "$DTRACE"; then
+-      if test "x$enable_dtrace" = xyes; then
+-        AC_MSG_ERROR([dtrace not found])
+-      fi
+-    else
+-      AC_CHECK_HEADER([sys/sdt.h],have_dtrace=yes,
+-                      [if test "x$enable_dtrace" = xyes; then
+-                        AC_MSG_ERROR([dtrace support needs sys/sdt.h header])
+-                       fi])
+-    fi
+-  fi
+-else
+-  AC_MSG_RESULT([no])
+-fi
+-if test "x$have_dtrace" = xyes; then
+-  AC_DEFINE([HAVE_DTRACE], [1], [Define to 1 if using dtrace probes.])
+-fi
+-AM_CONDITIONAL([ENABLE_DTRACE], [test x$have_dtrace = xyes ])
+-
+-AC_MSG_CHECKING([whether to include systemtap tracing support])
+-AC_ARG_ENABLE([systemtap],
+-             [AS_HELP_STRING([--enable-systemtap],
+-                              [include tracing support for systemtap])])
+-have_systemtap=no
+-if test "x$enable_systemtap" != xno -a "x$have_dtrace" = xyes; then
+-  have_systemtap=yes
+-fi
+-AC_MSG_RESULT(${have_systemtap})
+-
+-AM_CONDITIONAL([ENABLE_SYSTEMTAP], [test x$have_systemtap = xyes])
+-
+-AC_ARG_WITH([tapset-install-dir],
+-            AS_HELP_STRING([--with-tapset-install-dir=DIR],
+-                            [path where systemtap tapsets are installed [DATADIR/systemtap/tapset]]),
+-            [if test "x${withval}" = x; then
+-	       ABS_TAPSET_DIR="\$(datadir)/systemtap/tapset"
+-	     else
+-	       ABS_TAPSET_DIR="${withval}"
+-	      fi],
+-	    [ABS_TAPSET_DIR="\$(datadir)/systemtap/tapset"])
+-AC_SUBST(ABS_TAPSET_DIR)
+-
+ dnl ************************************
+ dnl *** Enable lcov coverage reports ***
+ dnl ************************************
+@@ -3529,87 +3410,22 @@ AC_SUBST(gio_INCLUDES)
  
  
  AC_CONFIG_FILES([
