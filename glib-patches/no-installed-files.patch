@@ -161,3 +161,13 @@ index 6fb3a34..1cf80a2 100644
 -
 -uninstall-gdb:
 -	-rm -r $(DESTDIR)$(datadir)/gdb
+diff --git a/glib/m4macros/Makefile.am b/glib/m4macros/Makefile.am
+index 75a9ca0..10a2f5f 100644
+--- a/glib/m4macros/Makefile.am
++++ b/glib/m4macros/Makefile.am
+@@ -5,4 +5,4 @@ installed_m4= glib-2.0.m4 glib-gettext.m4 gsettings.m4
+ EXTRA_DIST+=$(installed_m4)
+ 
+ m4datadir = $(datadir)/aclocal
+-m4data_DATA = $(installed_m4)
++noinst_DATA = $(installed_m4)
