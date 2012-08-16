@@ -24,31 +24,6 @@ EXTRA_DIST += 			\
 
 charset_alias = $(DESTDIR)$(libdir)/charset.alias
 charset_tmp = $(DESTDIR)$(libdir)/charset.tmp
-install-exec-local: all-local
-	$(mkinstalldirs) $(DESTDIR)$(libdir)
-	if test -f $(charset_alias); then \
-	  sed -f ref-add.sed $(charset_alias) > $(charset_tmp) ; \
-	  $(INSTALL_DATA) $(charset_tmp) $(charset_alias) ; \
-	  rm -f $(charset_tmp) ; \
-	else \
-	  if test @GLIBC21@ = no; then \
-	    sed -f ref-add.sed charset.alias > $(charset_tmp) ; \
-	    $(INSTALL_DATA) $(charset_tmp) $(charset_alias) ; \
-	    rm -f $(charset_tmp) ; \
-	  fi ; \
-	fi
-
-uninstall-local: all-local
-	if test -f $(charset_alias); then \
-	  sed -f ref-del.sed $(charset_alias) > $(charset_tmp); \
-	  if grep '^# Packages using this file: $$' $(charset_tmp) \
-	      > /dev/null; then \
-	    rm -f $(charset_alias); \
-	  else \
-	    $(INSTALL_DATA) $(charset_tmp) $(charset_alias); \
-	  fi; \
-	  rm -f $(charset_tmp); \
-	fi
 
 charset.alias: config.charset
 	$(AM_V_GEN) $(SHELL) $(srcdir)/config.charset '@host@' > t-$@
