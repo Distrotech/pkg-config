@@ -4,6 +4,7 @@
 *.la
 *.a
 *.so
+*.exe
 .deps/
 .libs/
 INSTALL
