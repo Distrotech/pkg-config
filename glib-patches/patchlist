@@ -6,3 +6,4 @@ no-pkg-config.patch
 no-gettext.patch
 cross-compiling.patch
 static-only.patch
+win32-static-init.patch

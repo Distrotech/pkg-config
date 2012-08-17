@@ -225,6 +225,10 @@ glib_init (void)
 
 HMODULE glib_dll;
 
+#endif
+
+#if defined (G_OS_WIN32) && !defined (GLIB_STATIC_COMPILATION)
+
 BOOL WINAPI
 DllMain (HINSTANCE hinstDLL,
          DWORD     fdwReason,
@@ -261,6 +265,10 @@ G_DEFINE_CONSTRUCTOR(glib_init_ctor)
 static void
 glib_init_ctor (void)
 {
+#ifdef G_OS_WIN32
+  g_clock_win32_init ();
+  g_thread_win32_init ();
+#endif
   glib_init ();
 }
 
