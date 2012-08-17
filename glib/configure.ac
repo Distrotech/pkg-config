@@ -498,7 +498,7 @@ esac
 
 dnl Initialize libtool
 LT_PREREQ([2.2])
-LT_INIT([disable-static win32-dll])
+LT_INIT([disable-shared win32-dll])
 dnl when using libtool 2.x create libtool early, because it's used in configure
 m4_ifdef([LT_OUTPUT], [LT_OUTPUT])
 

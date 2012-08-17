@@ -4,3 +4,4 @@ foreign-automake.patch
 no-gregex.patch
 no-pkg-config.patch
 cross-compiling.patch
+static-only.patch
