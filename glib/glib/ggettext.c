@@ -40,7 +40,7 @@
 
 #include <string.h>
 #include <locale.h>
-#include <libintl.h>
+#include "glibintl.h"
 
 #ifdef G_OS_WIN32
 
