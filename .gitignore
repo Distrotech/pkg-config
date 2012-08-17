@@ -5,6 +5,7 @@
 *.a
 *.so
 *.exe
+*.orig
 .deps/
 .libs/
 INSTALL
