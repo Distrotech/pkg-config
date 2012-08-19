@@ -5,6 +5,8 @@ if [ "$PKG_CONFIG_SHELL_IS_POSIX" != "1" ]; then
     PKG_CONFIG_SHELL_IS_POSIX=1 PATH=`getconf PATH` exec sh $0 "$@"
 fi
 
+set -e
+
 . ${srcdir}/common
 
 # non-existent package; call should fail and cause no output
