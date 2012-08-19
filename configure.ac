@@ -23,6 +23,13 @@ AC_PROG_CC
 dnl Check for headers
 AC_CHECK_HEADERS([dirent.h unistd.h sys/wait.h malloc.h])
 
+dnl A POSIX shell is required for the tests. If TEST_SHELL hasn't been
+dnl set on the command line then we try to find bash or ksh or sh from
+dnl the path. If none of those are available, we just use whatever
+dnl autoconf detected for configure.
+AC_ARG_VAR([TESTS_SHELL], [Path to a POSIX shell to be used for testing])
+conf_path="$PATH:`getconf PATH 2>/dev/null`"
+AC_PATH_PROGS([TESTS_SHELL], [bash ksh sh], [$CONFIG_SHELL], [$conf_path])
 
 dnl
 dnl Default pkg-config search path

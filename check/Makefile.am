@@ -1,3 +1,5 @@
+TESTS_ENVIRONMENT = $(TESTS_SHELL)
+
 TESTS = \
 	check-cflags \
 	check-libs \
