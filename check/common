@@ -4,7 +4,7 @@
 # valid POSIX sh.
 #
 
-pkgconfig=../pkg-config
+pkgconfig=${PKG_CONFIG-../pkg-config}
 
 . ./config.sh
 
