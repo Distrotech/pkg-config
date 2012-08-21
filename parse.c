@@ -1051,6 +1051,14 @@ parse_line (Package *pkg, const char *untrimmed, const char *path,
 		    *q = '/';
 		  q++;
 		}
+
+	      /* Now escape the special characters so that there's no danger
+	       * of arguments that include the prefix getting split.
+	       */
+	      q = prefix;
+	      prefix = strdup_escape_shell (prefix);
+	      g_free (q);
+
 	      varname = g_strdup (tag);
 	      debug_spew (" Variable declaration, '%s' overridden with '%s'\n",
 			  tag, prefix);
