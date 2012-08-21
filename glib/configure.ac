@@ -485,9 +485,14 @@ case $with_libiconv in
     ;;
 esac
 
+dnl Ensure we do a static-only build. This really only matters on Windows,
+dnl but it's safer to do it for all platforms.
+enable_static=yes
+enable_shared=no
+
 dnl Initialize libtool
 LT_PREREQ([2.2])
-LT_INIT([disable-shared win32-dll])
+LT_INIT([disable-static win32-dll])
 dnl when using libtool 2.x create libtool early, because it's used in configure
 m4_ifdef([LT_OUTPUT], [LT_OUTPUT])
 
