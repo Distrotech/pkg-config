@@ -323,6 +323,11 @@ use to display what went wrong.
 Note that if there is a possibility the first call to
 PKG_CHECK_MODULES might not happen, you should be sure to include an
 explicit call to PKG_PROG_PKG_CONFIG in your configure.ac.
+
+Also note that repeated usage of VARIABLE-PREFIX is not recommended.
+After the first successful usage, subsequent calls with the same
+VARIABLE-PREFIX will simply use the _LIBS and _CFLAGS variables set from
+the previous usage without calling \fIpkg-config\fP again.
 .\"
 .TP
 .I "PKG_PROG_PKG_CONFIG([MIN-VERSION])"
