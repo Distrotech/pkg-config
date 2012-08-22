@@ -954,7 +954,10 @@ g_variant_new_dict_entry (GVariant *key,
  * this function returns %FALSE.  Otherwise, it unpacks the returned
  * value and returns %TRUE.
  *
- * See g_variant_get() for information about @format_string.
+ * @format_string determines the C types that are used for unpacking
+ * the values and also determines if the values are copied or borrowed,
+ * see the section on
+ * <link linkend='gvariant-format-strings-pointers'>GVariant Format Strings</link>.
  *
  * Returns: %TRUE if a value was unpacked
  *
@@ -2745,6 +2748,10 @@ g_variant_compare (gconstpointer one,
 
   switch (g_variant_classify (a))
     {
+    case G_VARIANT_CLASS_BOOLEAN:
+      return g_variant_get_boolean (a) -
+             g_variant_get_boolean (b);
+
     case G_VARIANT_CLASS_BYTE:
       return ((gint) g_variant_get_byte (a)) -
              ((gint) g_variant_get_byte (b));
@@ -4614,6 +4621,11 @@ g_variant_new_va (const gchar  *format_string,
  * Please note that the syntax of the format string is very likely to be
  * extended in the future.
  *
+ * @format_string determines the C types that are used for unpacking
+ * the values and also determines if the values are copied or borrowed,
+ * see the section on
+ * <link linkend='gvariant-format-strings-pointers'>GVariant Format Strings</link>.
+ *
  * Since: 2.24
  **/
 void
@@ -4661,6 +4673,11 @@ g_variant_get (GVariant    *value,
  * These two generalisations allow mixing of multiple calls to
  * g_variant_new_va() and g_variant_get_va() within a single actual
  * varargs call by the user.
+ *
+ * @format_string determines the C types that are used for unpacking
+ * the values and also determines if the values are copied or borrowed,
+ * see the section on
+ * <link linkend='gvariant-format-strings-pointers'>GVariant Format Strings</link>.
  *
  * Since: 2.24
  **/
@@ -4748,6 +4765,11 @@ g_variant_builder_add (GVariantBuilder *builder,
  * essentially a combination of g_variant_get_child_value() and
  * g_variant_get().
  *
+ * @format_string determines the C types that are used for unpacking
+ * the values and also determines if the values are copied or borrowed,
+ * see the section on
+ * <link linkend='gvariant-format-strings-pointers'>GVariant Format Strings</link>.
+ *
  * Since: 2.24
  **/
 void
@@ -4815,6 +4837,11 @@ g_variant_get_child (GVariant    *value,
  *
  * For a solution that is likely to be more convenient to C programmers
  * when dealing with loops, see g_variant_iter_loop().
+ *
+ * @format_string determines the C types that are used for unpacking
+ * the values and also determines if the values are copied or borrowed,
+ * see the section on
+ * <link linkend='gvariant-format-strings-pointers'>GVariant Format Strings</link>.
  *
  * Returns: %TRUE if a value was unpacked, or %FALSE if there as no value
  *
@@ -4913,6 +4940,11 @@ g_variant_iter_next (GVariantIter *iter,
  * types, g_variant_iter_next() is definitely preferred.  For string
  * types, use the '&' prefix to avoid allocating any memory at all (and
  * thereby avoiding the need to free anything as well).
+ *
+ * @format_string determines the C types that are used for unpacking
+ * the values and also determines if the values are copied or borrowed,
+ * see the section on
+ * <link linkend='gvariant-format-strings-pointers'>GVariant Format Strings</link>.
  *
  * Returns: %TRUE if a value was unpacked, or %FALSE if there was no
  *          value

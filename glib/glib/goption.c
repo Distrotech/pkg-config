@@ -648,7 +648,7 @@ group_has_visible_entries (GOptionContext *context,
 }
 
 static gboolean
-group_list_has_visible_entires (GOptionContext *context,
+group_list_has_visible_entries (GOptionContext *context,
                                 GList          *group_list,
                                 gboolean       main_entries)
 {
@@ -914,7 +914,7 @@ g_option_context_get_help (GOptionContext *context,
   /* Print application options if --help or --help-all has been specified */
   if ((main_help || !group) &&
       (group_has_visible_entries (context, context->main_group, TRUE) ||
-       group_list_has_visible_entires (context, context->groups, TRUE)))
+       group_list_has_visible_entries (context, context->groups, TRUE)))
     {
       list = context->groups;
 
@@ -1680,7 +1680,7 @@ platform_get_argv0 (void)
 
   cmdline = (char **) realloc (cmdline, len);
 
-  if (sysctl (mib, nitems (mib), cmdline, &len, NULL, 0) == -1)
+  if (sysctl (mib, G_N_ELEMENTS (mib), cmdline, &len, NULL, 0) == -1)
     {
       g_free (cmdline);
       return NULL;

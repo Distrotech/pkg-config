@@ -377,7 +377,7 @@ g_find_program_in_path (const gchar *program)
  * variable. If the program is found, the return value contains the 
  * full name including the type suffix.
  *
- * Return value: absolute path, or %NULL
+ * Return value: a newly-allocated string with the absolute path, or %NULL
  **/
 #ifdef G_OS_WIN32
 static gchar *
@@ -660,19 +660,32 @@ g_get_any_init_do (void)
   gchar hostname[100];
 
   g_tmp_dir = g_strdup (g_getenv ("TMPDIR"));
+
   if (g_tmp_dir == NULL || *g_tmp_dir == '\0')
-    g_tmp_dir = g_strdup (g_getenv ("TMP"));
+    {
+      g_free (g_tmp_dir);
+      g_tmp_dir = g_strdup (g_getenv ("TMP"));
+    }
+
   if (g_tmp_dir == NULL || *g_tmp_dir == '\0')
-    g_tmp_dir = g_strdup (g_getenv ("TEMP"));
+    {
+      g_free (g_tmp_dir);
+      g_tmp_dir = g_strdup (g_getenv ("TEMP"));
+    }
 
 #ifdef G_OS_WIN32
   if (g_tmp_dir == NULL || *g_tmp_dir == '\0')
-    g_tmp_dir = get_windows_directory_root ();
-#else  
+    {
+      g_free (g_tmp_dir);
+      g_tmp_dir = get_windows_directory_root ();
+    }
+#else
+ 
 #ifdef P_tmpdir
   if (g_tmp_dir == NULL || *g_tmp_dir == '\0')
     {
-      gsize k;    
+      gsize k;
+      g_free (g_tmp_dir);
       g_tmp_dir = g_strdup (P_tmpdir);
       k = strlen (g_tmp_dir);
       if (k > 1 && G_IS_DIR_SEPARATOR (g_tmp_dir[k - 1]))
@@ -682,7 +695,8 @@ g_get_any_init_do (void)
   
   if (g_tmp_dir == NULL || *g_tmp_dir == '\0')
     {
-      g_tmp_dir = g_strdup ("/tmp");
+      g_free (g_tmp_dir);
+      g_tmp_dir = g_strdup (g_getenv ("/tmp"));
     }
 #endif	/* !G_OS_WIN32 */
   
@@ -1717,14 +1731,18 @@ g_reload_user_special_dirs_cache (void)
       /* only leak changed directories */
       for (i = 0; i < G_USER_N_DIRECTORIES; i++)
         {
-	  old_val = old_g_user_special_dirs[i];
-	  if (g_strcmp0 (old_val, g_user_special_dirs[i]) == 0)
+          old_val = old_g_user_special_dirs[i];
+          if (g_user_special_dirs[i] == NULL)
             {
-	      /* don't leak */
-	      g_free (g_user_special_dirs[i]);
-	      g_user_special_dirs[i] = old_val;
+              g_user_special_dirs[i] = old_val;
             }
-	  else
+          else if (g_strcmp0 (old_val, g_user_special_dirs[i]) == 0)
+            {
+              /* don't leak */
+              g_free (g_user_special_dirs[i]);
+              g_user_special_dirs[i] = old_val;
+            }
+          else
             g_free (old_val);
         }
 

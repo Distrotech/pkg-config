@@ -1,5 +1,5 @@
 diff --git a/glib/configure.ac b/glib/configure.ac
-index 641c0a9..9d3eb6d 100644
+index 99de9f7..e582232 100644
 --- a/glib/configure.ac
 +++ b/glib/configure.ac
 @@ -294,8 +294,6 @@ AC_PROG_INSTALL
@@ -35,7 +35,7 @@ index 641c0a9..9d3eb6d 100644
  dnl gettext support
  dnl
  
-@@ -1768,30 +1749,6 @@ dnl   failure. try libattr
+@@ -1779,30 +1760,6 @@ dnl   failure. try libattr
  fi
  AC_SUBST(XATTR_LIBS)
  
@@ -43,7 +43,7 @@ index 641c0a9..9d3eb6d 100644
 -dnl *** check for libelf ***
 -dnl ************************
 -
--PKG_CHECK_MODULES([LIBELF], [libelf], [have_libelf=yes], [have_libelf=maybe])
+-PKG_CHECK_MODULES([LIBELF], [libelf >= 0.8.12], [have_libelf=yes], [have_libelf=maybe])
 -
 -if test $have_libelf = maybe; then
 -  glib_save_LIBS=$LIBS
@@ -66,7 +66,7 @@ index 641c0a9..9d3eb6d 100644
  dnl ****************************************
  dnl *** platform dependent source checks ***
  dnl ****************************************
-@@ -3326,12 +3283,7 @@ AC_CHECK_ALIGNOF([unsigned long])
+@@ -3280,12 +3237,7 @@ AC_CHECK_ALIGNOF([unsigned long])
  # Check for libdbus1 - Optional - is only used in the GDBus test cases
  #
  # 1.2.14 required for dbus_message_set_serial
