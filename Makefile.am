@@ -36,6 +36,12 @@ pkg_config_SOURCES= \
 	parse.c \
 	main.c
 
+if HOST_TOOL
+host_tool = $(host)-pkg-config$(EXEEXT)
+install-exec-hook:
+	cd $(DESTDIR)$(bindir) && $(LN) pkg-config$(EXEEXT) $(host_tool)
+endif
+
 # Various data files
 m4dir = $(datadir)/aclocal
 dist_m4_DATA = pkg.m4

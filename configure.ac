@@ -19,6 +19,7 @@ m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
 
 dnl Check for programs
 AC_PROG_CC
+AC_CHECK_PROG([LN], [ln], [ln], [cp -Rp])
 
 dnl Check for headers
 AC_CHECK_HEADERS([dirent.h unistd.h sys/wait.h malloc.h])
@@ -202,6 +203,18 @@ if test "x$with_gcov" = xyes; then
   CFLAGS="${CFLAGS+$CFLAGS }-O0"
 fi
 AC_SUBST([GCOV_CFLAGS])
+
+dnl See if the user wants a host- prefixed tool
+dnl (e.g. i686-pc-linux-gnu-pkg-config) to be installed.
+dnl
+AC_MSG_CHECKING([if host- prefixed tool should be installed])
+AC_ARG_ENABLE([host-tool],
+  [AS_HELP_STRING([--disable-host-tool],
+    [install link to pkg-config with $host- prefix @<:@default=yes@:>@])],
+  [],
+  [enable_host_tool=yes])
+AC_MSG_RESULT([$enable_host_tool])
+AM_CONDITIONAL([HOST_TOOL], [test "x$enable_host_tool" = xyes])
 
 AC_CONFIG_FILES([
 Makefile
