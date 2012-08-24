@@ -1,3 +1,16 @@
+pkg-config 0.27.1
+===
+
+ - Various fixes for using the internal glib snapshot. It should now be
+   usable pretty much everywhere with the exception that universal
+   builds are not supported on OS X.
+ - Remove usage of gettext from the internal glib to avoid gettext and
+   libintl dependencies.
+ - Update internal glib snapshot to 2.32.4.
+ - Fix check for POSIX shell used in tests to work better.
+ - Handle spaces in autodetected prefix on Windows.
+ - Bugs fixed 3550, 51883, 52031, 53493.
+
 pkg-config 0.27
 ===
 

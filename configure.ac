@@ -1,6 +1,6 @@
 AC_PREREQ([2.62])
 AC_INIT([pkg-config],
-        [0.27],
+        [0.27.1],
         [https://bugs.freedesktop.org/enter_bug.cgi?product=pkg-config],
         [pkg-config])
 
