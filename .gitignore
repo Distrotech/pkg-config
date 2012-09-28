@@ -6,6 +6,9 @@
 *.so
 *.exe
 *.orig
+*.gcda
+*.gcno
+*.gcov
 .deps/
 .libs/
 INSTALL

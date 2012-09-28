@@ -182,6 +182,27 @@ fi
 AC_SUBST(GLIB_LIBS)
 AC_SUBST(GLIB_CFLAGS)
 
+dnl
+dnl Optional gcov test coverage usage
+dnl
+AC_ARG_WITH([gcov],
+  [AS_HELP_STRING([--with-gcov], [gcov test coverage @<:@default=no@:>@])],
+  [],
+  [with_gcov=no])
+if test "x$with_gcov" = xyes; then
+  if test "$GCC" = no; then
+    AC_MSG_ERROR([gcov test coverage can only be used with GCC])
+  fi
+
+  AC_PATH_PROG([GCOV], [gcov], [AC_MSG_ERROR([could not find gcov program])])
+  GCOV_CFLAGS="-fprofile-arcs -ftest-coverage"
+
+  # Ensure there's no optimizing since last -O wins and CFLAGS is used
+  # at the end of COMPILE/LTCOMPILE.
+  CFLAGS="${CFLAGS+$CFLAGS }-O0"
+fi
+AC_SUBST([GCOV_CFLAGS])
+
 AC_CONFIG_FILES([
 Makefile
 check/Makefile
