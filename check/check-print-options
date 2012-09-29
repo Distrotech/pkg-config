@@ -1,0 +1,32 @@
+#! /bin/sh
+
+set -e
+. ${srcdir}/common
+
+# --modversion
+RESULT=1.0.0
+run_test --modversion simple
+
+# --print-variables
+RESULT="exec_prefix
+prefix
+libdir
+includedir"
+run_test --print-variables simple
+
+# --print-provides
+RESULT="simple = 1.0.0"
+run_test --print-provides simple
+
+# --print-requires
+RESULT=""
+run_test --print-requires simple
+
+# --print-requires-private
+RESULT=""
+run_test --print-requires-private simple
+
+# --list-all, limit to a subdirectory
+RESULT="sub1 Subdirectory package 1 - Test package 1 for subdirectory
+sub2 Subdirectory package 2 - Test package 2 for subdirectory"
+PKG_CONFIG_LIBDIR="$srcdir/sub" run_test --list-all

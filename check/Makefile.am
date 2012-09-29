@@ -13,7 +13,8 @@ TESTS = \
 	check-idirafter \
 	check-whitespace \
 	check-cmd-options \
-	check-version
+	check-version \
+	check-print-options
 
 EXTRA_DIST = \
 	$(TESTS) \
@@ -28,4 +29,6 @@ EXTRA_DIST = \
 	idirafter.pc \
 	conflicts-test.pc \
 	whitespace.pc \
-	fields-blank.pc
+	fields-blank.pc \
+	sub/sub1.pc \
+	sub/sub2.pc
