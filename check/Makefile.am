@@ -14,7 +14,8 @@ TESTS = \
 	check-whitespace \
 	check-cmd-options \
 	check-version \
-	check-print-options
+	check-print-options \
+	check-path
 
 EXTRA_DIST = \
 	$(TESTS) \
