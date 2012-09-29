@@ -4,15 +4,13 @@ set -e
 
 . ${srcdir}/common
 
+RESULT="-I/includedir/"
 case ${MACHTYPE} in
 *-msys)
     # Make sure path doesn't get mangled on MSYS
-    ARGS="--define-variable=includedir=\\/includedir/ --cflags simple"
+    run_test --define-variable=includedir=\\/includedir/ --cflags simple
     ;;
 *)
-    ARGS="--define-variable=includedir=/includedir/ --cflags simple"
+    run_test --define-variable=includedir=/includedir/ --cflags simple
     ;;
 esac
-RESULT="-I/includedir/"
-
-run_test

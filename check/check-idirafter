@@ -4,7 +4,5 @@ set -e
 
 . ${srcdir}/common
 
-ARGS="--cflags idirafter"
 RESULT="-idirafter -I/after -I/foo -I/bar"
-
-run_test
+run_test --cflags idirafter

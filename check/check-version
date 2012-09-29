@@ -9,94 +9,76 @@ v2=1.0.0
 v3=1.0.1
 
 # exact version testing
-ARGS="--exists --print-errors simple = $v1"
 EXPECT_RETURN=1
 RESULT="Requested 'simple = $v1' but version of Simple test is $v2"
-run_test
+run_test --exists --print-errors simple = $v1
 
-ARGS="--exists --print-errors --exact-version=$v1 simple"
 EXPECT_RETURN=1
 RESULT="Requested 'simple = $v1' but version of Simple test is $v2"
-run_test
+run_test --exists --print-errors --exact-version=$v1 simple
 
-ARGS="--exists --print-errors simple = $v2"
 EXPECT_RETURN=0
 RESULT=""
-run_test
+run_test --exists --print-errors simple = $v2
 
-ARGS="--exists --print-errors --exact-version=$v2 simple"
 EXPECT_RETURN=0
 RESULT=""
-run_test
+run_test --exists --print-errors --exact-version=$v2 simple
 
-ARGS="--exists --print-errors simple = $v3"
 EXPECT_RETURN=1
 RESULT="Requested 'simple = $v3' but version of Simple test is $v2"
-run_test
+run_test --exists --print-errors simple = $v3
 
-ARGS="--exists --print-errors --exact-version=$v3 simple"
 EXPECT_RETURN=1
 RESULT="Requested 'simple = $v3' but version of Simple test is $v2"
-run_test
+run_test --exists --print-errors --exact-version=$v3 simple
 
 # atleast version testing
-ARGS="--exists --print-errors simple >= $v1"
 EXPECT_RETURN=0
 RESULT=""
-run_test
+run_test --exists --print-errors simple \>= $v1
 
-ARGS="--exists --print-errors --atleast-version=$v1 simple"
 EXPECT_RETURN=0
 RESULT=""
-run_test
+run_test --exists --print-errors --atleast-version=$v1 simple
 
-ARGS="--exists --print-errors simple >= $v2"
 EXPECT_RETURN=0
 RESULT=""
-run_test
+run_test --exists --print-errors simple \>= $v2
 
-ARGS="--exists --print-errors --atleast-version=$v2 simple"
 EXPECT_RETURN=0
 RESULT=""
-run_test
+run_test --exists --print-errors --atleast-version=$v2 simple
 
-ARGS="--exists --print-errors simple >= $v3"
 EXPECT_RETURN=1
 RESULT="Requested 'simple >= $v3' but version of Simple test is $v2"
-run_test
+run_test --exists --print-errors simple \>= $v3
 
-ARGS="--exists --print-errors --atleast-version=$v3 simple"
 EXPECT_RETURN=1
 RESULT="Requested 'simple >= $v3' but version of Simple test is $v2"
-run_test
+run_test --exists --print-errors --atleast-version=$v3 simple
 
 # max version testing
-ARGS="--exists --print-errors simple <= $v1"
 EXPECT_RETURN=1
 RESULT="Requested 'simple <= $v1' but version of Simple test is $v2"
-run_test
+run_test --exists --print-errors simple \<= $v1
 
-ARGS="--exists --print-errors --max-version=$v1 simple"
 EXPECT_RETURN=1
 RESULT="Requested 'simple <= $v1' but version of Simple test is $v2"
-run_test
+run_test --exists --print-errors --max-version=$v1 simple
 
-ARGS="--exists --print-errors simple <= $v2"
 EXPECT_RETURN=0
 RESULT=""
-run_test
+run_test --exists --print-errors simple \<= $v2
 
-ARGS="--exists --print-errors --max-version=$v2 simple"
 EXPECT_RETURN=0
 RESULT=""
-run_test
+run_test --exists --print-errors --max-version=$v2 simple
 
-ARGS="--exists --print-errors simple <= $v3"
 EXPECT_RETURN=0
 RESULT=""
-run_test
+run_test --exists --print-errors simple \<= $v3
 
-ARGS="--exists --print-errors --max-version=$v3 simple"
 EXPECT_RETURN=0
 RESULT=""
-run_test
+run_test --exists --print-errors --max-version=$v3 simple

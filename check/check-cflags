@@ -4,11 +4,8 @@ set -e
 
 . ${srcdir}/common
 
-ARGS="--cflags simple"
 RESULT=""
-run_test
+run_test --cflags simple
 
-ARGS="--cflags fields-blank"
 RESULT=""
-run_test
-
+run_test --cflags fields-blank

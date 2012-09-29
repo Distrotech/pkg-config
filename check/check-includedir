@@ -4,7 +4,5 @@ set -e
 
 . ${srcdir}/common
 
-ARGS="--cflags includedir"
 RESULT="-I/usr/include/somedir"
-
-run_test
+run_test --cflags includedir

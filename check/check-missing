@@ -7,25 +7,21 @@ set -e
 # non-existent package; call should fail and cause no output
 EXPECT_RETURN=1
 RESULT=""
-ARGS="--exists pkg-non-existent"
-run_test
+run_test --exists pkg-non-existent
 
 # existing package, but with missing Requires
 EXPECT_RETURN=1
 RESULT=""
-ARGS="--exists missing-requires"
-run_test
+run_test --exists missing-requires
 
 # tests below are on an existing package, but with missing Requires.private;
 # when pkg-config outputs error, the actual error text isn't checked
 # package exists, but should fail since deps can't be resolved
-ARGS="--exists missing-requires-private"
 EXPECT_RETURN=1
 RESULT=""
-run_test
+run_test --exists missing-requires-private
 
 # get Libs
-ARGS="--libs missing-requires-private"
 if [ "$list_indirect_deps" = "yes" ]; then
     EXPECT_RETURN=1
     RESULT='Package pkg-non-existent-private-dep was not found in the pkg-config search path.
@@ -36,54 +32,46 @@ else
     EXPECT_RETURN=0
     RESULT="-L/missing-requires-private/lib -lmissing-requires-private"
 fi
-run_test
+run_test --libs missing-requires-private
 
 # Libs.private should fail (verbosely, but the output isn't verified)
-ARGS="--silence-errors --static --libs missing-requires-private"
 EXPECT_RETURN=1
 RESULT=""
-run_test
+run_test --silence-errors --static --libs missing-requires-private
 
 # Cflags.private should fail (verbosely, but the output isn't verified)
-ARGS="--silence-errors --static --cflags missing-requires-private"
 EXPECT_RETURN=1
 RESULT=""
-run_test
+run_test --silence-errors --static --cflags missing-requires-private
 
 # Cflags should fail (verbosely, but the output isn't verified)
-ARGS="--silence-errors --cflags missing-requires-private"
 EXPECT_RETURN=1
 RESULT=""
-run_test
+run_test --silence-errors --cflags missing-requires-private
 
 # get includedir var
-ARGS="--variable includedir missing-requires-private"
 EXPECT_RETURN=0
 RESULT="/usr/include/somedir"
-run_test
+run_test --variable includedir missing-requires-private
 
 # tests below are on an existing package, but with missing Requires; when
 # pkg-config outputs error, the actual error text isn't checked
 # package exists
-ARGS="missing-requires"
 EXPECT_RETURN=0
 RESULT=""
-run_test
+run_test missing-requires
 
 # Libs should fail
-ARGS="--silence-errors --libs missing-requires"
 EXPECT_RETURN=1
 RESULT=""
-run_test
+run_test --silence-errors --libs missing-requires
 
 # Cflags should fail
-ARGS="--silence-errors --cflags missing-requires"
 EXPECT_RETURN=1
 RESULT=""
-run_test
+run_test --silence-errors --cflags missing-requires
 
 # get includedir var
-ARGS="--variable includedir missing-requires"
 EXPECT_RETURN=0
 RESULT="/usr/include/somedir"
-run_test
+run_test --variable includedir missing-requires

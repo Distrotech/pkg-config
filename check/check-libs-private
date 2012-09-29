@@ -4,7 +4,5 @@ set -e
 
 . ${srcdir}/common
 
-ARGS="--static --libs simple"
 RESULT="-lsimple -lm"
-
-run_test
+run_test --static --libs simple

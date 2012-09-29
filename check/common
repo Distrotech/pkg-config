@@ -15,17 +15,17 @@ export LC_ALL=C
 
 run_test () {
     set +e
-    ${pkgconfig} $ARGS >/dev/null 2>&1
+    ${pkgconfig} "$@" >/dev/null 2>&1
     R=$?
     if [ "$R" -ne "${EXPECT_RETURN:-0}" ]; then
-	${pkgconfig} --print-errors $ARGS
-	echo "${pkgconfig} $ARGS exited with $R (expected ${EXPECT_RETURN:-0})" 1>&2
+	${pkgconfig} --print-errors "$@"
+	echo "${pkgconfig} $@ exited with $R (expected ${EXPECT_RETURN:-0})" 1>&2
         exit 1
     fi
 
-    R=$(${pkgconfig} $ARGS 2>&1 | sed -e 's,^[[:space:]]*,,' -e 's,[[:space:]]*$,,')
+    R=$(${pkgconfig} "$@" 2>&1 | sed -e 's,^[[:space:]]*,,' -e 's,[[:space:]]*$,,')
     if [ "$R" != "$RESULT" ]; then
-	echo "${pkgconfig} $ARGS :"
+	echo "${pkgconfig} $@ :"
 	echo "'$R' != '$RESULT'"
 	exit 1
     fi
