@@ -4,6 +4,14 @@ set -e
 
 . ${srcdir}/common
 
+# --atleast-pkgconfig-version
+RESULT=""
+run_test --atleast-pkgconfig-version=$PACKAGE_VERSION
+
+EXPECT_RETURN=1
+RESULT=""
+run_test --atleast-pkgconfig-version=999
+
 v1=0.9.9
 v2=1.0.0
 v3=1.0.1

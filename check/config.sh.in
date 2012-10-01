@@ -12,3 +12,4 @@ pc_path="@pc_path@"
 system_include_path="@system_include_path@"
 system_library_path="@system_library_path@"
 list_indirect_deps=@use_indirect_deps@
+PACKAGE_VERSION=@PACKAGE_VERSION@
