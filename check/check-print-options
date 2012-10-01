@@ -19,12 +19,12 @@ RESULT="simple = 1.0.0"
 run_test --print-provides simple
 
 # --print-requires
-RESULT=""
-run_test --print-requires simple
+RESULT="public-dep >= 1"
+run_test --print-requires requires-test
 
 # --print-requires-private
-RESULT=""
-run_test --print-requires-private simple
+RESULT="private-dep >= 1"
+run_test --print-requires-private requires-test
 
 # --list-all, limit to a subdirectory
 RESULT="sub1 Subdirectory package 1 - Test package 1 for subdirectory
