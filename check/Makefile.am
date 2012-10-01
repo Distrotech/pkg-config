@@ -15,7 +15,8 @@ TESTS = \
 	check-cmd-options \
 	check-version \
 	check-print-options \
-	check-path
+	check-path \
+	check-sysroot
 
 EXTRA_DIST = \
 	$(TESTS) \
