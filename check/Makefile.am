@@ -16,7 +16,8 @@ TESTS = \
 	check-version \
 	check-print-options \
 	check-path \
-	check-sysroot
+	check-sysroot \
+	check-uninstalled
 
 EXTRA_DIST = \
 	$(TESTS) \
@@ -33,4 +34,6 @@ EXTRA_DIST = \
 	whitespace.pc \
 	fields-blank.pc \
 	sub/sub1.pc \
-	sub/sub2.pc
+	sub/sub2.pc \
+	inst.pc \
+	inst-uninstalled.pc
