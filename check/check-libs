@@ -13,3 +13,15 @@ run_test --libs simple
 
 RESULT=""
 run_test --libs fields-blank
+
+RESULT="-Wl,--as-needed -L/other/lib -lother"
+run_test --libs other
+
+RESULT="-lother"
+run_test --libs-only-l other
+
+RESULT="-L/other/lib"
+run_test --libs-only-L other
+
+RESULT="-Wl,--as-needed"
+run_test --libs-only-other other

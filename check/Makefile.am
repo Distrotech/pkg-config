@@ -37,4 +37,5 @@ EXTRA_DIST = \
 	sub/sub1.pc \
 	sub/sub2.pc \
 	inst.pc \
-	inst-uninstalled.pc
+	inst-uninstalled.pc \
+	other.pc
