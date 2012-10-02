@@ -17,7 +17,8 @@ TESTS = \
 	check-print-options \
 	check-path \
 	check-sysroot \
-	check-uninstalled
+	check-uninstalled \
+	check-debug
 
 EXTRA_DIST = \
 	$(TESTS) \

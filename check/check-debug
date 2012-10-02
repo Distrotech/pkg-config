@@ -1,0 +1,22 @@
+#! /bin/sh
+
+set -e
+
+. ${srcdir}/common
+
+# Check that debug output works with minimal output. This is still much
+# more than desirable.
+
+RESULT="PKG_CONFIG_DEBUG_SPEW variable enabling debug spew
+Adding directory '.' from PKG_CONFIG_PATH
+Global variable definition 'pc_sysrootdir' = '/'
+Global variable definition 'pc_top_builddir' = '\$(top_builddir)'
+Error printing enabled by default due to use of --version, --libs, --cflags, --libs-only-l, --libs-only-L, --libs-only-other, --cflags-only-I, --cflags-only-other or --list. Value of --silence-errors: 0
+Error printing enabled
+$PACKAGE_VERSION"
+PKG_CONFIG_DEBUG_SPEW=1 run_test --version
+
+RESULT="Error printing enabled by default due to use of --version, --libs, --cflags, --libs-only-l, --libs-only-L, --libs-only-other, --cflags-only-I, --cflags-only-other or --list. Value of --silence-errors: 0
+Error printing enabled
+0.27.1"
+run_test --debug --version
