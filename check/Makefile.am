@@ -14,6 +14,7 @@ TESTS = \
 	check-whitespace \
 	check-cmd-options \
 	check-version \
+	check-requires-version \
 	check-print-options \
 	check-path \
 	check-sysroot \
@@ -38,4 +39,7 @@ EXTRA_DIST = \
 	sub/sub2.pc \
 	inst.pc \
 	inst-uninstalled.pc \
-	other.pc
+	other.pc \
+	requires-version-1.pc \
+	requires-version-2.pc \
+	requires-version-3.pc
