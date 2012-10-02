@@ -55,15 +55,10 @@ struct _Package
   GSList *requires;
   GSList *requires_private;
   GSList *l_libs;
-  char   *l_libs_merged;
   GSList *L_libs;
-  char   *L_libs_merged;
   GSList *other_libs;
-  char   *other_libs_merged;
   GSList *I_cflags;
-  char   *I_cflags_merged;
   GSList *other_cflags;
-  char *other_cflags_merged;
   GHashTable *vars;
   GHashTable *required_versions; /* hash from name to RequiredVersion */
   GSList *conflicts; /* list of RequiredVersion */
@@ -75,16 +70,11 @@ struct _Package
 
 Package *get_package               (const char *name);
 Package *get_package_quiet         (const char *name);
-char *   package_get_l_libs        (Package    *pkg);
 char *   packages_get_l_libs       (GSList     *pkgs);
-char *   package_get_L_libs        (Package    *pkg);
 char *   packages_get_L_libs       (GSList     *pkgs);
-char *   package_get_other_libs    (Package    *pkg);
 char *   packages_get_other_libs   (GSList     *pkgs);
 char *   packages_get_all_libs     (GSList     *pkgs);
-char *   package_get_I_cflags      (Package    *pkg);
 char *   packages_get_I_cflags     (GSList     *pkgs);
-char *   package_get_other_cflags  (Package    *pkg);
 char *   packages_get_other_cflags (GSList     *pkgs);
 char *   packages_get_all_cflags   (GSList     *pkgs);
 char *   package_get_var           (Package    *pkg,

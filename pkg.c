@@ -587,45 +587,6 @@ recursive_fill_list (Package *pkg, GetListFunc func, GSList **listp)
 }
 
 static void
-fill_list_single_package (Package *pkg, GetListFunc func,
-                          GSList **listp, gboolean in_path_order,
-			  gboolean include_private)
-{
-  /* First we get the list in natural/recursive order, then
-   * stable sort by path position
-   */
-  GSList *packages;
-  GSList *tmp;
-
-  /* Get list of packages */
-  packages = NULL;
-  packages = g_slist_append (packages, pkg);
-  recursive_fill_list (pkg,
-		       include_private ? get_requires_private : get_requires,
-		       &packages);
-  
-  if (in_path_order)
-    {
-      spew_package_list ("original", packages);
-      
-      packages = packages_sort_by_path_position (packages);
-      
-      spew_package_list ("sorted", packages);
-    }
-  
-  /* Convert package list to string list */
-  tmp = packages;
-  while (tmp != NULL)
-    {
-      fill_one_level (tmp->data, func, listp);
-      
-      tmp = tmp->next;
-    }
-
-  g_slist_free (packages);
-}
-
-static void
 fill_list (GSList *packages, GetListFunc func,
            GSList **listp, gboolean in_path_order, gboolean include_private)
 {
@@ -930,50 +891,6 @@ verify_package (Package *pkg)
 }
 
 static char*
-get_merged (Package *pkg, GetListFunc func, gboolean in_path_order,
-	    gboolean include_private)
-{
-  GSList *list;
-  GSList *dups_list = NULL;
-  char *retval;
-  
-  fill_list_single_package (pkg, func, &dups_list, in_path_order,
-			    include_private);
-  
-  list = string_list_strip_duplicates (dups_list);
-
-  g_slist_free (dups_list);
-  
-  retval = string_list_to_string (list);
-
-  g_slist_free (list);
-  
-  return retval;
-}
-
-static char*
-get_merged_from_back (Package *pkg, GetListFunc func, gboolean in_path_order,
-		      gboolean include_private)
-{
-  GSList *list;
-  GSList *dups_list = NULL;
-  char *retval;
-  
-  fill_list_single_package (pkg, func, &dups_list, in_path_order,
-			    include_private);
-  
-  list = string_list_strip_duplicates_from_back (dups_list);
-
-  g_slist_free (dups_list);
-  
-  retval = string_list_to_string (list);
-
-  g_slist_free (list);
-  
-  return retval;
-}
-
-static char*
 get_multi_merged (GSList *pkgs, GetListFunc func, gboolean in_path_order,
 		  gboolean include_private)
 {
@@ -1016,19 +933,6 @@ get_multi_merged_from_back (GSList *pkgs, GetListFunc func,
 }
 
 char *
-package_get_l_libs (Package *pkg)
-{
-  /* We don't want these in search path order, rather in dependency
-   * order, so static linking works.
-   */
-  if (pkg->l_libs_merged == NULL)
-    pkg->l_libs_merged = get_merged_from_back (pkg, get_l_libs, FALSE,
-					       !ignore_private_libs);
-
-  return pkg->l_libs_merged;
-}
-
-char *
 packages_get_l_libs (GSList     *pkgs)
 {
   return get_multi_merged_from_back (pkgs, get_l_libs, FALSE,
@@ -1036,30 +940,9 @@ packages_get_l_libs (GSList     *pkgs)
 }
 
 char *
-package_get_L_libs (Package *pkg)
-{
-  /* We want these in search path order so the -L flags don't override PKG_CONFIG_PATH */
-  if (pkg->L_libs_merged == NULL)
-    pkg->L_libs_merged = get_merged (pkg, get_L_libs, TRUE,
-				     !ignore_private_libs);
-
-  return pkg->L_libs_merged;
-}
-
-char *
 packages_get_L_libs (GSList     *pkgs)
 {
   return get_multi_merged (pkgs, get_L_libs, TRUE, !ignore_private_libs);
-}
-
-char *
-package_get_other_libs (Package *pkg)
-{
-  if (pkg->other_libs_merged == NULL)
-    pkg->other_libs_merged = get_merged (pkg, get_other_libs, TRUE,
-					 !ignore_private_libs);
-
-  return pkg->other_libs_merged;
 }
 
 char *
@@ -1104,16 +987,6 @@ packages_get_all_libs (GSList *pkgs)
 }
 
 char *
-package_get_I_cflags (Package *pkg)
-{
-  /* sort by path position so PKG_CONFIG_PATH affects -I flag order */
-  if (pkg->I_cflags_merged == NULL)
-    pkg->I_cflags_merged = get_merged (pkg, get_I_cflags, TRUE, FALSE);
-
-  return pkg->I_cflags_merged;
-}
-
-char *
 packages_get_I_cflags (GSList     *pkgs)
 {
   /* sort by path position so PKG_CONFIG_PATH affects -I flag order */
@@ -1121,26 +994,9 @@ packages_get_I_cflags (GSList     *pkgs)
 }
 
 char *
-package_get_other_cflags (Package *pkg)
-{
-  if (pkg->other_cflags_merged == NULL)
-    pkg->other_cflags_merged = get_merged (pkg, get_other_cflags, TRUE, TRUE);
-
-  return pkg->other_cflags_merged;
-}
-
-char *
 packages_get_other_cflags (GSList *pkgs)
 {
   return get_multi_merged (pkgs, get_other_cflags, TRUE, TRUE);
-}
-
-char *
-package_get_cflags (Package *pkg)
-{
-
-  g_assert_not_reached ();
-  return NULL;
 }
 
 char *
