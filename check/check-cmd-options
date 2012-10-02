@@ -4,6 +4,11 @@ set -e
 
 . ${srcdir}/common
 
+# non-existent option should fail
+EXPECT_RETURN=1
+RESULT="Unknown option --blah"
+run_test --blah
+
 # all of these should fail, but when '=' or ' ' aren't used consistently
 # between the two options, broken popt sets the version to compare to be
 # "a=b"
