@@ -34,6 +34,8 @@ pkg_config_SOURCES= \
 	pkg.c \
 	parse.h \
 	parse.c \
+	rpmvercmp.c \
+	rpmvercmp.h \
 	main.c
 
 if HOST_TOOL
