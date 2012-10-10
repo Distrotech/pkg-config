@@ -26,13 +26,14 @@
 /* return 1: a is newer than b */
 /*        0: a and b are the same version */
 /*       -1: b is newer than a */
-int rpmvercmp(const char * a, const char * b) {
+int rpmvercmp(const char * a, const char * b)
+{
     char oldch1, oldch2;
     char * str1, * str2;
     char * one, * two;
     int rc;
     int isnum;
-    
+
     /* easy comparison to see if versions are identical */
     if (!strcmp(a, b)) return 0;
 
@@ -68,7 +69,7 @@ int rpmvercmp(const char * a, const char * b) {
 	    while (*str2 && isalpha((guchar)*str2)) str2++;
 	    isnum = 0;
 	}
-		
+
 	/* save character at the end of the alpha or numeric segment */
 	/* so that they can be restored after the comparison */
 	oldch1 = *str1;
@@ -76,9 +77,13 @@ int rpmvercmp(const char * a, const char * b) {
 	oldch2 = *str2;
 	*str2 = '\0';
 
-	/* take care of the case where the two version segments are */
-	/* different types: one numeric and one alpha */
+	/* this cannot happen, as we previously tested to make sure that */
+	/* the first string has a non-null segment */
 	if (one == str1) return -1;	/* arbitrary */
+
+	/* take care of the case where the two version segments are */
+	/* different types: one numeric, the other alpha (i.e. empty) */
+	/* numeric segments are always newer than alpha segments */
 	/* XXX See patch #60884 (and details) from bugzilla #50977. */
 	if (two == str2) return (isnum ? 1 : -1);
 
@@ -86,7 +91,7 @@ int rpmvercmp(const char * a, const char * b) {
 	    /* this used to be done by converting the digit segments */
 	    /* to ints using atoi() - it's changed because long  */
 	    /* digit segments can overflow an int - this should fix that. */
-	  
+
 	    /* throw away any leading zeros - it's a number, right? */
 	    while (*one == '0') one++;
 	    while (*two == '0') two++;
@@ -102,7 +107,7 @@ int rpmvercmp(const char * a, const char * b) {
 	/* compare */
 	rc = strcmp(one, two);
 	if (rc) return rc;
-	
+
 	/* restore character that was replaced by null above */
 	*str1 = oldch1;
 	one = str1;
