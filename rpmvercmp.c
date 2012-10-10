@@ -106,7 +106,7 @@ int rpmvercmp(const char * a, const char * b)
 	/* if they are equal because there might be more segments to */
 	/* compare */
 	rc = strcmp(one, two);
-	if (rc) return rc;
+	if (rc) return (rc < 1 ? -1 : 1);
 
 	/* restore character that was replaced by null above */
 	*str1 = oldch1;
