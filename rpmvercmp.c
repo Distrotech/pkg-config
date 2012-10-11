@@ -22,6 +22,12 @@
 #include <string.h>
 #include <ctype.h>
 
+/* macros to help code look more like upstream */
+#define rstreq(a, b)	(strcmp(a, b) == 0)
+#define risalnum(c)	isalnum((guchar)(c))
+#define risdigit(c)	isdigit((guchar)(c))
+#define risalpha(c)	isalpha((guchar)(c))
+
 /* compare alpha and numeric segments of two versions */
 /* return 1: a is newer than b */
 /*        0: a and b are the same version */
@@ -35,7 +41,7 @@ int rpmvercmp(const char * a, const char * b)
     int isnum;
 
     /* easy comparison to see if versions are identical */
-    if (!strcmp(a, b)) return 0;
+    if (rstreq(a, b)) return 0;
 
     str1 = g_alloca(strlen(a) + 1);
     str2 = g_alloca(strlen(b) + 1);
@@ -48,8 +54,8 @@ int rpmvercmp(const char * a, const char * b)
 
     /* loop through each version segment of str1 and str2 and compare them */
     while (*one && *two) {
-	while (*one && !isalnum((guchar)*one)) one++;
-	while (*two && !isalnum((guchar)*two)) two++;
+	while (*one && !risalnum(*one)) one++;
+	while (*two && !risalnum(*two)) two++;
 
 	/* If we ran to the end of either, we are finished with the loop */
 	if (!(*one && *two)) break;
@@ -60,13 +66,13 @@ int rpmvercmp(const char * a, const char * b)
 	/* grab first completely alpha or completely numeric segment */
 	/* leave one and two pointing to the start of the alpha or numeric */
 	/* segment and walk str1 and str2 to end of segment */
-	if (isdigit((guchar)*str1)) {
-	    while (*str1 && isdigit((guchar)*str1)) str1++;
-	    while (*str2 && isdigit((guchar)*str2)) str2++;
+	if (risdigit(*str1)) {
+	    while (*str1 && risdigit(*str1)) str1++;
+	    while (*str2 && risdigit(*str2)) str2++;
 	    isnum = 1;
 	} else {
-	    while (*str1 && isalpha((guchar)*str1)) str1++;
-	    while (*str2 && isalpha((guchar)*str2)) str2++;
+	    while (*str1 && risalpha(*str1)) str1++;
+	    while (*str2 && risalpha(*str2)) str2++;
 	    isnum = 0;
 	}
 
