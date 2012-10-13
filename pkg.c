@@ -106,8 +106,8 @@ ends_in_dotpc (const char *str)
     return FALSE;
 }
 
-/* strlen ("uninstalled") */
-#define UNINSTALLED_LEN 11
+/* strlen ("-uninstalled") */
+#define UNINSTALLED_LEN 12
 
 gboolean
 name_ends_in_uninstalled (const char *str)
@@ -115,7 +115,7 @@ name_ends_in_uninstalled (const char *str)
   int len = strlen (str);
   
   if (len > UNINSTALLED_LEN &&
-      FOLDCMP ((str + len - UNINSTALLED_LEN), "uninstalled") == 0)
+      FOLDCMP ((str + len - UNINSTALLED_LEN), "-uninstalled") == 0)
     return TRUE;
   else
     return FALSE;
