@@ -49,4 +49,5 @@ EXTRA_DIST = \
 	non-l-required.pc \
 	circular-1.pc \
 	circular-2.pc \
-	circular-3.pc
+	circular-3.pc \
+	no-variables.pc

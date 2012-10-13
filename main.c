@@ -580,9 +580,10 @@ main (int argc, char **argv)
       while (tmp != NULL)
         {
           Package *pkg = tmp->data;
-          g_hash_table_foreach(pkg->vars,
-                               &print_hashtable_key,
-                               NULL);
+          if (pkg->vars != NULL)
+            g_hash_table_foreach(pkg->vars,
+                                 &print_hashtable_key,
+                                 NULL);
           tmp = g_slist_next (tmp);
           if (tmp) printf ("\n");
         }

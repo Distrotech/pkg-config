@@ -11,7 +11,10 @@ run_test --version
 RESULT=1.0.0
 run_test --modversion simple
 
-# --print-variables
+# --print-variables, make sure having no variables doesn't crash
+RESULT=""
+run_test --print-variables no-variables
+
 RESULT="exec_prefix
 prefix
 libdir
