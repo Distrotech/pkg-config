@@ -25,3 +25,23 @@ run_test --libs-only-L other
 
 RESULT="-Wl,--as-needed"
 run_test --libs-only-other other
+
+# Try various mixed combinations
+RESULT="-L/other/lib -lother"
+run_test --libs-only-l --libs-only-L other
+run_test --libs-only-L --libs-only-l other
+
+RESULT="-Wl,--as-needed -lother"
+run_test --libs-only-l --libs-only-other other
+run_test --libs-only-other --libs-only-l other
+
+RESULT="-Wl,--as-needed -L/other/lib"
+run_test --libs-only-L --libs-only-other other
+run_test --libs-only-other --libs-only-L other
+
+RESULT="-Wl,--as-needed -L/other/lib -lother"
+run_test --libs-only-l --libs-only-L --libs-only-other other
+run_test --libs --libs-only-l --libs-only-L --libs-only-other other
+run_test --libs --libs-only-l other
+run_test --libs --libs-only-L other
+run_test --libs --libs-only-other other

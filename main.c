@@ -220,6 +220,7 @@ main (int argc, char **argv)
   static int want_variable_list = 0;
   GString *str;
   GSList *packages = NULL;
+  FlagType flags = 0;
   char *search_path;
   char *pcbuilddir;
   gboolean need_newline;
@@ -374,6 +375,21 @@ main (int argc, char **argv)
       return 1;
     }
 
+  /* construct Libs/Cflags mask */
+  if (want_cflags)
+    flags |= CFLAGS_ANY;
+  if (want_I_cflags)
+    flags |= CFLAGS_I;
+  if (want_other_cflags)
+    flags |= CFLAGS_OTHER;
+  if (want_libs)
+    flags |= LIBS_ANY;
+  if (want_l_libs)
+    flags |= LIBS_l;
+  if (want_L_libs)
+    flags |= LIBS_L;
+  if (want_other_libs)
+    flags |= LIBS_OTHER;
 
   /* Error printing is determined as follows:
    *     - for --cflags, --libs, etc. it's on by default
@@ -716,53 +732,10 @@ main (int argc, char **argv)
       need_newline = TRUE;
     }
 
-  if (want_I_cflags)
+  if (flags != 0)
     {
-      char *str = packages_get_I_cflags (packages);
-      printf ("%s ", str);
-      g_free (str);
-      need_newline = TRUE;
-    }
-  else if (want_other_cflags)
-    {
-      char *str = packages_get_other_cflags (packages);
-      printf ("%s ", str);
-      g_free (str);
-      need_newline = TRUE;
-    }
-  else if (want_cflags)
-    {
-      char *str = packages_get_all_cflags (packages);
-      printf ("%s ", str);
-      g_free (str);
-      need_newline = TRUE;
-    }
-
-  if (want_l_libs)
-    {
-      char *str = packages_get_l_libs (packages);
-      printf ("%s ", str);
-      g_free (str);
-      need_newline = TRUE;
-    }
-  else if (want_L_libs)
-    {
-      char *str = packages_get_L_libs (packages);
-      printf ("%s ", str);
-      g_free (str);
-      need_newline = TRUE;
-    }
-  else if (want_other_libs)
-    {
-      char *str = packages_get_other_libs (packages);
-      printf ("%s ", str);
-      g_free (str);
-      need_newline = TRUE;
-    }
-  else if (want_libs)
-    {
-      char *str = packages_get_all_libs (packages);
-      printf ("%s ", str);
+      char *str = packages_get_flags (packages, flags);
+      printf ("%s", str);
       g_free (str);
       need_newline = TRUE;
     }

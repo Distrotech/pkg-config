@@ -22,6 +22,18 @@
 
 #include <glib.h>
 
+typedef guint8 FlagType; /* bit mask for flag types */
+
+#define LIBS_l       (1 << 0)
+#define LIBS_L       (1 << 1)
+#define LIBS_OTHER   (1 << 2)
+#define CFLAGS_I     (1 << 3)
+#define CFLAGS_OTHER (1 << 4)
+
+#define LIBS_ANY     (LIBS_l | LIBS_L | LIBS_OTHER)
+#define CFLAGS_ANY   (CFLAGS_I | CFLAGS_OTHER)
+#define FLAGS_ANY    (LIBS_ANY | CFLAGS_ANY)
+
 typedef enum
 {
   LESS_THAN,
@@ -72,18 +84,12 @@ struct _Package
 
 Package *get_package               (const char *name);
 Package *get_package_quiet         (const char *name);
-char *   packages_get_l_libs       (GSList     *pkgs);
-char *   packages_get_L_libs       (GSList     *pkgs);
-char *   packages_get_other_libs   (GSList     *pkgs);
-char *   packages_get_all_libs     (GSList     *pkgs);
-char *   packages_get_I_cflags     (GSList     *pkgs);
-char *   packages_get_other_cflags (GSList     *pkgs);
-char *   packages_get_all_cflags   (GSList     *pkgs);
+char *   packages_get_flags        (GSList     *pkgs,
+                                    FlagType   flags);
 char *   package_get_var           (Package    *pkg,
                                     const char *var);
 char *   packages_get_var          (GSList     *pkgs,
                                     const char *var);
-
 
 void add_search_dir (const char *path);
 void add_search_dirs (const char *path, const char *separator);
@@ -134,4 +140,3 @@ extern int msvc_syntax;
 #endif
 
 #endif
-

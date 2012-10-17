@@ -1018,101 +1018,56 @@ get_multi_merged_from_back (GSList *pkgs, GetListFunc func,
 }
 
 char *
-packages_get_l_libs (GSList     *pkgs)
+packages_get_flags (GSList *pkgs, FlagType flags)
 {
-  return get_multi_merged_from_back (pkgs, get_l_libs, FALSE,
-				     !ignore_private_libs);
-}
-
-char *
-packages_get_L_libs (GSList     *pkgs)
-{
-  return get_multi_merged (pkgs, get_L_libs, TRUE, !ignore_private_libs);
-}
-
-char *
-packages_get_other_libs (GSList   *pkgs)
-{
-  return get_multi_merged (pkgs, get_other_libs, TRUE, !ignore_private_libs);
-}
-
-char *
-packages_get_all_libs (GSList *pkgs)
-{
-  char *l_libs;
-  char *L_libs;
-  char *other_libs;
   GString *str;
-  char *retval;
-  
-  str = g_string_new ("");  
+  char *cur;
 
-  other_libs = packages_get_other_libs (pkgs);
-  L_libs = packages_get_L_libs (pkgs);
-  l_libs = packages_get_l_libs (pkgs);
+  str = g_string_new (NULL);
 
-  if (other_libs)
-    g_string_append (str, other_libs);
-  
- if (L_libs)
-    g_string_append (str, L_libs);
-  
-  if (l_libs)
-    g_string_append (str, l_libs); 
 
-  g_free (l_libs);
-  g_free (L_libs);
-  g_free (other_libs);
+  /* sort flags from beginning and in forward direction except for -l */
+  if (flags & CFLAGS_OTHER)
+    {
+      cur = get_multi_merged (pkgs, get_other_cflags, TRUE, TRUE);
+      debug_spew ("adding CFLAGS_OTHER string \"%s\"\n", cur);
+      g_string_append (str, cur);
+      g_free (cur);
+    }
+  if (flags & CFLAGS_I)
+    {
+      cur = get_multi_merged (pkgs, get_I_cflags, TRUE, TRUE);
+      debug_spew ("adding CFLAGS_I string \"%s\"\n", cur);
+      g_string_append (str, cur);
+      g_free (cur);
+    }
+  if (flags & LIBS_OTHER)
+    {
+      cur = get_multi_merged (pkgs, get_other_libs, TRUE,
+                              !ignore_private_libs);
+      debug_spew ("adding LIBS_OTHER string \"%s\"\n", cur);
+      g_string_append (str, cur);
+      g_free (cur);
+    }
+  if (flags & LIBS_L)
+    {
+      cur = get_multi_merged (pkgs, get_L_libs, TRUE, !ignore_private_libs);
+      debug_spew ("adding LIBS_L string \"%s\"\n", cur);
+      g_string_append (str, cur);
+      g_free (cur);
+    }
+  if (flags & LIBS_l)
+    {
+      cur = get_multi_merged_from_back (pkgs, get_l_libs, FALSE,
+                                        !ignore_private_libs);
+      debug_spew ("adding LIBS_l string \"%s\"\n", cur);
+      g_string_append (str, cur);
+      g_free (cur);
+    }
 
-  retval = str->str;
-
-  g_string_free (str, FALSE);
-
-  return retval;
+  debug_spew ("returning flags string \"%s\"\n", str->str);
+  return g_string_free (str, FALSE);
 }
-
-char *
-packages_get_I_cflags (GSList     *pkgs)
-{
-  /* sort by path position so PKG_CONFIG_PATH affects -I flag order */
-  return get_multi_merged (pkgs, get_I_cflags, TRUE, TRUE);
-}
-
-char *
-packages_get_other_cflags (GSList *pkgs)
-{
-  return get_multi_merged (pkgs, get_other_cflags, TRUE, TRUE);
-}
-
-char *
-packages_get_all_cflags (GSList     *pkgs)
-{
-  char *I_cflags;
-  char *other_cflags;
-  GString *str;
-  char *retval;
-  
-  str = g_string_new ("");  
-
-  other_cflags = packages_get_other_cflags (pkgs);
-  I_cflags = packages_get_I_cflags (pkgs);
-
-  if (other_cflags)
-    g_string_append (str, other_cflags);
-  
- if (I_cflags)
-    g_string_append (str, I_cflags);
-
-  g_free (I_cflags);
-  g_free (other_cflags);
-
-  retval = str->str;
-
-  g_string_free (str, FALSE);
-
-  return retval;
-}
-
 
 void
 define_global_variable (const char *varname,

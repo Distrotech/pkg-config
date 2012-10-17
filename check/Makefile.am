@@ -4,6 +4,7 @@ TESTS_ENVIRONMENT = PKG_CONFIG='$(TESTS_PKG_CONFIG)' $(TESTS_SHELL)
 TESTS = \
 	check-cflags \
 	check-libs \
+	check-mixed-flags \
 	check-non-l-flags \
 	check-define-variable \
 	check-libs-private \
