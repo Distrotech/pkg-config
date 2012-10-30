@@ -613,16 +613,6 @@ packages_sort_by_path_position (GSList *list)
 }
 
 static void
-fill_one_level (Package *pkg, GetListFunc func, GSList **listp)
-{
-  GSList *copy;
-
-  copy = g_slist_copy ((*func)(pkg));
-
-  *listp = g_slist_concat (*listp, copy);
-}
-
-static void
 recursive_fill_list (Package *pkg, GetListFunc func, GSList **listp)
 {
   GSList *tmp;
@@ -657,6 +647,38 @@ recursive_fill_list (Package *pkg, GetListFunc func, GSList **listp)
   chain = g_slist_remove (chain, pkg);
 }
 
+/* merge the flags from the individual packages */
+static void
+merge_flag_lists (GSList *packages, GetListFunc func, GSList **listp)
+{
+  GSList *pkg;
+  GSList *last = NULL;
+  GSList *flags;
+
+  for (pkg = packages; pkg != NULL; pkg = pkg->next)
+    {
+      /* manually copy the elements so we can keep track of the end */
+      for (flags = (*func) (pkg->data); flags != NULL; flags = flags->next)
+        {
+          if (last == NULL)
+            {
+              *listp = g_slist_alloc ();
+              last = *listp;
+            }
+          else
+            {
+              last->next = g_slist_alloc ();
+              last = last->next;
+            }
+          last->data = flags->data;
+        }
+    }
+
+  /* terminate the last element */
+  if (last != NULL)
+    last->next = NULL;
+}
+
 static void
 fill_list (GSList *packages, GetListFunc func,
            GSList **listp, gboolean in_path_order, gboolean include_private)
@@ -683,14 +705,8 @@ fill_list (GSList *packages, GetListFunc func,
       
       spew_package_list ("sorted", expanded);
     }
-  
-  tmp = expanded;
-  while (tmp != NULL)
-    {
-      fill_one_level (tmp->data, func, listp);
-      
-      tmp = tmp->next;
-    }
+
+  merge_flag_lists (expanded, func, listp);
 
   g_slist_free (expanded);
 }
