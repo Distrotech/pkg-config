@@ -216,6 +216,89 @@ init_pc_path (void)
 #endif
 }
 
+static gboolean
+process_package_args (const char *cmdline, GList **packages, FILE *log)
+{
+  gboolean success = TRUE;
+  GList *reqs;
+
+  reqs = parse_module_list (NULL, cmdline, "(command line arguments)");
+  if (reqs == NULL)
+    {
+      fprintf (stderr, "Must specify package names on the command line\n");
+      return FALSE;
+    }
+
+  for (; reqs != NULL; reqs = g_list_next (reqs))
+    {
+      Package *req;
+      RequiredVersion *ver = reqs->data;
+
+      /* override requested versions with cmdline options */
+      if (required_exact_version)
+        {
+          g_free (ver->version);
+          ver->comparison = EQUAL;
+          ver->version = g_strdup (required_exact_version);
+        }
+      else if (required_atleast_version)
+        {
+          g_free (ver->version);
+          ver->comparison = GREATER_THAN_EQUAL;
+          ver->version = g_strdup (required_atleast_version);
+        }
+      else if (required_max_version)
+        {
+          g_free (ver->version);
+          ver->comparison = LESS_THAN_EQUAL;
+          ver->version = g_strdup (required_max_version);
+        }
+
+      if (want_short_errors)
+        req = get_package_quiet (ver->name);
+      else
+        req = get_package (ver->name);
+
+      if (log != NULL)
+        {
+          if (req == NULL)
+            fprintf (log, "%s NOT-FOUND\n", ver->name);
+          else
+            fprintf (log, "%s %s %s\n", ver->name,
+                     comparison_to_str (ver->comparison),
+                     (ver->version == NULL) ? "(null)" : ver->version);
+        }
+
+      if (req == NULL)
+        {
+          success = FALSE;
+          verbose_error ("No package '%s' found\n", ver->name);
+          continue;
+        }
+
+      if (!version_test (ver->comparison, req->version, ver->version))
+        {
+          success = FALSE;
+          verbose_error ("Requested '%s %s %s' but version of %s is %s\n",
+                         ver->name,
+                         comparison_to_str (ver->comparison),
+                         ver->version,
+                         req->name,
+                         req->version);
+          if (req->url)
+            verbose_error ("You may find new versions of %s at %s\n",
+                           req->name, req->url);
+          continue;
+        }
+
+      *packages = g_list_prepend (*packages, req);
+    }
+
+  *packages = g_list_reverse (*packages);
+
+  return success;
+}
+
 static const GOptionEntry options_table[] = {
   { "version", 0, 0, G_OPTION_ARG_NONE, &want_my_version,
     "output version of pkg-config", NULL },
@@ -500,107 +583,14 @@ main (int argc, char **argv)
 	}
     }
 
-  {
-    gboolean failed = FALSE;
-    GList *reqs;
-    GList *iter;
+  /* find and parse each of the packages specified */
+  if (!process_package_args (str->str, &packages, log))
+    return 1;
 
-    reqs = parse_module_list (NULL, str->str,
-                              "(command line arguments)");
-
-    iter = reqs;
-
-    while (iter != NULL)
-      {
-        Package *req;
-        RequiredVersion *ver = iter->data;
-
-	/* override requested versions with cmdline options */
-	if (required_exact_version)
-	  {
-	    g_free (ver->version);
-	    ver->comparison = EQUAL;
-	    ver->version = g_strdup (required_exact_version);
-	  }
-	else if (required_atleast_version)
-	  {
-	    g_free (ver->version);
-	    ver->comparison = GREATER_THAN_EQUAL;
-	    ver->version = g_strdup (required_atleast_version);
-	  }
-	else if (required_max_version)
-	  {
-	    g_free (ver->version);
-	    ver->comparison = LESS_THAN_EQUAL;
-	    ver->version = g_strdup (required_max_version);
-	  }
-
-        if (want_short_errors)
-          req = get_package_quiet (ver->name);
-        else
-          req = get_package (ver->name);
-
-	if (log != NULL)
-	  {
-	    if (req == NULL)
-	      fprintf (log, "%s NOT-FOUND", ver->name);
-	    else
-	      fprintf (log, "%s %s %s", ver->name,
-		       comparison_to_str (ver->comparison),
-		       (ver->version == NULL) ? "(null)" : ver->version);
-	    fprintf (log, "\n");
-	  }
-
-        if (req == NULL)
-          {
-            failed = TRUE;
-            verbose_error ("No package '%s' found\n", ver->name);
-            goto nextiter;
-          }
-
-        if (!version_test (ver->comparison, req->version, ver->version))
-          {
-            failed = TRUE;
-            verbose_error ("Requested '%s %s %s' but version of %s is %s\n",
-                           ver->name,
-                           comparison_to_str (ver->comparison),
-                           ver->version,
-                           req->name,
-                           req->version);
-
-	    if (req->url)
-	      verbose_error ("You may find new versions of %s at %s\n",
-			     req->name, req->url);
-
-            goto nextiter;
-          }
-
-        packages = g_list_prepend (packages, req);
-
-      nextiter:
-        iter = g_list_next (iter);
-      }
-
-    if (log != NULL)
-      {
-	fclose (log);
-      }
-
-    if (failed) {
-      return 1;
-    }
-  }
+  if (log != NULL)
+    fclose (log);
 
   g_string_free (str, TRUE);
-
-  packages = g_list_reverse (packages);
-
-  if (packages == NULL)
-    {
-      fprintf (stderr, "Must specify package names on the command line\n");
-
-      exit (1);
-    }
 
   if (want_exists)
     return 0; /* if we got here, all the packages existed. */
