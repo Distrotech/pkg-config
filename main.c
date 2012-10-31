@@ -572,6 +572,21 @@ main (int argc, char **argv)
     if (failed) {
       return 1;
     }
+  }
+
+  g_string_free (str, TRUE);
+
+  packages = g_slist_reverse (packages);
+
+  if (packages == NULL)
+    {
+      fprintf (stderr, "Must specify package names on the command line\n");
+
+      exit (1);
+    }
+
+  if (want_exists)
+    return 0; /* if we got here, all the packages existed. */
 
   if (want_variable_list)
     {
@@ -589,22 +604,6 @@ main (int argc, char **argv)
         }
       need_newline = FALSE;
     }
-
-  }
-
-  g_string_free (str, TRUE);
-
-  packages = g_slist_reverse (packages);
-
-  if (packages == NULL)
-    {
-      fprintf (stderr, "Must specify package names on the command line\n");
-
-      exit (1);
-    }
-
-  if (want_exists)
-    return 0; /* if we got here, all the packages existed. */
 
   if (want_uninstalled)
     {
