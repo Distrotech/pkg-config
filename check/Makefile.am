@@ -14,6 +14,7 @@ TESTS = \
 	check-conflicts \
 	check-missing \
 	check-idirafter \
+	check-sort-order \
 	check-whitespace \
 	check-cmd-options \
 	check-version \
@@ -51,4 +52,13 @@ EXTRA_DIST = \
 	circular-1.pc \
 	circular-2.pc \
 	circular-3.pc \
-	no-variables.pc
+	no-variables.pc \
+	sort-order-1-1.pc \
+	sort/sort-order-2-1.pc \
+	sort/sort/sort-order-3-1.pc \
+	sort-order-1-2.pc \
+	sort/sort-order-2-2.pc \
+	sort/sort/sort-order-3-2.pc \
+	sort-order-1-3.pc \
+	sort/sort-order-2-3.pc \
+	sort/sort/sort-order-3-3.pc
