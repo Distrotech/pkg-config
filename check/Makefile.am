@@ -15,6 +15,7 @@ TESTS = \
 	check-missing \
 	check-idirafter \
 	check-sort-order \
+	check-duplicate-flags \
 	check-whitespace \
 	check-cmd-options \
 	check-version \
@@ -61,4 +62,6 @@ EXTRA_DIST = \
 	sort/sort/sort-order-3-2.pc \
 	sort-order-1-3.pc \
 	sort/sort-order-2-3.pc \
-	sort/sort/sort-order-3-3.pc
+	sort/sort/sort-order-3-3.pc \
+	flag-dup-1.pc \
+	flag-dup-2.pc
