@@ -25,7 +25,8 @@ TESTS = \
 	check-sysroot \
 	check-uninstalled \
 	check-debug \
-	check-gtk
+	check-gtk \
+	check-tilde
 
 EXTRA_DIST = \
 	$(TESTS) \
@@ -91,4 +92,5 @@ EXTRA_DIST = \
 	gtk/xau.pc \
 	gtk/xcb.pc \
 	gtk/xproto.pc \
-	gtk/xrender.pc
+	gtk/xrender.pc \
+	tilde.pc
