@@ -671,6 +671,43 @@ merge_flag_lists (GList *packages, GetListFunc func, GList **listp)
     }
 }
 
+/* Work backwards from the end of the package list to remove duplicate
+ * packages. This could happen because the package was specified multiple
+ * times on the command line, or because multiple packages require the same
+ * package. When we have duplicate dependencies, starting from the end of the
+ * list ensures that the dependency shows up later in the package list and
+ * Libs will come out correctly. */
+static GList *
+package_list_strip_duplicates (GList *packages)
+{
+  GList *cur;
+  GHashTable *requires;
+
+  requires = g_hash_table_new (g_str_hash, g_str_equal);
+  for (cur = g_list_last (packages); cur != NULL; cur = g_list_previous (cur))
+    {
+      Package *pkg = cur->data;
+
+      if (g_hash_table_lookup (requires, pkg->key) != NULL)
+        {
+          GList *dup = cur;
+
+          /* Remove the duplicate package from the list */
+          debug_spew ("Removing duplicate package %s\n", pkg->key);
+          cur = cur->next;
+          packages = g_list_delete_link (packages, dup);
+        }
+      else
+        {
+          /* Unique package. Track it and move to the next. */
+          g_hash_table_insert (requires, pkg->key, pkg);
+        }
+    }
+  g_hash_table_destroy (requires);
+
+  return packages;
+}
+
 static void
 fill_list (GList *packages, GetListFunc func,
            GList **listp, gboolean in_path_order, gboolean include_private)
@@ -688,6 +725,13 @@ fill_list (GList *packages, GetListFunc func,
 
       tmp = tmp->next;
     }
+
+  /* Remove duplicate packages from the recursive list. This should provide a
+   * serialized package list where all interdependencies are resolved
+   * consistently. */
+  spew_package_list (" pre-remove", expanded);
+  expanded = package_list_strip_duplicates (expanded);
+  spew_package_list ("post-remove", expanded);
 
   if (in_path_order)
     {

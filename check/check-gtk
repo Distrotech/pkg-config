@@ -14,10 +14,9 @@ PKG_CONFIG_LIBDIR=${srcdir}/gtk
 # -I/gtk/include/glib-2.0 -I/gtk/lib/glib-2.0/include -I/gtk/include/pixman-1 \
 # -I/gtk/include -I/gtk/include/freetype2
 RESULT="-DGSEAL_ENABLE -pthread -I/gtk/include/gtk-3.0 \
--I/gtk/include/pango-1.0 -I/gtk/include -I/gtk/include/freetype2 \
--I/gtk/include/glib-2.0 -I/gtk/lib/glib-2.0/include \
--I/gtk/include/gdk-pixbuf-2.0 -I/gtk/include/cairo -I/gtk/include/pixman-1 \
--I/gtk/include/atk-1.0"
+-I/gtk/include/pango-1.0 -I/gtk/include/atk-1.0 -I/gtk/include/cairo \
+-I/gtk/include/gdk-pixbuf-2.0 -I/gtk/include -I/gtk/include/freetype2 \
+-I/gtk/include/pixman-1 -I/gtk/include/glib-2.0 -I/gtk/lib/glib-2.0/include"
 run_test --cflags gtk+-3.0
 run_test --cflags --static gtk+-3.0
 

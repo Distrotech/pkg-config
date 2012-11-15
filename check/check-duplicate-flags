@@ -6,7 +6,6 @@ set -e
 
 RESULT="-DPATH2 -DFOO -DPATH1 -I/path/include"
 run_test --cflags flag-dup-1 flag-dup-2
-RESULT="-DPATH1 -DFOO -DPATH2 -I/path/include"
 run_test --cflags flag-dup-2 flag-dup-1
 
 RESULT="-Wl,--whole-archive --Wl,--no-whole-archive -Xlinker -R /path/lib \
