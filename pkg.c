@@ -593,13 +593,13 @@ spew_package_list (const char *name,
 {
   GSList *tmp;
 
-  debug_spew (" %s: ", name);
-  
+  debug_spew (" %s:", name);
+
   tmp = list;
   while (tmp != NULL)
     {
       Package *pkg = tmp->data;
-      debug_spew (" %s ", pkg->key);
+      debug_spew (" %s", pkg->key);
       tmp = tmp->next;
     }
   debug_spew ("\n");
@@ -700,10 +700,8 @@ fill_list (GSList *packages, GetListFunc func,
   if (in_path_order)
     {
       spew_package_list ("original", expanded);
-      
       expanded = packages_sort_by_path_position (expanded);
-      
-      spew_package_list ("sorted", expanded);
+      spew_package_list ("  sorted", expanded);
     }
 
   merge_flag_lists (expanded, func, listp);
