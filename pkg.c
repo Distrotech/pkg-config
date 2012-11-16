@@ -641,12 +641,13 @@ recursive_fill_list (Package *pkg, GetListFunc func, GList **listp)
 }
 
 /* merge the flags from the individual packages */
-static void
-merge_flag_lists (GList *packages, GetListFunc func, GList **listp)
+static GList *
+merge_flag_lists (GList *packages, GetListFunc func)
 {
   GList *pkg;
-  GList *last = NULL;
   GList *flags;
+  GList *last = NULL;
+  GList *merged = NULL;
 
   /* keep track of the last element to avoid traversing the whole list */
   for (pkg = packages; pkg != NULL; pkg = pkg->next)
@@ -655,13 +656,15 @@ merge_flag_lists (GList *packages, GetListFunc func, GList **listp)
         {
           if (last == NULL)
             {
-              *listp = g_list_prepend (NULL, flags->data);
-              last = *listp;
+              merged = g_list_prepend (NULL, flags->data);
+              last = merged;
             }
           else
             last = g_list_next (g_list_append (last, flags->data));
         }
     }
+
+  return merged;
 }
 
 /* Work backwards from the end of the package list to remove duplicate
@@ -701,12 +704,13 @@ package_list_strip_duplicates (GList *packages)
   return packages;
 }
 
-static void
+static GList *
 fill_list (GList *packages, GetListFunc func,
-           GList **listp, gboolean in_path_order, gboolean include_private)
+           gboolean in_path_order, gboolean include_private)
 {
   GList *tmp;
   GList *expanded = NULL;
+  GList *flags;
 
   /* Start from the end of the requested package list to maintain order since
    * the recursive list is built by prepending. */
@@ -729,9 +733,10 @@ fill_list (GList *packages, GetListFunc func,
       spew_package_list ("  sorted", expanded);
     }
 
-  merge_flag_lists (expanded, func, listp);
-
+  flags = merge_flag_lists (expanded, func);
   g_list_free (expanded);
+
+  return flags;
 }
 
 static GList *
@@ -1002,10 +1007,10 @@ static char*
 get_multi_merged (GList *pkgs, GetListFunc func, gboolean in_path_order,
 		  gboolean include_private)
 {
-  GList *list = NULL;
+  GList *list;
   char *retval;
 
-  fill_list (pkgs, func, &list, in_path_order, include_private);
+  list = fill_list (pkgs, func, in_path_order, include_private);
   list = string_list_strip_duplicates (list);
   retval = string_list_to_string (list);
   g_list_free (list);
@@ -1017,10 +1022,10 @@ static char*
 get_multi_merged_from_back (GList *pkgs, GetListFunc func,
 			    gboolean in_path_order, gboolean include_private)
 {
-  GList *list = NULL;
+  GList *list;
   char *retval;
 
-  fill_list (pkgs, func, &list, in_path_order, include_private);
+  list = fill_list (pkgs, func, in_path_order, include_private);
   list = string_list_strip_duplicates_from_back (list);
   retval = string_list_to_string (list);
   g_list_free (list);
