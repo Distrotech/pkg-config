@@ -986,30 +986,22 @@ verify_package (Package *pkg)
     }
 }
 
-static char*
+/* Create a merged list of required packages and retrieve the flags from them.
+ * Strip the duplicates from the flags list. The sorting and stripping can be
+ * done in one of two ways: packages sorted by position in the pkg-config path
+ * and stripping done from the beginning of the list, or packages sorted from
+ * most dependent to least dependent and stripping from the end of the list.
+ * The former is done for -I/-L flags, and the latter for all others.
+ */
+static char *
 get_multi_merged (GList *pkgs, GetListFunc func, gboolean in_path_order,
-		  gboolean include_private)
+                  gboolean include_private)
 {
   GList *list;
   char *retval;
 
   list = fill_list (pkgs, func, in_path_order, include_private);
-  list = string_list_strip_duplicates (list, TRUE);
-  retval = string_list_to_string (list);
-  g_list_free (list);
-
-  return retval;
-}
-
-static char*
-get_multi_merged_from_back (GList *pkgs, GetListFunc func,
-			    gboolean in_path_order, gboolean include_private)
-{
-  GList *list;
-  char *retval;
-
-  list = fill_list (pkgs, func, in_path_order, include_private);
-  list = string_list_strip_duplicates (list, FALSE);
+  list = string_list_strip_duplicates (list, in_path_order);
   retval = string_list_to_string (list);
   g_list_free (list);
 
@@ -1027,7 +1019,7 @@ packages_get_flags (GList *pkgs, FlagType flags)
   /* sort packages in path order for -L/-I, dependency order otherwise */
   if (flags & CFLAGS_OTHER)
     {
-      cur = get_multi_merged_from_back (pkgs, get_other_cflags, FALSE, TRUE);
+      cur = get_multi_merged (pkgs, get_other_cflags, FALSE, TRUE);
       debug_spew ("adding CFLAGS_OTHER string \"%s\"\n", cur);
       g_string_append (str, cur);
       g_free (cur);
@@ -1041,8 +1033,8 @@ packages_get_flags (GList *pkgs, FlagType flags)
     }
   if (flags & LIBS_OTHER)
     {
-      cur = get_multi_merged_from_back (pkgs, get_other_libs, FALSE,
-                                        !ignore_private_libs);
+      cur = get_multi_merged (pkgs, get_other_libs, FALSE,
+                              !ignore_private_libs);
       debug_spew ("adding LIBS_OTHER string \"%s\"\n", cur);
       g_string_append (str, cur);
       g_free (cur);
@@ -1056,8 +1048,7 @@ packages_get_flags (GList *pkgs, FlagType flags)
     }
   if (flags & LIBS_l)
     {
-      cur = get_multi_merged_from_back (pkgs, get_l_libs, FALSE,
-                                        !ignore_private_libs);
+      cur = get_multi_merged (pkgs, get_l_libs, FALSE, !ignore_private_libs);
       debug_spew ("adding LIBS_l string \"%s\"\n", cur);
       g_string_append (str, cur);
       g_free (cur);
