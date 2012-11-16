@@ -496,56 +496,6 @@ string_list_to_string (GList *list)
   return retval;
 }
 
-typedef GList *(* GetListFunc) (Package *pkg);
-
-static GList *
-get_l_libs (Package *pkg)
-{
-  return pkg->l_libs;
-}
-
-static GList *
-get_L_libs (Package *pkg)
-{
-  return pkg->L_libs;
-}
-
-static GList *
-get_other_libs (Package *pkg)
-{  
-  return pkg->other_libs;
-}
-
-static GList *
-get_I_cflags (Package *pkg)
-{
-  return pkg->I_cflags;
-}
-
-static GList *
-get_other_cflags (Package *pkg)
-{
-  return pkg->other_cflags;
-}
-
-static GList *
-get_conflicts (Package *pkg)
-{
-  return pkg->conflicts;
-}
-
-static GList *
-get_requires (Package *pkg)
-{
-  return pkg->requires;
-}
-
-static GList *
-get_requires_private (Package *pkg)
-{
-  return pkg->requires_private;
-}
-
 static int
 pathposcmp (gconstpointer a, gconstpointer b)
 {
@@ -586,16 +536,10 @@ packages_sort_by_path_position (GList *list)
 }
 
 static void
-recursive_fill_list (Package *pkg, GetListFunc func, GList **listp)
+recursive_fill_list (Package *pkg, gboolean include_private, GList **listp)
 {
   GList *tmp;
   static GList *chain = NULL;
-
-  /*
-   * This function should only be called to resolve Requires or
-   * Requires.private.
-   */
-  g_assert (func == get_requires || func == get_requires_private);
 
   /*
    * If the package is one of the parents, we can skip it. This allows
@@ -613,9 +557,9 @@ recursive_fill_list (Package *pkg, GetListFunc func, GList **listp)
 
   /* Start from the end of the required package list to maintain order since
    * the recursive list is built by prepending. */
-  for (tmp = g_list_last ((*func) (pkg)); tmp != NULL;
-       tmp = g_list_previous (tmp))
-    recursive_fill_list (tmp->data, func, listp);
+  tmp = include_private ? pkg->requires_private : pkg->requires;
+  for (tmp = g_list_last (tmp); tmp != NULL; tmp = g_list_previous (tmp))
+    recursive_fill_list (tmp->data, include_private, listp);
 
   *listp = g_list_prepend (*listp, pkg);
 
@@ -625,17 +569,42 @@ recursive_fill_list (Package *pkg, GetListFunc func, GList **listp)
 
 /* merge the flags from the individual packages */
 static GList *
-merge_flag_lists (GList *packages, GetListFunc func)
+merge_flag_lists (GList *packages, FlagType type)
 {
-  GList *pkg;
-  GList *flags;
   GList *last = NULL;
   GList *merged = NULL;
 
   /* keep track of the last element to avoid traversing the whole list */
-  for (pkg = packages; pkg != NULL; pkg = pkg->next)
+  for (; packages != NULL; packages = g_list_next (packages))
     {
-      for (flags = (*func) (pkg->data); flags != NULL; flags = flags->next)
+      Package *pkg = packages->data;
+      GList *flags;
+
+      /* fetch the appropriate flags */
+      switch (type)
+        {
+        case CFLAGS_OTHER:
+          flags = pkg->other_cflags;
+          break;
+        case CFLAGS_I:
+          flags = pkg->I_cflags;
+          break;
+        case LIBS_OTHER:
+          flags = pkg->other_libs;
+          break;
+        case LIBS_L:
+          flags = pkg->L_libs;
+          break;
+        case LIBS_l:
+          flags = pkg->l_libs;
+          break;
+        default:
+          g_assert_not_reached ();
+          break;
+        }
+
+      /* manually copy the elements so we can keep track of the end */
+      for (; flags != NULL; flags = g_list_next (flags))
         {
           if (last == NULL)
             {
@@ -688,7 +657,7 @@ package_list_strip_duplicates (GList *packages)
 }
 
 static GList *
-fill_list (GList *packages, GetListFunc func,
+fill_list (GList *packages, FlagType type,
            gboolean in_path_order, gboolean include_private)
 {
   GList *tmp;
@@ -698,9 +667,7 @@ fill_list (GList *packages, GetListFunc func,
   /* Start from the end of the requested package list to maintain order since
    * the recursive list is built by prepending. */
   for (tmp = g_list_last (packages); tmp != NULL; tmp = g_list_previous (tmp))
-    recursive_fill_list (tmp->data,
-                         include_private ? get_requires_private : get_requires,
-                         &expanded);
+    recursive_fill_list (tmp->data, include_private, &expanded);
 
   /* Remove duplicate packages from the recursive list. This should provide a
    * serialized package list where all interdependencies are resolved
@@ -716,7 +683,7 @@ fill_list (GList *packages, GetListFunc func,
       spew_package_list ("  sorted", expanded);
     }
 
-  flags = merge_flag_lists (expanded, func);
+  flags = merge_flag_lists (expanded, type);
   g_list_free (expanded);
 
   return flags;
@@ -818,8 +785,8 @@ verify_package (Package *pkg)
   /* Make sure we didn't drag in any conflicts via Requires
    * (inefficient algorithm, who cares)
    */
-  recursive_fill_list (pkg, get_requires_private, &requires);
-  conflicts = get_conflicts (pkg);
+  recursive_fill_list (pkg, TRUE, &requires);
+  conflicts = pkg->conflicts;
 
   requires_iter = requires;
   while (requires_iter != NULL)
@@ -994,13 +961,13 @@ verify_package (Package *pkg)
  * The former is done for -I/-L flags, and the latter for all others.
  */
 static char *
-get_multi_merged (GList *pkgs, GetListFunc func, gboolean in_path_order,
+get_multi_merged (GList *pkgs, FlagType type, gboolean in_path_order,
                   gboolean include_private)
 {
   GList *list;
   char *retval;
 
-  list = fill_list (pkgs, func, in_path_order, include_private);
+  list = fill_list (pkgs, type, in_path_order, include_private);
   list = string_list_strip_duplicates (list, in_path_order);
   retval = string_list_to_string (list);
   g_list_free (list);
@@ -1019,36 +986,35 @@ packages_get_flags (GList *pkgs, FlagType flags)
   /* sort packages in path order for -L/-I, dependency order otherwise */
   if (flags & CFLAGS_OTHER)
     {
-      cur = get_multi_merged (pkgs, get_other_cflags, FALSE, TRUE);
+      cur = get_multi_merged (pkgs, CFLAGS_OTHER, FALSE, TRUE);
       debug_spew ("adding CFLAGS_OTHER string \"%s\"\n", cur);
       g_string_append (str, cur);
       g_free (cur);
     }
   if (flags & CFLAGS_I)
     {
-      cur = get_multi_merged (pkgs, get_I_cflags, TRUE, TRUE);
+      cur = get_multi_merged (pkgs, CFLAGS_I, TRUE, TRUE);
       debug_spew ("adding CFLAGS_I string \"%s\"\n", cur);
       g_string_append (str, cur);
       g_free (cur);
     }
   if (flags & LIBS_OTHER)
     {
-      cur = get_multi_merged (pkgs, get_other_libs, FALSE,
-                              !ignore_private_libs);
+      cur = get_multi_merged (pkgs, LIBS_OTHER, FALSE, !ignore_private_libs);
       debug_spew ("adding LIBS_OTHER string \"%s\"\n", cur);
       g_string_append (str, cur);
       g_free (cur);
     }
   if (flags & LIBS_L)
     {
-      cur = get_multi_merged (pkgs, get_L_libs, TRUE, !ignore_private_libs);
+      cur = get_multi_merged (pkgs, LIBS_L, TRUE, !ignore_private_libs);
       debug_spew ("adding LIBS_L string \"%s\"\n", cur);
       g_string_append (str, cur);
       g_free (cur);
     }
   if (flags & LIBS_l)
     {
-      cur = get_multi_merged (pkgs, get_l_libs, FALSE, !ignore_private_libs);
+      cur = get_multi_merged (pkgs, LIBS_l, FALSE, !ignore_private_libs);
       debug_spew ("adding LIBS_l string \"%s\"\n", cur);
       g_string_append (str, cur);
       g_free (cur);
