@@ -425,42 +425,15 @@ get_package_quiet (const char *name)
 }
 
 static GList *
-string_list_strip_duplicates (GList *list)
+string_list_strip_duplicates (GList *list, gboolean forward)
 {
   GHashTable *table;
   GList *tmp;
 
   table = g_hash_table_new (g_str_hash, g_str_equal);
-  for (tmp = list; tmp != NULL; tmp = g_list_next (tmp))
-    {
-        if (!g_hash_table_lookup_extended (table, tmp->data, NULL, NULL))
-        {
-          /* Unique string. Track it and and move to the next. */
-          g_hash_table_replace (table, tmp->data, tmp->data);
-        }
-      else
-        {
-          GList *dup = tmp;
-
-          /* Remove the duplicate string from the list. */
-          debug_spew (" removing duplicate \"%s\"\n", tmp->data);
-          tmp = tmp->prev;
-          list = g_list_remove_link (list, dup);
-        }
-    }
-  g_hash_table_destroy (table);
-
-  return list;
-}
-
-static GList *
-string_list_strip_duplicates_from_back (GList *list)
-{
-  GHashTable *table;
-  GList *tmp;
-  
-  table = g_hash_table_new (g_str_hash, g_str_equal);
-  for (tmp = g_list_last (list); tmp != NULL; tmp = g_list_previous (tmp))
+  for (tmp = forward ? list : g_list_last (list);
+       tmp != NULL;
+       tmp = forward ? g_list_next (tmp) : g_list_previous (tmp))
     {
       if (!g_hash_table_lookup_extended (table, tmp->data, NULL, NULL))
         {
@@ -471,14 +444,24 @@ string_list_strip_duplicates_from_back (GList *list)
         {
           GList *dup = tmp;
 
-          /* Remove the duplicate string from the list. */
-          debug_spew (" removing duplicate (from back) \"%s\"\n", tmp->data);
-          tmp = tmp->next;
+          /* Remove the duplicate string from the list and move to the last
+           * element to prepare for the next iteration. */
+          if (forward)
+            {
+              debug_spew (" removing duplicate \"%s\"\n", tmp->data);
+              tmp = g_list_previous (tmp);
+            }
+          else
+            {
+              debug_spew (" removing duplicate (from back) \"%s\"\n",
+                          tmp->data);
+              tmp = g_list_next (tmp);
+            }
           list = g_list_remove_link (list, dup);
         }
     }
   g_hash_table_destroy (table);
-  
+
   return list;
 }
 
@@ -1011,7 +994,7 @@ get_multi_merged (GList *pkgs, GetListFunc func, gboolean in_path_order,
   char *retval;
 
   list = fill_list (pkgs, func, in_path_order, include_private);
-  list = string_list_strip_duplicates (list);
+  list = string_list_strip_duplicates (list, TRUE);
   retval = string_list_to_string (list);
   g_list_free (list);
 
@@ -1026,7 +1009,7 @@ get_multi_merged_from_back (GList *pkgs, GetListFunc func,
   char *retval;
 
   list = fill_list (pkgs, func, in_path_order, include_private);
-  list = string_list_strip_duplicates_from_back (list);
+  list = string_list_strip_duplicates (list, FALSE);
   retval = string_list_to_string (list);
   g_list_free (list);
 
