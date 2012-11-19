@@ -425,7 +425,7 @@ get_package_quiet (const char *name)
 }
 
 static GList *
-string_list_strip_duplicates (GList *list, gboolean forward)
+flag_list_strip_duplicates (GList *list, gboolean forward)
 {
   GHashTable *table;
   GList *tmp;
@@ -435,26 +435,30 @@ string_list_strip_duplicates (GList *list, gboolean forward)
        tmp != NULL;
        tmp = forward ? g_list_next (tmp) : g_list_previous (tmp))
     {
-      if (!g_hash_table_lookup_extended (table, tmp->data, NULL, NULL))
+      Flag *flag = tmp->data;
+
+      debug_spew ("Seeing if arg %s is duplicate\n", flag->arg);
+
+      if (!g_hash_table_lookup_extended (table, flag->arg, NULL, NULL))
         {
-          /* Unique string. Track it and and move to the next. */
-          g_hash_table_replace (table, tmp->data, tmp->data);
+          /* Unique flag. Track it and and move to the next. */
+          g_hash_table_replace (table, flag->arg, flag->arg);
         }
       else
         {
           GList *dup = tmp;
 
-          /* Remove the duplicate string from the list and move to the last
+          /* Remove the duplicate flag from the list and move to the last
            * element to prepare for the next iteration. */
           if (forward)
             {
-              debug_spew (" removing duplicate \"%s\"\n", tmp->data);
+              debug_spew (" removing duplicate \"%s\"\n", flag->arg);
               tmp = g_list_previous (tmp);
             }
           else
             {
               debug_spew (" removing duplicate (from back) \"%s\"\n",
-                          tmp->data);
+                          flag->arg);
               tmp = g_list_next (tmp);
             }
           list = g_list_remove_link (list, dup);
@@ -466,7 +470,7 @@ string_list_strip_duplicates (GList *list, gboolean forward)
 }
 
 static char *
-string_list_to_string (GList *list)
+flag_list_to_string (GList *list)
 {
   GList *tmp;
   GString *str = g_string_new ("");
@@ -474,11 +478,10 @@ string_list_to_string (GList *list)
   
   tmp = list;
   while (tmp != NULL) {
-    char *tmpstr = (char*) tmp->data;
-    if (pcsysrootdir != NULL &&
-	tmpstr[0] == '-' &&
-	(tmpstr[1] == 'I' ||
-	 tmpstr[1] == 'L')) {
+    Flag *flag = tmp->data;
+    char *tmpstr = flag->arg;
+
+    if (pcsysrootdir != NULL && flag->type & (CFLAGS_I | LIBS_L)) {
       g_string_append_c (str, '-');
       g_string_append_c (str, tmpstr[1]);
       g_string_append (str, pcsysrootdir);
@@ -578,41 +581,23 @@ merge_flag_lists (GList *packages, FlagType type)
   for (; packages != NULL; packages = g_list_next (packages))
     {
       Package *pkg = packages->data;
-      GList *flags;
-
-      /* fetch the appropriate flags */
-      switch (type)
-        {
-        case CFLAGS_OTHER:
-          flags = pkg->other_cflags;
-          break;
-        case CFLAGS_I:
-          flags = pkg->I_cflags;
-          break;
-        case LIBS_OTHER:
-          flags = pkg->other_libs;
-          break;
-        case LIBS_L:
-          flags = pkg->L_libs;
-          break;
-        case LIBS_l:
-          flags = pkg->l_libs;
-          break;
-        default:
-          g_assert_not_reached ();
-          break;
-        }
+      GList *flags = (type & LIBS_ANY) ? pkg->libs : pkg->cflags;
 
       /* manually copy the elements so we can keep track of the end */
       for (; flags != NULL; flags = g_list_next (flags))
         {
-          if (last == NULL)
+          Flag *flag = flags->data;
+
+          if (flag->type & type)
             {
-              merged = g_list_prepend (NULL, flags->data);
-              last = merged;
+              if (last == NULL)
+                {
+                  merged = g_list_prepend (NULL, flags->data);
+                  last = merged;
+                }
+              else
+                last = g_list_next (g_list_append (last, flags->data));
             }
-          else
-            last = g_list_next (g_list_append (last, flags->data));
         }
     }
 
@@ -850,15 +835,19 @@ verify_package (Package *pkg)
     }
 
   count = 0;
-  iter = pkg->I_cflags;
-  while (iter != NULL)
+  for (iter = pkg->cflags; iter != NULL; iter = g_list_next (iter))
     {
       gint offset = 0;
+      Flag *flag = iter->data;
+
+      if (!(flag->type & CFLAGS_I))
+        continue;
+
       /* we put things in canonical -I/usr/include (vs. -I /usr/include) format,
        * but if someone changes it later we may as well be robust
        */
-      if (((strncmp (iter->data, "-I", 2) == 0) && (offset = 2))||
-          ((strncmp (iter->data, "-I ", 3) == 0) && (offset = 3)))
+      if (((strncmp (flag->arg, "-I", 2) == 0) && (offset = 2))||
+          ((strncmp (flag->arg, "-I ", 3) == 0) && (offset = 3)))
         {
 	  if (offset == 0)
 	    {
@@ -870,29 +859,28 @@ verify_package (Package *pkg)
 	  while (system_dir_iter != NULL)
 	    {
 	      if (strcmp (system_dir_iter->data,
-                          ((char*)iter->data) + offset) == 0)
+                          ((char*)flag->arg) + offset) == 0)
 		{
-		  debug_spew ("Package %s has %s in Cflags\n",
-			      pkg->key, (gchar *)iter->data);
+                  debug_spew ("Package %s has %s in Cflags\n",
+			      pkg->key, (gchar *)flag->arg);
 		  if (g_getenv ("PKG_CONFIG_ALLOW_SYSTEM_CFLAGS") == NULL)
 		    {
-		      debug_spew ("Removing %s from cflags for %s\n", iter->data, pkg->key);
+                      debug_spew ("Removing %s from cflags for %s\n",
+                                  flag->arg, pkg->key);
 		      ++count;
 		      iter->data = NULL;
-		      
+
 		      break;
 		    }
 		}
 	      system_dir_iter = system_dir_iter->next;
 	    }
         }
-
-      iter = iter->next;
     }
 
   while (count)
     {
-      pkg->I_cflags = g_list_remove (pkg->I_cflags, NULL);
+      pkg->cflags = g_list_remove (pkg->cflags, NULL);
       --count;
     }
 
@@ -911,15 +899,18 @@ verify_package (Package *pkg)
   system_directories = add_env_variable_to_list (system_directories, search_path);
 
   count = 0;
-  iter = pkg->L_libs;
-  while (iter != NULL)
+  for (iter = pkg->libs; iter != NULL; iter = g_list_next (iter))
     {
       GList *system_dir_iter = system_directories;
+      Flag *flag = iter->data;
+
+      if (!(flag->type & LIBS_L))
+        continue;
 
       while (system_dir_iter != NULL)
         {
           gboolean is_system = FALSE;
-          const char *linker_arg = iter->data;
+          const char *linker_arg = flag->arg;
           const char *system_libpath = system_dir_iter->data;
 
           if (strncmp (linker_arg, "-L ", 3) == 0 &&
@@ -936,7 +927,8 @@ verify_package (Package *pkg)
                 {
                   iter->data = NULL;
                   ++count;
-                  debug_spew ("Removing -L %s from libs for %s\n", system_libpath, pkg->key);
+                  debug_spew ("Removing -L %s from libs for %s\n",
+                              system_libpath, pkg->key);
                   break;
                 }
             }
@@ -948,7 +940,7 @@ verify_package (Package *pkg)
 
   while (count)
     {
-      pkg->L_libs = g_list_remove (pkg->L_libs, NULL);
+      pkg->libs = g_list_remove (pkg->libs, NULL);
       --count;
     }
 }
@@ -968,8 +960,8 @@ get_multi_merged (GList *pkgs, FlagType type, gboolean in_path_order,
   char *retval;
 
   list = fill_list (pkgs, type, in_path_order, include_private);
-  list = string_list_strip_duplicates (list, in_path_order);
-  retval = string_list_to_string (list);
+  list = flag_list_strip_duplicates (list, in_path_order);
+  retval = flag_list_to_string (list);
   g_list_free (list);
 
   return retval;

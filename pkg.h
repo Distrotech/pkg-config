@@ -45,8 +45,15 @@ typedef enum
   ALWAYS_MATCH
 } ComparisonType;
 
+typedef struct _Flag Flag;
 typedef struct _Package Package;
 typedef struct _RequiredVersion RequiredVersion;
+
+struct _Flag
+{
+  FlagType type;
+  char *arg;
+};
 
 struct _RequiredVersion
 {
@@ -68,11 +75,8 @@ struct _Package
   GList *requires;
   GList *requires_private_entries;
   GList *requires_private;
-  GList *l_libs;
-  GList *L_libs;
-  GList *other_libs;
-  GList *I_cflags;
-  GList *other_cflags;
+  GList *libs;
+  GList *cflags;
   GHashTable *vars;
   GHashTable *required_versions; /* hash from name to RequiredVersion */
   GList *conflicts; /* list of RequiredVersion */
