@@ -26,7 +26,7 @@ run_test --cflags --static gtk+-3.0
 # -lpangocairo-1.0 -lgdk_pixbuf-2.0 -lcairo-gobject -lcairo -lpango-1.0 \
 # -lfreetype -lfontconfig -lgobject-2.0 -lgmodule-2.0 -lgthread-2.0 -lrt \
 # -lglib-2.0
-RESULT="-pthread -L/gtk/lib -lgtk-3 -lgdk-3 -lpangocairo-1.0 -latk-1.0 \
+RESULT="-L/gtk/lib -pthread -lgtk-3 -lgdk-3 -lpangocairo-1.0 -latk-1.0 \
 -lcairo-gobject -lcairo -lgdk_pixbuf-2.0 -lgio-2.0 -lpangoft2-1.0 \
 -lpango-1.0 -lgobject-2.0 -lgthread-2.0 -lgmodule-2.0 -lrt -lglib-2.0 \
 -lfreetype -lfontconfig"
@@ -47,7 +47,7 @@ fi
 # -lpixman-1 -lXrender -lX11 -lpthread -lxcb -lXau -lpng12 -lz -lm \
 # -lpango-1.0 -lfontconfig -lexpat -lfreetype -lgobject-2.0 -lffi \
 # -lgmodule-2.0 -ldl -lgthread-2.0 -lglib-2.0 -lrt
-RESULT="-pthread -L/gtk/lib -lgtk-3 -lgdk-3 -lpangocairo-1.0 -latk-1.0 \
+RESULT="-L/gtk/lib -pthread -lgtk-3 -lgdk-3 -lpangocairo-1.0 -latk-1.0 \
 -lcairo-gobject -lcairo -lpixman-1 -lXrender -lX11 -lpthread -lxcb -lXau \
 -lgdk_pixbuf-2.0 -lpng12 -lm -lgio-2.0 -lz -lresolv -lpangoft2-1.0 \
 -lpango-1.0 -lgobject-2.0 -lffi -lgthread-2.0 -lgmodule-2.0 -ldl -lglib-2.0 \

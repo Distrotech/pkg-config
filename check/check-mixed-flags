@@ -4,7 +4,7 @@ set -e
 
 . ${srcdir}/common
 
-RESULT="-DOTHER -I/other/include -Wl,--as-needed -L/other/lib -lother"
+RESULT="-DOTHER -I/other/include -L/other/lib -Wl,--as-needed -lother"
 run_test --cflags --libs other
 run_test --libs --cflags other
 run_test --cflags-only-I --cflags-only-other --libs-only-l --libs-only-L \
@@ -50,11 +50,11 @@ RESULT="-DOTHER -Wl,--as-needed -lother"
 run_test --cflags-only-other --libs-only-other --libs-only-l other
 run_test --libs-only-l --libs-only-other --cflags-only-other other
 
-RESULT="-I/other/include -Wl,--as-needed -L/other/lib"
+RESULT="-I/other/include -L/other/lib -Wl,--as-needed"
 run_test --cflags-only-I --libs-only-other --libs-only-L other
 run_test --libs-only-L --libs-only-other --cflags-only-I other
 
-RESULT="-DOTHER -Wl,--as-needed -L/other/lib"
+RESULT="-DOTHER -L/other/lib -Wl,--as-needed"
 run_test --cflags-only-other --libs-only-other --libs-only-L other
 run_test --libs-only-L --libs-only-other --cflags-only-other other
 
@@ -70,10 +70,10 @@ RESULT="-DOTHER -I/other/include -Wl,--as-needed"
 run_test --cflags --libs-only-other other
 run_test --cflags-only-I --cflags-only-other --libs-only-other other
 
-RESULT="-I/other/include -Wl,--as-needed -L/other/lib -lother"
+RESULT="-I/other/include -L/other/lib -Wl,--as-needed -lother"
 run_test --cflags-only-I --libs other
 run_test --cflags-only-I --libs-only-l --libs-only-L --libs-only-other other
 
-RESULT="-DOTHER -Wl,--as-needed -L/other/lib -lother"
+RESULT="-DOTHER -L/other/lib -Wl,--as-needed -lother"
 run_test --cflags-only-other --libs other
 run_test --cflags-only-other --libs-only-l --libs-only-L --libs-only-other other
