@@ -91,7 +91,7 @@ run_test --libs sort-order-1-2 sort-order-3-2 sort-order-2-2
 run_test --libs sort-order-1-2 sort-order-2-2 sort-order-3-2
 
 # Check package set -3
-RESULT="-DPATH3 -DPATH2 -DPATH1 -I/path3/include -I/path2/include \
+RESULT="-DPATH1 -DPATH2 -DPATH3 -I/path3/include -I/path2/include \
 -I/path1/include"
 run_test --cflags sort-order-1-3
 run_test --cflags sort-order-1-3 sort-order-2-3
@@ -103,7 +103,7 @@ run_test --cflags sort-order-2-3 sort-order-1-3 sort-order-3-3
 run_test --cflags sort-order-1-3 sort-order-3-3 sort-order-2-3
 run_test --cflags sort-order-1-3 sort-order-2-3 sort-order-3-3
 
-RESULT="-Wl,-O3 -Wl,-O2 -Wl,-O1 -L/path3/lib -L/path2/lib -L/path1/lib \
+RESULT="-Wl,-O1 -Wl,-O2 -Wl,-O3 -L/path3/lib -L/path2/lib -L/path1/lib \
 -lpath1 -lpath2 -lpath3"
 run_test --libs sort-order-1-3
 run_test --libs sort-order-1-3 sort-order-2-3
@@ -119,7 +119,7 @@ run_test --libs sort-order-1-3 sort-order-2-3 sort-order-3-3
 PKG_CONFIG_PATH="$order2"
 
 # Check package set -1
-RESULT="-DPATH2 -DPATH3 -DPATH1 -I/path2/include -I/path3/include \
+RESULT="-DPATH3 -DPATH2 -DPATH1 -I/path2/include -I/path3/include \
 -I/path1/include"
 run_test --cflags sort-order-3-1
 run_test --cflags sort-order-3-1 sort-order-2-1
@@ -131,7 +131,7 @@ run_test --cflags sort-order-2-1 sort-order-1-1 sort-order-3-1
 run_test --cflags sort-order-1-1 sort-order-3-1 sort-order-2-1
 run_test --cflags sort-order-1-1 sort-order-2-1 sort-order-3-1
 
-RESULT="-Wl,-O2 -Wl,-O3 -Wl,-O1 -L/path2/lib -L/path3/lib -L/path1/lib \
+RESULT="-Wl,-O3 -Wl,-O2 -Wl,-O1 -L/path2/lib -L/path3/lib -L/path1/lib \
 -lpath3 -lpath2 -lpath1"
 run_test --libs sort-order-3-1
 run_test --libs sort-order-3-1 sort-order-2-1
@@ -144,7 +144,7 @@ run_test --libs sort-order-1-1 sort-order-3-1 sort-order-2-1
 run_test --libs sort-order-1-1 sort-order-2-1 sort-order-3-1
 
 # Check package set -2
-RESULT="-DPATH2 -DPATH3 -DPATH1 -I/path2/include -I/path3/include \
+RESULT="-DPATH3 -DPATH2 -DPATH1 -I/path2/include -I/path3/include \
 -I/path1/include"
 run_test --cflags sort-order-3-2
 run_test --cflags sort-order-3-2 sort-order-2-2
@@ -156,7 +156,7 @@ run_test --cflags sort-order-2-2 sort-order-1-2 sort-order-3-2
 run_test --cflags sort-order-1-2 sort-order-3-2 sort-order-2-2
 run_test --cflags sort-order-1-2 sort-order-2-2 sort-order-3-2
 
-RESULT="-Wl,-O2 -Wl,-O3 -Wl,-O1 -L/path2/lib -L/path3/lib -L/path1/lib \
+RESULT="-Wl,-O3 -Wl,-O2 -Wl,-O1 -L/path2/lib -L/path3/lib -L/path1/lib \
 -lpath3 -lpath2 -lpath1"
 run_test --libs sort-order-3-2
 run_test --libs sort-order-3-2 sort-order-2-2
@@ -169,7 +169,7 @@ run_test --libs sort-order-1-2 sort-order-3-2 sort-order-2-2
 run_test --libs sort-order-1-2 sort-order-2-2 sort-order-3-2
 
 # Check package set -3
-RESULT="-DPATH2 -DPATH3 -DPATH1 -I/path2/include -I/path3/include \
+RESULT="-DPATH1 -DPATH2 -DPATH3 -I/path2/include -I/path3/include \
 -I/path1/include"
 run_test --cflags sort-order-1-3
 run_test --cflags sort-order-1-3 sort-order-2-3
@@ -181,7 +181,7 @@ run_test --cflags sort-order-2-3 sort-order-1-3 sort-order-3-3
 run_test --cflags sort-order-1-3 sort-order-3-3 sort-order-2-3
 run_test --cflags sort-order-1-3 sort-order-2-3 sort-order-3-3
 
-RESULT="-Wl,-O2 -Wl,-O3 -Wl,-O1 -L/path2/lib -L/path3/lib -L/path1/lib \
+RESULT="-Wl,-O1 -Wl,-O2 -Wl,-O3 -L/path2/lib -L/path3/lib -L/path1/lib \
 -lpath1 -lpath2 -lpath3"
 run_test --libs sort-order-1-3
 run_test --libs sort-order-1-3 sort-order-2-3

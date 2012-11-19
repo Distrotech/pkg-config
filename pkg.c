@@ -1036,11 +1036,10 @@ packages_get_flags (GList *pkgs, FlagType flags)
 
   str = g_string_new (NULL);
 
-
-  /* sort flags from beginning and in forward direction except for -l */
+  /* sort packages in path order for -L/-I, dependency order otherwise */
   if (flags & CFLAGS_OTHER)
     {
-      cur = get_multi_merged (pkgs, get_other_cflags, TRUE, TRUE);
+      cur = get_multi_merged_from_back (pkgs, get_other_cflags, FALSE, TRUE);
       debug_spew ("adding CFLAGS_OTHER string \"%s\"\n", cur);
       g_string_append (str, cur);
       g_free (cur);
@@ -1054,8 +1053,8 @@ packages_get_flags (GList *pkgs, FlagType flags)
     }
   if (flags & LIBS_OTHER)
     {
-      cur = get_multi_merged (pkgs, get_other_libs, TRUE,
-                              !ignore_private_libs);
+      cur = get_multi_merged_from_back (pkgs, get_other_libs, FALSE,
+                                        !ignore_private_libs);
       debug_spew ("adding LIBS_OTHER string \"%s\"\n", cur);
       g_string_append (str, cur);
       g_free (cur);
