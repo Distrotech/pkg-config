@@ -424,47 +424,30 @@ get_package_quiet (const char *name)
   return internal_get_package (name, FALSE);
 }
 
+/* Strip consecutive duplicate arguments in the flag list. */
 static GList *
-flag_list_strip_duplicates (GList *list, gboolean forward)
+flag_list_strip_duplicates (GList *list)
 {
-  GHashTable *table;
   GList *tmp;
 
-  table = g_hash_table_new (g_str_hash, g_str_equal);
-  for (tmp = forward ? list : g_list_last (list);
-       tmp != NULL;
-       tmp = forward ? g_list_next (tmp) : g_list_previous (tmp))
+  /* Start at the 2nd element of the list so we don't have to check for an
+   * existing previous element. */
+  for (tmp = g_list_next (list); tmp != NULL; tmp = g_list_next (tmp))
     {
-      Flag *flag = tmp->data;
+      Flag *cur = tmp->data;
+      Flag *prev = tmp->prev->data;
 
-      debug_spew ("Seeing if arg %s is duplicate\n", flag->arg);
-
-      if (!g_hash_table_lookup_extended (table, flag->arg, NULL, NULL))
+      if (cur->type == prev->type && g_strcmp0 (cur->arg, prev->arg) == 0)
         {
-          /* Unique flag. Track it and and move to the next. */
-          g_hash_table_replace (table, flag->arg, flag->arg);
-        }
-      else
-        {
-          GList *dup = tmp;
-
           /* Remove the duplicate flag from the list and move to the last
            * element to prepare for the next iteration. */
-          if (forward)
-            {
-              debug_spew (" removing duplicate \"%s\"\n", flag->arg);
-              tmp = g_list_previous (tmp);
-            }
-          else
-            {
-              debug_spew (" removing duplicate (from back) \"%s\"\n",
-                          flag->arg);
-              tmp = g_list_next (tmp);
-            }
+          GList *dup = tmp;
+
+          debug_spew (" removing duplicate \"%s\"\n", cur->arg);
+          tmp = g_list_previous (tmp);
           list = g_list_remove_link (list, dup);
         }
     }
-  g_hash_table_destroy (table);
 
   return list;
 }
@@ -960,7 +943,7 @@ get_multi_merged (GList *pkgs, FlagType type, gboolean in_path_order,
   char *retval;
 
   list = fill_list (pkgs, type, in_path_order, include_private);
-  list = flag_list_strip_duplicates (list, in_path_order);
+  list = flag_list_strip_duplicates (list);
   retval = flag_list_to_string (list);
   g_list_free (list);
 
