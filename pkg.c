@@ -997,17 +997,11 @@ packages_get_flags (GList *pkgs, FlagType flags)
       g_string_append (str, cur);
       g_free (cur);
     }
-  if (flags & LIBS_OTHER)
+  if (flags & (LIBS_OTHER | LIBS_l))
     {
-      cur = get_multi_merged (pkgs, LIBS_OTHER, FALSE, !ignore_private_libs);
-      debug_spew ("adding LIBS_OTHER string \"%s\"\n", cur);
-      g_string_append (str, cur);
-      g_free (cur);
-    }
-  if (flags & LIBS_l)
-    {
-      cur = get_multi_merged (pkgs, LIBS_l, FALSE, !ignore_private_libs);
-      debug_spew ("adding LIBS_l string \"%s\"\n", cur);
+      cur = get_multi_merged (pkgs, flags & (LIBS_OTHER | LIBS_l), FALSE,
+                              !ignore_private_libs);
+      debug_spew ("adding LIBS_OTHER | LIBS_l string \"%s\"\n", cur);
       g_string_append (str, cur);
       g_free (cur);
     }
