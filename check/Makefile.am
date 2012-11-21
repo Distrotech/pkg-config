@@ -24,7 +24,8 @@ TESTS = \
 	check-path \
 	check-sysroot \
 	check-uninstalled \
-	check-debug
+	check-debug \
+	check-gtk
 
 EXTRA_DIST = \
 	$(TESTS) \
@@ -64,4 +65,30 @@ EXTRA_DIST = \
 	sort/sort-order-2-3.pc \
 	sort/sort/sort-order-3-3.pc \
 	flag-dup-1.pc \
-	flag-dup-2.pc
+	flag-dup-2.pc \
+	gtk/atk.pc \
+	gtk/cairo-gobject.pc \
+	gtk/cairo.pc \
+	gtk/fontconfig.pc \
+	gtk/freetype2.pc \
+	gtk/gdk-3.0.pc \
+	gtk/gdk-pixbuf-2.0.pc \
+	gtk/gio-2.0.pc \
+	gtk/glib-2.0.pc \
+	gtk/gmodule-no-export-2.0.pc \
+	gtk/gobject-2.0.pc \
+	gtk/gthread-2.0.pc \
+	gtk/gtk+-3.0.pc \
+	gtk/kbproto.pc \
+	gtk/libpng12.pc \
+	gtk/libpng.pc \
+	gtk/pangocairo.pc \
+	gtk/pangoft2.pc \
+	gtk/pango.pc \
+	gtk/pixman-1.pc \
+	gtk/renderproto.pc \
+	gtk/x11.pc \
+	gtk/xau.pc \
+	gtk/xcb.pc \
+	gtk/xproto.pc \
+	gtk/xrender.pc
