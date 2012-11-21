@@ -348,7 +348,7 @@ internal_get_package (const char *name, gboolean warn)
     GPOINTER_TO_INT (g_hash_table_lookup (path_positions, pkg->key));
 
   debug_spew ("Path position of '%s' is %d\n",
-              pkg->name, pkg->path_position);
+              pkg->key, pkg->path_position);
   
   debug_spew ("Adding '%s' to list of known packages\n", pkg->key);
   g_hash_table_insert (packages, pkg->key, pkg);
@@ -360,12 +360,12 @@ internal_get_package (const char *name, gboolean warn)
       RequiredVersion *ver = iter->data;
 
       debug_spew ("Searching for '%s' requirement '%s'\n",
-                  pkg->name, ver->name);
+                  pkg->key, ver->name);
       req = internal_get_package (ver->name, warn);
       if (req == NULL)
         {
           verbose_error ("Package '%s', required by '%s', not found\n",
-                         ver->name, pkg->name);
+                         ver->name, pkg->key);
           exit (1);
         }
 
@@ -384,12 +384,12 @@ internal_get_package (const char *name, gboolean warn)
       RequiredVersion *ver = iter->data;
 
       debug_spew ("Searching for '%s' private requirement '%s'\n",
-                  pkg->name, ver->name);
+                  pkg->key, ver->name);
       req = internal_get_package (ver->name, warn);
       if (req == NULL)
         {
           verbose_error ("Package '%s', required by '%s', not found\n",
-			 ver->name, pkg->name);
+			 ver->name, pkg->key);
           exit (1);
         }
 
@@ -599,7 +599,7 @@ spew_package_list (const char *name,
   while (tmp != NULL)
     {
       Package *pkg = tmp->data;
-      debug_spew (" %s ", pkg->name);
+      debug_spew (" %s ", pkg->key);
       tmp = tmp->next;
     }
   debug_spew ("\n");
@@ -788,10 +788,10 @@ verify_package (Package *pkg)
           if (!version_test (ver->comparison, req->version, ver->version))
             {
               verbose_error ("Package '%s' requires '%s %s %s' but version of %s is %s\n",
-                             pkg->name, req->key,
+                             pkg->key, req->key,
                              comparison_to_str (ver->comparison),
                              ver->version,
-                             req->name,
+                             req->key,
                              req->version);
               if (req->url)
                 verbose_error ("You may find new versions of %s at %s\n",
@@ -828,11 +828,11 @@ verify_package (Package *pkg)
             {
               verbose_error ("Version %s of %s creates a conflict.\n"
                              "(%s %s %s conflicts with %s %s)\n",
-                             req->version, req->name,
+                             req->version, req->key,
                              ver->name,
                              comparison_to_str (ver->comparison),
                              ver->version ? ver->version : "(any)",
-                             ver->owner->name,
+                             ver->owner->key,
                              ver->owner->version);
 
               exit (1);
@@ -895,7 +895,7 @@ verify_package (Package *pkg)
                           ((char*)iter->data) + offset) == 0)
 		{
 		  debug_spew ("Package %s has %s in Cflags\n",
-			      pkg->name, (gchar *)iter->data);
+			      pkg->key, (gchar *)iter->data);
 		  if (g_getenv ("PKG_CONFIG_ALLOW_SYSTEM_CFLAGS") == NULL)
 		    {
 		      debug_spew ("Removing %s from cflags for %s\n", iter->data, pkg->key);
@@ -953,7 +953,7 @@ verify_package (Package *pkg)
           if (is_system)
             {
               debug_spew ("Package %s has -L %s in Libs\n",
-                          pkg->name, system_libpath);
+                          pkg->key, system_libpath);
               if (g_getenv ("PKG_CONFIG_ALLOW_SYSTEM_LIBS") == NULL)
                 {
                   iter->data = NULL;
