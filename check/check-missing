@@ -22,21 +22,18 @@ RESULT=""
 run_test --exists missing-requires-private
 
 # get Libs
-if [ "$list_indirect_deps" = "yes" ]; then
-    EXPECT_RETURN=1
-    RESULT='Package pkg-non-existent-private-dep was not found in the pkg-config search path.
-Perhaps you should add the directory containing `pkg-non-existent-private-dep.pc'\''
-to the PKG_CONFIG_PATH environment variable
-Package '\''pkg-non-existent-private-dep'\'', required by '\''Missing Requires.private test package'\'', not found'
-else
-    EXPECT_RETURN=0
-    RESULT="-L/missing-requires-private/lib -lmissing-requires-private"
+EXPECT_RETURN=0
+RESULT="-L/missing-requires-private/lib -lmissing-requires-private"
+if [ "$list_indirect_deps" = no ]; then
+    run_test --libs missing-requires-private
 fi
-run_test --libs missing-requires-private
 
 # Libs.private should fail (verbosely, but the output isn't verified)
 EXPECT_RETURN=1
 RESULT=""
+if [ "$list_indirect_deps" = yes ]; then
+    run_test --silence-errors --libs missing-requires-private
+fi
 run_test --silence-errors --static --libs missing-requires-private
 
 # Cflags.private should fail (verbosely, but the output isn't verified)

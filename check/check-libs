@@ -4,12 +4,16 @@ set -e
 
 . ${srcdir}/common
 
-if [ "$list_indirect_deps" = "yes" ]; then
-    RESULT="-lsimple -lm"
-else
-    RESULT="-lsimple"
+RESULT="-lsimple"
+if [ "$list_indirect_deps" = no ]; then
+    run_test --libs simple
 fi
-run_test --libs simple
+
+RESULT="-lsimple -lm"
+if [ "$list_indirect_deps" = yes ]; then
+    run_test --libs simple
+fi
+run_test --libs --static simple
 
 RESULT=""
 run_test --libs fields-blank

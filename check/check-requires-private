@@ -13,13 +13,14 @@ RESULT="-I/requires-test/include -I/public-dep/include -I/private-dep/include"
 run_test --static --cflags requires-test
 
 # expect libs for just requires-test and public-dep
-if [ "$list_indirect_deps" = "yes" ]; then
-    RESULT="-L/requires-test/lib -L/public-dep/lib -L/private-dep/lib -lrequires-test -lpublic-dep -lprivate-dep"
-else
-    RESULT="-L/requires-test/lib -L/public-dep/lib -lrequires-test -lpublic-dep"
+RESULT="-L/requires-test/lib -L/public-dep/lib -lrequires-test -lpublic-dep"
+if [ "$list_indirect_deps" = no ]; then
+    run_test --libs requires-test
 fi
-run_test --libs requires-test
 
 # expect libs for requires-test, public-dep and private-dep in static case
 RESULT="-L/requires-test/lib -L/public-dep/lib -L/private-dep/lib -lrequires-test -lpublic-dep -lprivate-dep"
+if [ "$list_indirect_deps" = yes ]; then
+    run_test --libs requires-test
+fi
 run_test --static --libs requires-test
