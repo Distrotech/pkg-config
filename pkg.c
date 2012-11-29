@@ -633,7 +633,10 @@ recursive_fill_list (Package *pkg, GetListFunc func, GList **listp)
   /* record this package in the dependency chain */
   chain = g_list_prepend (chain, pkg);
 
-  for (tmp = (*func) (pkg); tmp != NULL; tmp = g_list_next (tmp))
+  /* Start from the end of the required package list to maintain order since
+   * the recursive list is built by prepending. */
+  for (tmp = g_list_last ((*func) (pkg)); tmp != NULL;
+       tmp = g_list_previous (tmp))
     recursive_fill_list (tmp->data, func, listp);
 
   *listp = g_list_prepend (*listp, pkg);
@@ -708,18 +711,14 @@ fill_list (GList *packages, GetListFunc func,
            GList **listp, gboolean in_path_order, gboolean include_private)
 {
   GList *tmp;
-  GList *expanded;
+  GList *expanded = NULL;
 
-  expanded = NULL;
-  tmp = packages;
-  while (tmp != NULL)
-    {
-      recursive_fill_list (tmp->data,
-			   include_private ? get_requires_private : get_requires,
-			   &expanded);
-
-      tmp = tmp->next;
-    }
+  /* Start from the end of the requested package list to maintain order since
+   * the recursive list is built by prepending. */
+  for (tmp = g_list_last (packages); tmp != NULL; tmp = g_list_previous (tmp))
+    recursive_fill_list (tmp->data,
+                         include_private ? get_requires_private : get_requires,
+                         &expanded);
 
   /* Remove duplicate packages from the recursive list. This should provide a
    * serialized package list where all interdependencies are resolved

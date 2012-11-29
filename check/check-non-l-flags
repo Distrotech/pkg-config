@@ -6,12 +6,8 @@ set -e
 
 RESULT="-I/non-l/include -I/non-l-required/include"
 run_test --cflags non-l-required non-l
-
-RESULT="-I/non-l/include -I/non-l-required/include"
 run_test --cflags --static non-l-required non-l
 
 RESULT="/non-l.a /non-l-required.a -pthread"
 run_test --libs non-l-required non-l
-
-RESULT="/non-l.a /non-l-required.a -pthread"
 run_test --libs --static non-l-required non-l
