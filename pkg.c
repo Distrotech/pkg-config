@@ -462,13 +462,10 @@ string_list_strip_duplicates_from_back (GList *list)
   GHashTable *table;
   GList *tmp;
   GList *nodups = NULL;
-  GList *reversed;
   
   table = g_hash_table_new (g_str_hash, g_str_equal);
 
-  reversed = g_list_reverse (g_list_copy (list));
-  
-  tmp = reversed;
+  tmp = g_list_last (list);
   while (tmp != NULL)
     {
       if (g_hash_table_lookup (table, tmp->data) == NULL)
@@ -482,10 +479,8 @@ string_list_strip_duplicates_from_back (GList *list)
           debug_spew (" removing duplicate (from back) \"%s\"\n", tmp->data);
         }
       
-      tmp = g_list_next (tmp);
+      tmp = g_list_previous (tmp);
     }
-
-  g_list_free (reversed);
   
   g_hash_table_destroy (table);
   
