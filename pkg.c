@@ -655,28 +655,20 @@ merge_flag_lists (GSList *packages, GetListFunc func, GSList **listp)
   GSList *last = NULL;
   GSList *flags;
 
+  /* keep track of the last element to avoid traversing the whole list */
   for (pkg = packages; pkg != NULL; pkg = pkg->next)
     {
-      /* manually copy the elements so we can keep track of the end */
       for (flags = (*func) (pkg->data); flags != NULL; flags = flags->next)
         {
           if (last == NULL)
             {
-              *listp = g_slist_alloc ();
+              *listp = g_slist_prepend (NULL, flags->data);
               last = *listp;
             }
           else
-            {
-              last->next = g_slist_alloc ();
-              last = last->next;
-            }
-          last->data = flags->data;
+            last = g_slist_next (g_slist_append (last, flags->data));
         }
     }
-
-  /* terminate the last element */
-  if (last != NULL)
-    last->next = NULL;
 }
 
 static void
