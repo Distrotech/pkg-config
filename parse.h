@@ -26,7 +26,7 @@ Package *parse_package_file (const char *path, gboolean ignore_requires,
 			     gboolean ignore_private_libs,
 			     gboolean ignore_requires_private);
 
-GSList  *parse_module_list (Package *pkg, const char *str, const char *path);
+GList   *parse_module_list (Package *pkg, const char *str, const char *path);
 
 #endif
 

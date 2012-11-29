@@ -136,7 +136,7 @@ static gboolean
 pkg_uninstalled (Package *pkg)
 {
   /* See if > 0 pkgs were uninstalled */
-  GSList *tmp;
+  GList *tmp;
 
   if (pkg->uninstalled)
     return TRUE;
@@ -149,7 +149,7 @@ pkg_uninstalled (Package *pkg)
       if (pkg_uninstalled (pkg))
         return TRUE;
 
-      tmp = g_slist_next (tmp);
+      tmp = g_list_next (tmp);
     }
 
   return FALSE;
@@ -219,7 +219,7 @@ main (int argc, char **argv)
   static int want_silence_errors = 0;
   static int want_variable_list = 0;
   GString *str;
-  GSList *packages = NULL;
+  GList *packages = NULL;
   FlagType flags = 0;
   char *search_path;
   char *pcbuilddir;
@@ -501,8 +501,8 @@ main (int argc, char **argv)
 
   {
     gboolean failed = FALSE;
-    GSList *reqs;
-    GSList *iter;
+    GList *reqs;
+    GList *iter;
 
     reqs = parse_module_list (NULL, str->str,
                               "(command line arguments)");
@@ -574,10 +574,10 @@ main (int argc, char **argv)
             goto nextiter;
           }
 
-        packages = g_slist_prepend (packages, req);
+        packages = g_list_prepend (packages, req);
 
       nextiter:
-        iter = g_slist_next (iter);
+        iter = g_list_next (iter);
       }
 
     if (log != NULL)
@@ -592,7 +592,7 @@ main (int argc, char **argv)
 
   g_string_free (str, TRUE);
 
-  packages = g_slist_reverse (packages);
+  packages = g_list_reverse (packages);
 
   if (packages == NULL)
     {
@@ -606,7 +606,7 @@ main (int argc, char **argv)
 
   if (want_variable_list)
     {
-      GSList *tmp;
+      GList *tmp;
       tmp = packages;
       while (tmp != NULL)
         {
@@ -615,7 +615,7 @@ main (int argc, char **argv)
             g_hash_table_foreach(pkg->vars,
                                  &print_hashtable_key,
                                  NULL);
-          tmp = g_slist_next (tmp);
+          tmp = g_list_next (tmp);
           if (tmp) printf ("\n");
         }
       need_newline = FALSE;
@@ -624,7 +624,7 @@ main (int argc, char **argv)
   if (want_uninstalled)
     {
       /* See if > 0 pkgs (including dependencies recursively) were uninstalled */
-      GSList *tmp;
+      GList *tmp;
       tmp = packages;
       while (tmp != NULL)
         {
@@ -633,7 +633,7 @@ main (int argc, char **argv)
           if (pkg_uninstalled (pkg))
             return 0;
 
-          tmp = g_slist_next (tmp);
+          tmp = g_list_next (tmp);
         }
 
       return 1;
@@ -641,7 +641,7 @@ main (int argc, char **argv)
 
   if (want_version)
     {
-      GSList *tmp;
+      GList *tmp;
       tmp = packages;
       while (tmp != NULL)
         {
@@ -649,13 +649,13 @@ main (int argc, char **argv)
 
           printf ("%s\n", pkg->version);
 
-          tmp = g_slist_next (tmp);
+          tmp = g_list_next (tmp);
         }
     }
 
  if (want_provides)
    {
-     GSList *tmp;
+     GList *tmp;
      tmp = packages;
      while (tmp != NULL)
        {
@@ -666,20 +666,20 @@ main (int argc, char **argv)
            key++;
          if (strlen(key) > 0)
            printf ("%s = %s\n", key, pkg->version);
-         tmp = g_slist_next (tmp);
+         tmp = g_list_next (tmp);
        }
    }
 
   if (want_requires)
     {
-      GSList *pkgtmp;
-      for (pkgtmp = packages; pkgtmp != NULL; pkgtmp = g_slist_next (pkgtmp))
+      GList *pkgtmp;
+      for (pkgtmp = packages; pkgtmp != NULL; pkgtmp = g_list_next (pkgtmp))
         {
           Package *pkg = pkgtmp->data;
-          GSList *reqtmp;
+          GList *reqtmp;
 
           /* process Requires: */
-          for (reqtmp = pkg->requires; reqtmp != NULL; reqtmp = g_slist_next (reqtmp))
+          for (reqtmp = pkg->requires; reqtmp != NULL; reqtmp = g_list_next (reqtmp))
             {
               Package *deppkg = reqtmp->data;
               RequiredVersion *req;
@@ -695,19 +695,19 @@ main (int argc, char **argv)
     }
   if (want_requires_private)
     {
-      GSList *pkgtmp;
-      for (pkgtmp = packages; pkgtmp != NULL; pkgtmp = g_slist_next (pkgtmp))
+      GList *pkgtmp;
+      for (pkgtmp = packages; pkgtmp != NULL; pkgtmp = g_list_next (pkgtmp))
         {
           Package *pkg = pkgtmp->data;
-          GSList *reqtmp;
+          GList *reqtmp;
           /* process Requires.private: */
-          for (reqtmp = pkg->requires_private; reqtmp != NULL; reqtmp = g_slist_next (reqtmp))
+          for (reqtmp = pkg->requires_private; reqtmp != NULL; reqtmp = g_list_next (reqtmp))
             {
 
               Package *deppkg = reqtmp->data;
               RequiredVersion *req;
 
-              if (g_slist_find (pkg->requires, reqtmp->data))
+              if (g_list_find (pkg->requires, reqtmp->data))
                 continue;
 
               req = g_hash_table_lookup(pkg->required_versions, deppkg->key);

@@ -64,18 +64,18 @@ struct _Package
   char *description;
   char *url;
   char *pcfiledir; /* directory it was loaded from */
-  GSList *requires_entries;
-  GSList *requires;
-  GSList *requires_private_entries;
-  GSList *requires_private;
-  GSList *l_libs;
-  GSList *L_libs;
-  GSList *other_libs;
-  GSList *I_cflags;
-  GSList *other_cflags;
+  GList *requires_entries;
+  GList *requires;
+  GList *requires_private_entries;
+  GList *requires_private;
+  GList *l_libs;
+  GList *L_libs;
+  GList *other_libs;
+  GList *I_cflags;
+  GList *other_cflags;
   GHashTable *vars;
   GHashTable *required_versions; /* hash from name to RequiredVersion */
-  GSList *conflicts; /* list of RequiredVersion */
+  GList *conflicts; /* list of RequiredVersion */
   gboolean uninstalled; /* used the -uninstalled file */
   int path_position; /* used to order packages by position in path of their .pc file, lower number means earlier in path */
   int libs_num; /* Number of times the "Libs" header has been seen */
@@ -84,11 +84,11 @@ struct _Package
 
 Package *get_package               (const char *name);
 Package *get_package_quiet         (const char *name);
-char *   packages_get_flags        (GSList     *pkgs,
+char *   packages_get_flags        (GList      *pkgs,
                                     FlagType   flags);
 char *   package_get_var           (Package    *pkg,
                                     const char *var);
-char *   packages_get_var          (GSList     *pkgs,
+char *   packages_get_var          (GList      *pkgs,
                                     const char *var);
 
 void add_search_dir (const char *path);
