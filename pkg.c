@@ -429,31 +429,28 @@ string_list_strip_duplicates (GList *list)
 {
   GHashTable *table;
   GList *tmp;
-  GList *nodups = NULL;
-  
-  table = g_hash_table_new (g_str_hash, g_str_equal);
 
-  tmp = list;
-  while (tmp != NULL)
+  table = g_hash_table_new (g_str_hash, g_str_equal);
+  for (tmp = list; tmp != NULL; tmp = g_list_next (tmp))
     {
       if (g_hash_table_lookup (table, tmp->data) == NULL)
         {
-          nodups = g_list_prepend (nodups, tmp->data);
+          /* Unique string. Track it and and move to the next. */
           g_hash_table_insert (table, tmp->data, tmp->data);
         }
       else
         {
+          GList *dup = tmp;
+
+          /* Remove the duplicate string from the list. */
           debug_spew (" removing duplicate \"%s\"\n", tmp->data);
+          tmp = tmp->prev;
+          list = g_list_remove_link (list, dup);
         }
-
-      tmp = g_list_next (tmp);
     }
-
-  nodups = g_list_reverse (nodups);
-  
   g_hash_table_destroy (table);
-  
-  return nodups;
+
+  return list;
 }
 
 static GList *
@@ -461,30 +458,28 @@ string_list_strip_duplicates_from_back (GList *list)
 {
   GHashTable *table;
   GList *tmp;
-  GList *nodups = NULL;
   
   table = g_hash_table_new (g_str_hash, g_str_equal);
-
-  tmp = g_list_last (list);
-  while (tmp != NULL)
+  for (tmp = g_list_last (list); tmp != NULL; tmp = g_list_previous (tmp))
     {
       if (g_hash_table_lookup (table, tmp->data) == NULL)
         {
-          /* This unreverses the reversed list */
-          nodups = g_list_prepend (nodups, tmp->data);
+          /* Unique string. Track it and and move to the next. */
           g_hash_table_insert (table, tmp->data, tmp->data);
         }
       else
         {
+          GList *dup = tmp;
+
+          /* Remove the duplicate string from the list. */
           debug_spew (" removing duplicate (from back) \"%s\"\n", tmp->data);
+          tmp = tmp->next;
+          list = g_list_remove_link (list, dup);
         }
-      
-      tmp = g_list_previous (tmp);
     }
-  
   g_hash_table_destroy (table);
   
-  return nodups;
+  return list;
 }
 
 static char *
@@ -1007,20 +1002,14 @@ static char*
 get_multi_merged (GList *pkgs, GetListFunc func, gboolean in_path_order,
 		  gboolean include_private)
 {
-  GList *dups_list = NULL;
-  GList *list;
+  GList *list = NULL;
   char *retval;
 
-  fill_list (pkgs, func, &dups_list, in_path_order, include_private);
-  
-  list = string_list_strip_duplicates (dups_list);
-
-  g_list_free (dups_list);
-  
+  fill_list (pkgs, func, &list, in_path_order, include_private);
+  list = string_list_strip_duplicates (list);
   retval = string_list_to_string (list);
-
   g_list_free (list);
-  
+
   return retval;
 }
 
@@ -1028,20 +1017,14 @@ static char*
 get_multi_merged_from_back (GList *pkgs, GetListFunc func,
 			    gboolean in_path_order, gboolean include_private)
 {
-  GList *dups_list = NULL;
-  GList *list;
+  GList *list = NULL;
   char *retval;
 
-  fill_list (pkgs, func, &dups_list, in_path_order, include_private);
-  
-  list = string_list_strip_duplicates_from_back (dups_list);
-
-  g_list_free (dups_list);
-  
+  fill_list (pkgs, func, &list, in_path_order, include_private);
+  list = string_list_strip_duplicates_from_back (list);
   retval = string_list_to_string (list);
-
   g_list_free (list);
-  
+
   return retval;
 }
 
