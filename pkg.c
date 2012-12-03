@@ -433,10 +433,10 @@ string_list_strip_duplicates (GList *list)
   table = g_hash_table_new (g_str_hash, g_str_equal);
   for (tmp = list; tmp != NULL; tmp = g_list_next (tmp))
     {
-      if (g_hash_table_lookup (table, tmp->data) == NULL)
+        if (!g_hash_table_lookup_extended (table, tmp->data, NULL, NULL))
         {
           /* Unique string. Track it and and move to the next. */
-          g_hash_table_insert (table, tmp->data, tmp->data);
+          g_hash_table_replace (table, tmp->data, tmp->data);
         }
       else
         {
@@ -462,10 +462,10 @@ string_list_strip_duplicates_from_back (GList *list)
   table = g_hash_table_new (g_str_hash, g_str_equal);
   for (tmp = g_list_last (list); tmp != NULL; tmp = g_list_previous (tmp))
     {
-      if (g_hash_table_lookup (table, tmp->data) == NULL)
+      if (!g_hash_table_lookup_extended (table, tmp->data, NULL, NULL))
         {
           /* Unique string. Track it and and move to the next. */
-          g_hash_table_insert (table, tmp->data, tmp->data);
+          g_hash_table_replace (table, tmp->data, tmp->data);
         }
       else
         {
@@ -681,7 +681,7 @@ package_list_strip_duplicates (GList *packages)
     {
       Package *pkg = cur->data;
 
-      if (g_hash_table_lookup (requires, pkg->key) != NULL)
+      if (g_hash_table_lookup_extended (requires, pkg->key, NULL, NULL))
         {
           GList *dup = cur;
 
@@ -693,7 +693,7 @@ package_list_strip_duplicates (GList *packages)
       else
         {
           /* Unique package. Track it and move to the next. */
-          g_hash_table_insert (requires, pkg->key, pkg);
+          g_hash_table_replace (requires, pkg->key, pkg);
         }
     }
   g_hash_table_destroy (requires);
