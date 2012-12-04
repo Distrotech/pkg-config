@@ -693,7 +693,7 @@ package_list_strip_duplicates (GList *packages)
       else
         {
           /* Unique package. Track it and move to the next. */
-          g_hash_table_replace (requires, pkg->key, pkg);
+          g_hash_table_replace (requires, pkg->key, pkg->key);
         }
     }
   g_hash_table_destroy (requires);
