@@ -7,34 +7,21 @@ Unix variant, as far as pkg-config is concerned.) I don't call this
 "native" Win32 target MinGW, as pkg-config on Windows is supposed to
 be useable also by MSVC users.
 
-There should be no compile-time paths built into the executable of
-pkg-config. Likewise, not in the libraries it describes either.
+When pkg-config.exe is invoked, it uses the glib function
+g_win32_get_package_installation_directory_of_module() to find the
+directory it's being run from. It then adds the "lib" and "share"
+subdirectories to the pkg-config search path unless PKG_CONFIG_LIBDIR is
+set in the environment. This allows pkg-config to adjust to being
+relocated on Windows.
 
-pkg-config uses some optional entries in the Registry: Firstly, the
-path to the pkgconfig installation prefix. This can be either
-user-specific in HKCU\Software\pkgconfig\InstallationDirectory or for
-the whole machine in HKLM\Software\pkgconfig\InstallationDirectory.
+For each .pc file encountered, pkg-config will replace the prefix
+variable to the base of it's currently installed directory unless the
+command line option --dont-define-prefix is set. It will take the .pc
+directory and strip off either lib\pkgconfig or share\pkgconfig to
+determine the prefix. This allows the paths encoded in .pc files at
+build time to be replaced with appropriate values at runtime.
 
-If pkg-config.exe is invoked from the "bin" subdirectory of a
-directory with a lib/pkgconfig subdirectory, no Registry entry is even
-needed, as pkgconfig figures out the directory by itself. (The
-g_win32_get_package_installation_directory() function in GLib.)
-
-Additionally, in addition to the PKG_CONFIG_PATH environment
-variables, any string value in the Registry key
-HKLM\Software\pkgconfig\PKG_CONFIG_PATH (or HKCU\...) is assumed to be
-a directory name and is searched for .pc files.
-
-When pkg-config is invoked on Windows, it tries to set the "prefix"
-variable for each .pc file read to "top" of the directory tree where
-the .pc file is located. This is done only if the .pc file is in a
-path that ends in "lib/pkgconfig". Thus, if an end-user (developer)
-installs headers, import libraries and .pc files in the normal
-subdirectories under some random directory, everything should just
-work, even if the .pc file for that software doesn't know the true
-directory name, but contains the path used on the packager's
-site. This works as long as the .pc file uses the variable name
-"prefix" for its installation prefix. At least GLib, ATK, Pango and
-GTK does this.
-
---Tor Lillqvist <tml@iki.fi>
+In order to use the output of pkg-config with MSVC, the option
+--msvc-syntax can be used to convert UNIX style library output to
+arguments that work with MSVC. This means -Lfoo will be converted to
+/libpath:foo, and -lfoo will be converted to foo.lib.
