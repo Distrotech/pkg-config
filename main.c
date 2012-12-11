@@ -177,6 +177,13 @@ output_opt_cb (const char *opt, const char *arg, gpointer data,
           (want_requires_private && strcmp (opt, "--print-requires") == 0))
         bad_opt = FALSE;
 
+      /* --exists allowed with --atleast/exact/max-version */
+      if (want_exists &&
+          (strcmp (opt, "--atleast-version") == 0 ||
+           strcmp (opt, "--exact-version") == 0 ||
+           strcmp (opt, "--max-version") == 0))
+        bad_opt = FALSE;
+
       if (bad_opt)
         {
           fprintf (stderr, "Ignoring incompatible output option \"%s\"\n",
@@ -211,6 +218,21 @@ output_opt_cb (const char *opt, const char *arg, gpointer data,
     want_variable_list = TRUE;
   else if (strcmp (opt, "--uninstalled") == 0)
     want_uninstalled = TRUE;
+  else if (strcmp (opt, "--atleast-version") == 0)
+    {
+      required_atleast_version = g_strdup (arg);
+      want_exists = TRUE;
+    }
+  else if (strcmp (opt, "--exact-version") == 0)
+    {
+      required_exact_version = g_strdup (arg);
+      want_exists = TRUE;
+    }
+  else if (strcmp (opt, "--max-version") == 0)
+    {
+      required_max_version = g_strdup (arg);
+      want_exists = TRUE;
+    }
   else if (strcmp (opt, "--list-all") == 0)
     want_list = TRUE;
   else if (strcmp (opt, "--print-provides") == 0)
@@ -406,11 +428,11 @@ static const GOptionEntry options_table[] = {
   { "uninstalled", 0, G_OPTION_FLAG_NO_ARG, G_OPTION_ARG_CALLBACK,
     &output_opt_cb, "return 0 if the uninstalled version of one or more "
     "module(s) or their dependencies will be used", NULL },
-  { "atleast-version", 0, 0, G_OPTION_ARG_STRING, &required_atleast_version,
+  { "atleast-version", 0, 0, G_OPTION_ARG_CALLBACK, &output_opt_cb,
     "return 0 if the module is at least version VERSION", "VERSION" },
-  { "exact-version", 0, 0, G_OPTION_ARG_STRING, &required_exact_version,
+  { "exact-version", 0, 0, G_OPTION_ARG_CALLBACK, &output_opt_cb,
     "return 0 if the module is at exactly version VERSION", "VERSION" },
-  { "max-version", 0, 0, G_OPTION_ARG_STRING, &required_max_version,
+  { "max-version", 0, 0, G_OPTION_ARG_CALLBACK, &output_opt_cb,
     "return 0 if the module is at no newer than version VERSION", "VERSION" },
   { "list-all", 0, G_OPTION_FLAG_NO_ARG, G_OPTION_ARG_CALLBACK,
     &output_opt_cb, "list all known packages", NULL },
