@@ -444,11 +444,12 @@ static const GOptionEntry options_table[] = {
   { "debug", 0, 0, G_OPTION_ARG_NONE, &want_debug_spew,
     "show verbose debug information", NULL },
   { "print-errors", 0, 0, G_OPTION_ARG_NONE, &want_verbose_errors,
-    "show verbose information about missing or conflicting packages,"
-    "default if --cflags or --libs given on the command line", NULL },
+    "show verbose information about missing or conflicting packages "
+    "(default unless --exists or --atleast/exact/max-version given on the "
+    "command line)", NULL },
   { "silence-errors", 0, 0, G_OPTION_ARG_NONE, &want_silence_errors,
-    "be silent about errors (default unless --cflags or --libs"
-    "given on the command line)", NULL },
+    "be silent about errors (default when --exists or "
+    "--atleast/exact/max-version given on the command line)", NULL },
   { "errors-to-stdout", 0, 0, G_OPTION_ARG_NONE, &want_stdout_errors,
     "print errors from --print-errors to stdout not stderr", NULL },
   { "print-provides", 0, G_OPTION_FLAG_NO_ARG, G_OPTION_ARG_CALLBACK,
@@ -564,23 +565,16 @@ main (int argc, char **argv)
     }
 
   /* Error printing is determined as follows:
-   *     - for --cflags, --libs, etc. it's on by default
-   *       and --silence-errors can turn it off
-   *     - for --exists, --max-version, etc. and no options
-   *       at all, it's off by default and --print-errors
-   *       will turn it on
+   *     - for all output options besides --exists and --*-version,
+   *       it's on by default and --silence-errors can turn it off
+   *     - for --exists, --*-version, etc. and no options at all,
+   *       it's off by default and --print-errors will turn it on
    */
-
-  if (want_my_version ||
-      want_version ||
-      pkg_flags != 0 ||
-      want_list ||
-      want_variable_list)
+  if (!want_exists)
     {
-      debug_spew ("Error printing enabled by default due to use of --version, "
-                  "--libs, --cflags, --libs-only-l, --libs-only-L, "
-                  "--libs-only-other, --cflags-only-I, --cflags-only-other or "
-                  "--list. Value of --silence-errors: %d\n",
+      debug_spew ("Error printing enabled by default due to use of output "
+                  "options besides --exists or --atleast/exact/max-version. "
+                  "Value of --silence-errors: %d\n",
                   want_silence_errors);
 
       if (want_silence_errors && getenv ("PKG_CONFIG_DEBUG_SPEW") == NULL)
@@ -590,7 +584,9 @@ main (int argc, char **argv)
     }
   else
     {
-      debug_spew ("Error printing disabled by default, value of --print-errors: %d\n",
+      debug_spew ("Error printing disabled by default due to use of output "
+                  "options --exists, --atleast/exact/max-version or no "
+                  "output option at all. Value of --print-errors: %d\n",
                   want_verbose_errors);
 
       /* Leave want_verbose_errors unchanged, reflecting --print-errors */
