@@ -186,7 +186,9 @@ command line are known to \fIpkg-config\fP, and optionally whether the
 version number of a package meets certain constraints.  If all packages
 exist and meet the specified version constraints,
 .I pkg-config
-exits successfully. Otherwise it exits unsuccessfully.
+exits successfully. Otherwise it exits unsuccessfully. Only the first
+VERSION comparing option will be honored. Subsequent options of this
+type will be ignored.
 
 Rather than using the version-test options, you can simply give a version
 constraint after each package name, for example:

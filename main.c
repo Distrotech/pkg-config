@@ -156,6 +156,8 @@ static gboolean
 output_opt_cb (const char *opt, const char *arg, gpointer data,
                GError **error)
 {
+  static gboolean vercmp_opt_set = FALSE;
+
   /* only allow one output mode, with a few exceptions */
   if (output_opt_set)
     {
@@ -178,7 +180,7 @@ output_opt_cb (const char *opt, const char *arg, gpointer data,
         bad_opt = FALSE;
 
       /* --exists allowed with --atleast/exact/max-version */
-      if (want_exists &&
+      if (want_exists && !vercmp_opt_set &&
           (strcmp (opt, "--atleast-version") == 0 ||
            strcmp (opt, "--exact-version") == 0 ||
            strcmp (opt, "--max-version") == 0))
@@ -222,16 +224,19 @@ output_opt_cb (const char *opt, const char *arg, gpointer data,
     {
       required_atleast_version = g_strdup (arg);
       want_exists = TRUE;
+      vercmp_opt_set = TRUE;
     }
   else if (strcmp (opt, "--exact-version") == 0)
     {
       required_exact_version = g_strdup (arg);
       want_exists = TRUE;
+      vercmp_opt_set = TRUE;
     }
   else if (strcmp (opt, "--max-version") == 0)
     {
       required_max_version = g_strdup (arg);
       want_exists = TRUE;
+      vercmp_opt_set = TRUE;
     }
   else if (strcmp (opt, "--list-all") == 0)
     want_list = TRUE;

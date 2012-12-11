@@ -90,3 +90,8 @@ run_test --print-errors simple \<= $v3
 EXPECT_RETURN=0
 RESULT=""
 run_test --print-errors --max-version=$v3 simple
+
+# mixing version compare testing is not allowed
+EXPECT_RETURN=0
+RESULT='Ignoring incompatible output option "--exact-version"'
+run_test --atleast-version=1.0.0 --exact-version=1.0.0 simple
