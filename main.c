@@ -40,13 +40,7 @@ char *pkg_config_pc_path = NULL;
 
 static gboolean want_my_version = FALSE;
 static gboolean want_version = FALSE;
-static gboolean want_libs = FALSE;
-static gboolean want_cflags = FALSE;
-static gboolean want_l_libs = FALSE;
-static gboolean want_L_libs = FALSE;
-static gboolean want_other_libs = FALSE;
-static gboolean want_I_cflags = FALSE;
-static gboolean want_other_cflags = FALSE;
+static FlagType pkg_flags = 0;
 static gboolean want_list = FALSE;
 static gboolean want_static_lib_list = ENABLE_INDIRECT_DEPS;
 static gboolean want_short_errors = FALSE;
@@ -166,19 +160,19 @@ output_opt_cb (const char *opt, const char *arg, gpointer data,
   else if (strcmp (opt, "--modversion") == 0)
     want_version = TRUE;
   else if (strcmp (opt, "--libs") == 0)
-    want_libs = TRUE;
+    pkg_flags |= LIBS_ANY;
   else if (strcmp (opt, "--libs-only-l") == 0)
-    want_l_libs = TRUE;
+    pkg_flags |= LIBS_l;
   else if (strcmp (opt, "--libs-only-other") == 0)
-    want_other_libs = TRUE;
+    pkg_flags |= LIBS_OTHER;
   else if (strcmp (opt, "--libs-only-L") == 0)
-    want_L_libs = TRUE;
+    pkg_flags |= LIBS_L;
   else if (strcmp (opt, "--cflags") == 0)
-    want_cflags = TRUE;
+    pkg_flags |= CFLAGS_ANY;
   else if (strcmp (opt, "--cflags-only-I") == 0)
-    want_I_cflags = TRUE;
+    pkg_flags |= CFLAGS_I;
   else if (strcmp (opt, "--cflags-only-other") == 0)
-    want_other_cflags = TRUE;
+    pkg_flags |= CFLAGS_OTHER;
   else if (strcmp (opt, "--variable") == 0)
     variable_name = g_strdup (arg);
   else if (strcmp (opt, "--exists") == 0)
@@ -424,7 +418,6 @@ main (int argc, char **argv)
 {
   GString *str;
   GList *packages = NULL;
-  FlagType flags = 0;
   char *search_path;
   char *pcbuilddir;
   gboolean need_newline;
@@ -505,22 +498,6 @@ main (int argc, char **argv)
       return 1;
     }
 
-  /* construct Libs/Cflags mask */
-  if (want_cflags)
-    flags |= CFLAGS_ANY;
-  if (want_I_cflags)
-    flags |= CFLAGS_I;
-  if (want_other_cflags)
-    flags |= CFLAGS_OTHER;
-  if (want_libs)
-    flags |= LIBS_ANY;
-  if (want_l_libs)
-    flags |= LIBS_l;
-  if (want_L_libs)
-    flags |= LIBS_L;
-  if (want_other_libs)
-    flags |= LIBS_OTHER;
-
   /* Error printing is determined as follows:
    *     - for --cflags, --libs, etc. it's on by default
    *       and --silence-errors can turn it off
@@ -531,17 +508,15 @@ main (int argc, char **argv)
 
   if (want_my_version ||
       want_version ||
-      want_libs ||
-      want_cflags ||
-      want_l_libs ||
-      want_L_libs ||
-      want_other_libs ||
-      want_I_cflags ||
-      want_other_cflags ||
+      pkg_flags != 0 ||
       want_list ||
       want_variable_list)
     {
-      debug_spew ("Error printing enabled by default due to use of --version, --libs, --cflags, --libs-only-l, --libs-only-L, --libs-only-other, --cflags-only-I, --cflags-only-other or --list. Value of --silence-errors: %d\n", want_silence_errors);
+      debug_spew ("Error printing enabled by default due to use of --version, "
+                  "--libs, --cflags, --libs-only-l, --libs-only-L, "
+                  "--libs-only-other, --cflags-only-I, --cflags-only-other or "
+                  "--list. Value of --silence-errors: %d\n",
+                  want_silence_errors);
 
       if (want_silence_errors && getenv ("PKG_CONFIG_DEBUG_SPEW") == NULL)
         want_verbose_errors = FALSE;
@@ -569,16 +544,13 @@ main (int argc, char **argv)
   /* honor Requires.private if any Cflags are requested or any static
    * libs are requested */
 
-  if (want_I_cflags || want_other_cflags || want_cflags ||
-      want_requires_private || want_exists ||
-      (want_static_lib_list && (want_libs || want_l_libs || want_L_libs)))
+  if (pkg_flags & CFLAGS_ANY || want_requires_private || want_exists ||
+      (want_static_lib_list && (pkg_flags & LIBS_ANY)))
     enable_requires_private();
 
   /* ignore Requires if no Cflags or Libs are requested */
 
-  if (!want_I_cflags && !want_other_cflags && !want_cflags &&
-      !want_libs && !want_l_libs && !want_L_libs && !want_requires &&
-      !want_exists)
+  if (pkg_flags == 0 && !want_requires && !want_exists)
     disable_requires();
 
   if (want_my_version)
@@ -769,9 +741,9 @@ main (int argc, char **argv)
       need_newline = TRUE;
     }
 
-  if (flags != 0)
+  if (pkg_flags != 0)
     {
-      char *str = packages_get_flags (packages, flags);
+      char *str = packages_get_flags (packages, pkg_flags);
       printf ("%s", str);
       g_free (str);
       need_newline = TRUE;
