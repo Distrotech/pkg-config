@@ -123,7 +123,7 @@ or auto])
 esac
 AC_MSG_RESULT($use_indirect_deps)
 AC_DEFINE_UNQUOTED([ENABLE_INDIRECT_DEPS],
-    [`test $use_indirect_deps = no; echo $?`],
+    [`test $use_indirect_deps = yes && echo TRUE || echo FALSE`],
     [Link library to all dependent libraries, not only directly needed ones])
 AC_SUBST([use_indirect_deps])
 

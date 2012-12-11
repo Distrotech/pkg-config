@@ -131,12 +131,12 @@ extern char *pkg_config_pc_path;
 #ifdef G_OS_WIN32
 /* If TRUE, do not automatically define "prefix"  while
  * parsing each .pc file */
-extern int dont_define_prefix;
+extern gboolean dont_define_prefix;
 /* The name of the variable that acts as prefix, unless it is "prefix" */
 extern char *prefix_variable;
 
 /* If TRUE, output flags in MSVC syntax. */
-extern int msvc_syntax;
+extern gboolean msvc_syntax;
 #endif
 
 #endif

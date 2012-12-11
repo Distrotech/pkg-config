@@ -35,9 +35,9 @@
 #include <sys/types.h>
 
 #ifdef G_OS_WIN32
-int dont_define_prefix = FALSE;
+gboolean dont_define_prefix = FALSE;
 char *prefix_variable = "prefix";
-int msvc_syntax = FALSE;
+gboolean msvc_syntax = FALSE;
 #endif
 
 #ifdef G_OS_WIN32

@@ -38,33 +38,33 @@
 char *pcsysrootdir = NULL;
 char *pkg_config_pc_path = NULL;
 
-static int want_my_version = 0;
-static int want_version = 0;
-static int want_libs = 0;
-static int want_cflags = 0;
-static int want_l_libs = 0;
-static int want_L_libs = 0;
-static int want_other_libs = 0;
-static int want_I_cflags = 0;
-static int want_other_cflags = 0;
-static int want_list = 0;
-static int want_static_lib_list = ENABLE_INDIRECT_DEPS;
-static int want_short_errors = 0;
-static int want_uninstalled = 0;
+static gboolean want_my_version = FALSE;
+static gboolean want_version = FALSE;
+static gboolean want_libs = FALSE;
+static gboolean want_cflags = FALSE;
+static gboolean want_l_libs = FALSE;
+static gboolean want_L_libs = FALSE;
+static gboolean want_other_libs = FALSE;
+static gboolean want_I_cflags = FALSE;
+static gboolean want_other_cflags = FALSE;
+static gboolean want_list = FALSE;
+static gboolean want_static_lib_list = ENABLE_INDIRECT_DEPS;
+static gboolean want_short_errors = FALSE;
+static gboolean want_uninstalled = FALSE;
 static char *variable_name = NULL;
-static int want_exists = 0;
-static int want_provides = 0;
-static int want_requires = 0;
-static int want_requires_private = 0;
+static gboolean want_exists = FALSE;
+static gboolean want_provides = FALSE;
+static gboolean want_requires = FALSE;
+static gboolean want_requires_private = FALSE;
 static char *required_atleast_version = NULL;
 static char *required_exact_version = NULL;
 static char *required_max_version = NULL;
 static char *required_pkgconfig_version = NULL;
-static int want_silence_errors = 0;
-static int want_variable_list = 0;
-static int want_debug_spew = 0;
-static int want_verbose_errors = 0;
-static int want_stdout_errors = 0;
+static gboolean want_silence_errors = FALSE;
+static gboolean want_variable_list = FALSE;
+static gboolean want_debug_spew = FALSE;
+static gboolean want_verbose_errors = FALSE;
+static gboolean want_stdout_errors = FALSE;
 
 void
 debug_spew (const char *format, ...)
