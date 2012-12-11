@@ -51,10 +51,10 @@ EXPECT_RETURN=0
 RESULT="/usr/include/somedir"
 run_test --variable includedir missing-requires-private
 
-# tests below are on an existing package, but with missing Requires; when
-# pkg-config outputs error, the actual error text isn't checked
+# tests below are on an existing package, but with missing Requires;
+# when pkg-config outputs error, the actual error text isn't checked
 # package exists
-EXPECT_RETURN=0
+EXPECT_RETURN=1
 RESULT=""
 run_test missing-requires
 

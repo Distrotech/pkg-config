@@ -529,6 +529,13 @@ main (int argc, char **argv)
       return 1;
     }
 
+  /* If no output option was set, then --exists is the default. */
+  if (!output_opt_set)
+    {
+      debug_spew ("no output option set, defaulting to --exists\n");
+      want_exists = TRUE;
+    }
+
   /* Error printing is determined as follows:
    *     - for --cflags, --libs, etc. it's on by default
    *       and --silence-errors can turn it off
