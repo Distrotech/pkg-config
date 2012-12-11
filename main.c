@@ -158,6 +158,50 @@ define_variable_cb (const char *opt, const char *arg, gpointer data,
 }
 
 static gboolean
+output_opt_cb (const char *opt, const char *arg, gpointer data,
+               GError **error)
+{
+  if (strcmp (opt, "--version") == 0)
+    want_my_version = TRUE;
+  else if (strcmp (opt, "--modversion") == 0)
+    want_version = TRUE;
+  else if (strcmp (opt, "--libs") == 0)
+    want_libs = TRUE;
+  else if (strcmp (opt, "--libs-only-l") == 0)
+    want_l_libs = TRUE;
+  else if (strcmp (opt, "--libs-only-other") == 0)
+    want_other_libs = TRUE;
+  else if (strcmp (opt, "--libs-only-L") == 0)
+    want_L_libs = TRUE;
+  else if (strcmp (opt, "--cflags") == 0)
+    want_cflags = TRUE;
+  else if (strcmp (opt, "--cflags-only-I") == 0)
+    want_I_cflags = TRUE;
+  else if (strcmp (opt, "--cflags-only-other") == 0)
+    want_other_cflags = TRUE;
+  else if (strcmp (opt, "--variable") == 0)
+    variable_name = g_strdup (arg);
+  else if (strcmp (opt, "--exists") == 0)
+    want_exists = TRUE;
+  else if (strcmp (opt, "--print-variables") == 0)
+    want_variable_list = TRUE;
+  else if (strcmp (opt, "--uninstalled") == 0)
+    want_uninstalled = TRUE;
+  else if (strcmp (opt, "--list-all") == 0)
+    want_list = TRUE;
+  else if (strcmp (opt, "--print-provides") == 0)
+    want_provides = TRUE;
+  else if (strcmp (opt, "--print-requires") == 0)
+    want_requires = TRUE;
+  else if (strcmp (opt, "--print-requires-private") == 0)
+    want_requires_private = TRUE;
+  else
+    return FALSE;
+
+  return TRUE;
+}
+
+static gboolean
 pkg_uninstalled (Package *pkg)
 {
   /* See if > 0 pkgs were uninstalled */
@@ -300,50 +344,51 @@ process_package_args (const char *cmdline, GList **packages, FILE *log)
 }
 
 static const GOptionEntry options_table[] = {
-  { "version", 0, 0, G_OPTION_ARG_NONE, &want_my_version,
-    "output version of pkg-config", NULL },
-  { "modversion", 0, 0, G_OPTION_ARG_NONE, &want_version,
-    "output version for package", NULL },
+  { "version", 0, G_OPTION_FLAG_NO_ARG, G_OPTION_ARG_CALLBACK,
+    &output_opt_cb, "output version of pkg-config", NULL },
+  { "modversion", 0, G_OPTION_FLAG_NO_ARG, G_OPTION_ARG_CALLBACK,
+    &output_opt_cb, "output version for package", NULL },
   { "atleast-pkgconfig-version", 0, 0, G_OPTION_ARG_STRING,
     &required_pkgconfig_version,
     "require given version of pkg-config", "VERSION" },
-  { "libs", 0, 0, G_OPTION_ARG_NONE, &want_libs,
+  { "libs", 0, G_OPTION_FLAG_NO_ARG, G_OPTION_ARG_CALLBACK, &output_opt_cb,
     "output all linker flags", NULL },
   { "static", 0, 0, G_OPTION_ARG_NONE, &want_static_lib_list,
     "output linker flags for static linking", NULL },
   { "short-errors", 0, 0, G_OPTION_ARG_NONE, &want_short_errors,
     "print short errors", NULL },
-  { "libs-only-l", 0, 0, G_OPTION_ARG_NONE, &want_l_libs,
-    "output -l flags", NULL },
-  { "libs-only-other", 0, 0, G_OPTION_ARG_NONE, &want_other_libs,
-    "output other libs (e.g. -pthread)", NULL },
-  { "libs-only-L", 0, 0, G_OPTION_ARG_NONE, &want_L_libs,
-    "output -L flags", NULL },
-  { "cflags", 0, 0, G_OPTION_ARG_NONE, &want_cflags,
+  { "libs-only-l", 0, G_OPTION_FLAG_NO_ARG, G_OPTION_ARG_CALLBACK,
+    &output_opt_cb, "output -l flags", NULL },
+  { "libs-only-other", 0, G_OPTION_FLAG_NO_ARG, G_OPTION_ARG_CALLBACK,
+    &output_opt_cb, "output other libs (e.g. -pthread)", NULL },
+  { "libs-only-L", 0, G_OPTION_FLAG_NO_ARG, G_OPTION_ARG_CALLBACK,
+    &output_opt_cb, "output -L flags", NULL },
+  { "cflags", 0, G_OPTION_FLAG_NO_ARG, G_OPTION_ARG_CALLBACK, &output_opt_cb,
     "output all pre-processor and compiler flags", NULL },
-  { "cflags-only-I", 0, 0, G_OPTION_ARG_NONE, &want_I_cflags,
-    "output -I flags", NULL },
-  { "cflags-only-other", 0, 0, G_OPTION_ARG_NONE, &want_other_cflags,
-    "output cflags not covered by the cflags-only-I option", NULL },
-  { "variable", 0, 0, G_OPTION_ARG_STRING, &variable_name,
+  { "cflags-only-I", 0, G_OPTION_FLAG_NO_ARG, G_OPTION_ARG_CALLBACK,
+    &output_opt_cb, "output -I flags", NULL },
+  { "cflags-only-other", 0, G_OPTION_FLAG_NO_ARG, G_OPTION_ARG_CALLBACK,
+    &output_opt_cb, "output cflags not covered by the cflags-only-I option",
+    NULL },
+  { "variable", 0, 0, G_OPTION_ARG_CALLBACK, &output_opt_cb,
     "get the value of variable named NAME", "NAME" },
   { "define-variable", 0, 0, G_OPTION_ARG_CALLBACK, &define_variable_cb,
     "set variable NAME to VALUE", "NAME=VALUE" },
-  { "exists", 0, 0, G_OPTION_ARG_NONE, &want_exists,
+  { "exists", 0, G_OPTION_FLAG_NO_ARG, G_OPTION_ARG_CALLBACK, &output_opt_cb,
     "return 0 if the module(s) exist", NULL },
-  { "print-variables", 0, 0, G_OPTION_ARG_NONE, &want_variable_list,
-    "output list of variables defined by the module", NULL },
-  { "uninstalled", 0, 0, G_OPTION_ARG_NONE, &want_uninstalled,
-    "return 0 if the uninstalled version of one or more module(s) "
-    "or their dependencies will be used", NULL },
+  { "print-variables", 0, G_OPTION_FLAG_NO_ARG, G_OPTION_ARG_CALLBACK,
+    &output_opt_cb, "output list of variables defined by the module", NULL },
+  { "uninstalled", 0, G_OPTION_FLAG_NO_ARG, G_OPTION_ARG_CALLBACK,
+    &output_opt_cb, "return 0 if the uninstalled version of one or more "
+    "module(s) or their dependencies will be used", NULL },
   { "atleast-version", 0, 0, G_OPTION_ARG_STRING, &required_atleast_version,
     "return 0 if the module is at least version VERSION", "VERSION" },
   { "exact-version", 0, 0, G_OPTION_ARG_STRING, &required_exact_version,
     "return 0 if the module is at exactly version VERSION", "VERSION" },
   { "max-version", 0, 0, G_OPTION_ARG_STRING, &required_max_version,
     "return 0 if the module is at no newer than version VERSION", "VERSION" },
-  { "list-all", 0, 0, G_OPTION_ARG_NONE, &want_list,
-    "list all known packages", NULL },
+  { "list-all", 0, G_OPTION_FLAG_NO_ARG, G_OPTION_ARG_CALLBACK,
+    &output_opt_cb, "list all known packages", NULL },
   { "debug", 0, 0, G_OPTION_ARG_NONE, &want_debug_spew,
     "show verbose debug information", NULL },
   { "print-errors", 0, 0, G_OPTION_ARG_NONE, &want_verbose_errors,
@@ -354,12 +399,13 @@ static const GOptionEntry options_table[] = {
     "given on the command line)", NULL },
   { "errors-to-stdout", 0, 0, G_OPTION_ARG_NONE, &want_stdout_errors,
     "print errors from --print-errors to stdout not stderr", NULL },
-  { "print-provides", 0, 0, G_OPTION_ARG_NONE, &want_provides,
-    "print which packages the package provides", NULL },
-  { "print-requires", 0, 0, G_OPTION_ARG_NONE, &want_requires,
-    "print which packages the package requires", NULL },
-  { "print-requires-private", 0, 0, G_OPTION_ARG_NONE, &want_requires_private,
-    "print which packages the package requires for static linking", NULL },
+  { "print-provides", 0, G_OPTION_FLAG_NO_ARG, G_OPTION_ARG_CALLBACK,
+    &output_opt_cb, "print which packages the package provides", NULL },
+  { "print-requires", 0, G_OPTION_FLAG_NO_ARG, G_OPTION_ARG_CALLBACK,
+    &output_opt_cb, "print which packages the package requires", NULL },
+  { "print-requires-private", 0, G_OPTION_FLAG_NO_ARG, G_OPTION_ARG_CALLBACK,
+    &output_opt_cb, "print which packages the package requires for static "
+    "linking", NULL },
 #ifdef G_OS_WIN32
   { "dont-define-prefix", 0, 0, G_OPTION_ARG_NONE, &dont_define_prefix,
     "don't try to override the value of prefix for each .pc file found with "
