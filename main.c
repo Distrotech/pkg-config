@@ -59,6 +59,7 @@ static gboolean want_variable_list = FALSE;
 static gboolean want_debug_spew = FALSE;
 static gboolean want_verbose_errors = FALSE;
 static gboolean want_stdout_errors = FALSE;
+static gboolean output_opt_set = FALSE;
 
 void
 debug_spew (const char *format, ...)
@@ -155,6 +156,35 @@ static gboolean
 output_opt_cb (const char *opt, const char *arg, gpointer data,
                GError **error)
 {
+  /* only allow one output mode, with a few exceptions */
+  if (output_opt_set)
+    {
+      gboolean bad_opt = TRUE;
+
+      /* multiple flag options (--cflags --libs-only-l) allowed */
+      if (pkg_flags != 0 &&
+          (strcmp (opt, "--libs") == 0 ||
+           strcmp (opt, "--libs-only-l") == 0 ||
+           strcmp (opt, "--libs-only-other") == 0 ||
+           strcmp (opt, "--libs-only-L") == 0 ||
+           strcmp (opt, "--cflags") == 0 ||
+           strcmp (opt, "--cflags-only-I") == 0 ||
+           strcmp (opt, "--cflags-only-other") == 0))
+        bad_opt = FALSE;
+
+      /* --print-requires and --print-requires-private allowed */
+      if ((want_requires && strcmp (opt, "--print-requires-private") == 0) ||
+          (want_requires_private && strcmp (opt, "--print-requires") == 0))
+        bad_opt = FALSE;
+
+      if (bad_opt)
+        {
+          fprintf (stderr, "Ignoring incompatible output option \"%s\"\n",
+                   opt);
+          return TRUE;
+        }
+    }
+
   if (strcmp (opt, "--version") == 0)
     want_my_version = TRUE;
   else if (strcmp (opt, "--modversion") == 0)
@@ -192,6 +222,7 @@ output_opt_cb (const char *opt, const char *arg, gpointer data,
   else
     return FALSE;
 
+  output_opt_set = TRUE;
   return TRUE;
 }
 

@@ -37,3 +37,18 @@ run_test --print-requires-private requires-test
 RESULT="sub1 Subdirectory package 1 - Test package 1 for subdirectory
 sub2 Subdirectory package 2 - Test package 2 for subdirectory"
 PKG_CONFIG_LIBDIR="$srcdir/sub" run_test --list-all
+
+# Check handling when multiple incompatible options are set
+RESULT="Ignoring incompatible output option \"--modversion\"
+$PACKAGE_VERSION"
+run_test --version --modversion simple
+
+RESULT="Ignoring incompatible output option \"--version\"
+1.0.0"
+run_test --modversion --version simple
+
+# --print-requires/--print-requires-private allowed together
+RESULT="public-dep >= 1
+private-dep >= 1"
+run_test --print-requires --print-requires-private requires-test
+run_test --print-requires-private --print-requires requires-test
