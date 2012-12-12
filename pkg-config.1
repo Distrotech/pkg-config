@@ -362,6 +362,13 @@ module should install arch-independent pkg-config .pc files. By default
 the directory is $datadir/pkgconfig, but the default can be changed by
 passing DIRECTORY. The user can override through the
 --with-noarch-pkgconfigdir parameter.
+.TP
+.I "PKG_CHECK_VAR(VARIABLE, MODULE, CONFIG-VARIABLE, [ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND])"
+
+Retrieves the value of the pkg-config variable CONFIG-VARIABLE from
+MODULE and stores it in VARIABLE. Note that repeated usage of VARIABLE
+is not recommended as the check will be skipped if the variable is
+already set.
 
 .SH METADATA FILE SYNTAX
 To add a library to the set of packages \fIpkg-config\fP knows about,
