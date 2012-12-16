@@ -75,10 +75,10 @@ AC_ARG_WITH([system_library_path],
   [
 case "$libdir" in
 *lib64)
-  system_library_path="/usr/lib64:/usr/lib"
+  system_library_path="/usr/lib64:/lib64:/usr/lib:/lib"
   ;;
 *)
-  system_library_path="/usr/lib"
+  system_library_path="/usr/lib:/lib"
   ;;
 esac
 ])
