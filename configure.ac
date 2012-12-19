@@ -73,12 +73,13 @@ AC_ARG_WITH([system_library_path],
     [avoid -L flags from the given path])],
   [system_library_path="$withval"],
   [
-case "$libdir" in
-*lib64)
-  system_library_path="/usr/lib64:/lib64:/usr/lib:/lib"
+pc_lib_sfx=`echo "$libdir" | sed 's:.*/lib::'`
+case "$pc_lib_sfx" in
+*/*|"")
+  system_library_path="/usr/lib:/lib"
   ;;
 *)
-  system_library_path="/usr/lib:/lib"
+  system_library_path="/usr/lib$pc_lib_sfx:/lib$pc_lib_sfx:/usr/lib:/lib"
   ;;
 esac
 ])
