@@ -153,7 +153,10 @@ dnl
 dnl Find glib or use internal copy. Required version is 2.16 for
 dnl g_win32_get_package_installation_directory_of_module().
 dnl
-m4_define([glib_module], ["glib-2.0 >= 2.16"])
+dnl Pull in pkg-config macros to find external glib.
+dnl
+m4_include([pkg.m4])
+m4_define([glib_module], [glib-2.0 >= 2.16])
 AC_ARG_WITH([internal-glib],
   [AS_HELP_STRING([--with-internal-glib], [use internal glib])],
   [with_internal_glib="$withval"],
@@ -168,18 +171,11 @@ if test "x$with_internal_glib" = xyes; then
   AC_CONFIG_SUBDIRS([glib])
 else
   AC_MSG_RESULT([no])
-  if test "x$GLIB_CFLAGS" = "x" && test "x$GLIB_LIBS" = "x"; then
-    AC_CHECK_PROGS([PKG_CONFIG], [pkg-config], [])
-    if test -n $PKG_CONFIG && $PKG_CONFIG --exists glib_module; then
-      GLIB_CFLAGS=`$PKG_CONFIG --cflags glib_module`
-      GLIB_LIBS=`$PKG_CONFIG --libs glib_module`
-    else
-      AC_MSG_ERROR(m4_normalize([pkg-config and ]glib_module[ not found,
-                                 please set GLIB_CFLAGS and GLIB_LIBS to
-                                 the correct values or pass
-                                 --with-internal-glib to configure]))
-    fi
-  fi
+  PKG_CHECK_MODULES([GLIB], glib_module, [], [AC_MSG_ERROR([]dnl
+[m4_normalize([Either a previously installed pkg-config or "]glib_module["
+              could not be found. Please set GLIB_CFLAGS and GLIB_LIBS to
+              the correct values or pass --with-internal-glib to configure
+              to use the bundled copy.])])])
 fi
 AC_SUBST(GLIB_LIBS)
 AC_SUBST(GLIB_CFLAGS)
