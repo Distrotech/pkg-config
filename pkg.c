@@ -606,7 +606,6 @@ static void
 recursive_fill_list (Package *pkg, GetListFunc func, GList **listp)
 {
   GList *tmp;
-  static GList *chain = NULL;
 
   /*
    * This function should only be called to resolve Requires or
@@ -618,7 +617,7 @@ recursive_fill_list (Package *pkg, GetListFunc func, GList **listp)
    * If the package is one of the parents, we can skip it. This allows
    * circular requires loops to be broken.
    */
-  if (g_list_find (chain, pkg) != NULL)
+  if (pkg->in_requires_chain)
     {
       debug_spew ("Package %s already in requires chain, skipping\n",
                   pkg->key);
@@ -626,7 +625,7 @@ recursive_fill_list (Package *pkg, GetListFunc func, GList **listp)
     }
 
   /* record this package in the dependency chain */
-  chain = g_list_prepend (chain, pkg);
+  pkg->in_requires_chain = TRUE;
 
   /* Start from the end of the required package list to maintain order since
    * the recursive list is built by prepending. */
@@ -637,7 +636,7 @@ recursive_fill_list (Package *pkg, GetListFunc func, GList **listp)
   *listp = g_list_prepend (*listp, pkg);
 
   /* remove this package from the dependency chain now that we've unwound */
-  chain = g_list_remove (chain, pkg);
+  pkg->in_requires_chain = FALSE;
 }
 
 /* merge the flags from the individual packages */
