@@ -18,7 +18,7 @@ run_test --libs --static simple
 RESULT=""
 run_test --libs fields-blank
 
-RESULT="-Wl,--as-needed -L/other/lib -lother"
+RESULT="-L/other/lib -Wl,--as-needed -lother"
 run_test --libs other
 
 RESULT="-lother"
@@ -39,11 +39,11 @@ RESULT="-Wl,--as-needed -lother"
 run_test --libs-only-l --libs-only-other other
 run_test --libs-only-other --libs-only-l other
 
-RESULT="-Wl,--as-needed -L/other/lib"
+RESULT="-L/other/lib -Wl,--as-needed"
 run_test --libs-only-L --libs-only-other other
 run_test --libs-only-other --libs-only-L other
 
-RESULT="-Wl,--as-needed -L/other/lib -lother"
+RESULT="-L/other/lib -Wl,--as-needed -lother"
 run_test --libs-only-l --libs-only-L --libs-only-other other
 run_test --libs --libs-only-l --libs-only-L --libs-only-other other
 run_test --libs --libs-only-l other

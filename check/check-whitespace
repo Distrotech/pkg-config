@@ -9,5 +9,5 @@ RESULT='-Dlala=misc -I/usr/white\ space/include -I$(top_builddir) -Iinclude\ dir
 run_test --cflags whitespace
 
 # expect libs from whitespace
-RESULT="-r:foo -L/usr/white\\ space/lib -lfoo\\ bar -lbar\\ baz"
+RESULT="-L/usr/white\\ space/lib -lfoo\\ bar -lbar\\ baz -r:foo"
 run_test --libs whitespace

@@ -424,66 +424,36 @@ get_package_quiet (const char *name)
   return internal_get_package (name, FALSE);
 }
 
+/* Strip consecutive duplicate arguments in the flag list. */
 static GList *
-string_list_strip_duplicates (GList *list)
+flag_list_strip_duplicates (GList *list)
 {
-  GHashTable *table;
   GList *tmp;
 
-  table = g_hash_table_new (g_str_hash, g_str_equal);
-  for (tmp = list; tmp != NULL; tmp = g_list_next (tmp))
+  /* Start at the 2nd element of the list so we don't have to check for an
+   * existing previous element. */
+  for (tmp = g_list_next (list); tmp != NULL; tmp = g_list_next (tmp))
     {
-        if (!g_hash_table_lookup_extended (table, tmp->data, NULL, NULL))
+      Flag *cur = tmp->data;
+      Flag *prev = tmp->prev->data;
+
+      if (cur->type == prev->type && g_strcmp0 (cur->arg, prev->arg) == 0)
         {
-          /* Unique string. Track it and and move to the next. */
-          g_hash_table_replace (table, tmp->data, tmp->data);
-        }
-      else
-        {
+          /* Remove the duplicate flag from the list and move to the last
+           * element to prepare for the next iteration. */
           GList *dup = tmp;
 
-          /* Remove the duplicate string from the list. */
-          debug_spew (" removing duplicate \"%s\"\n", tmp->data);
-          tmp = tmp->prev;
+          debug_spew (" removing duplicate \"%s\"\n", cur->arg);
+          tmp = g_list_previous (tmp);
           list = g_list_remove_link (list, dup);
         }
     }
-  g_hash_table_destroy (table);
 
-  return list;
-}
-
-static GList *
-string_list_strip_duplicates_from_back (GList *list)
-{
-  GHashTable *table;
-  GList *tmp;
-  
-  table = g_hash_table_new (g_str_hash, g_str_equal);
-  for (tmp = g_list_last (list); tmp != NULL; tmp = g_list_previous (tmp))
-    {
-      if (!g_hash_table_lookup_extended (table, tmp->data, NULL, NULL))
-        {
-          /* Unique string. Track it and and move to the next. */
-          g_hash_table_replace (table, tmp->data, tmp->data);
-        }
-      else
-        {
-          GList *dup = tmp;
-
-          /* Remove the duplicate string from the list. */
-          debug_spew (" removing duplicate (from back) \"%s\"\n", tmp->data);
-          tmp = tmp->next;
-          list = g_list_remove_link (list, dup);
-        }
-    }
-  g_hash_table_destroy (table);
-  
   return list;
 }
 
 static char *
-string_list_to_string (GList *list)
+flag_list_to_string (GList *list)
 {
   GList *tmp;
   GString *str = g_string_new ("");
@@ -491,11 +461,10 @@ string_list_to_string (GList *list)
   
   tmp = list;
   while (tmp != NULL) {
-    char *tmpstr = (char*) tmp->data;
-    if (pcsysrootdir != NULL &&
-	tmpstr[0] == '-' &&
-	(tmpstr[1] == 'I' ||
-	 tmpstr[1] == 'L')) {
+    Flag *flag = tmp->data;
+    char *tmpstr = flag->arg;
+
+    if (pcsysrootdir != NULL && flag->type & (CFLAGS_I | LIBS_L)) {
       g_string_append_c (str, '-');
       g_string_append_c (str, tmpstr[1]);
       g_string_append (str, pcsysrootdir);
@@ -511,56 +480,6 @@ string_list_to_string (GList *list)
   g_string_free (str, FALSE);
 
   return retval;
-}
-
-typedef GList *(* GetListFunc) (Package *pkg);
-
-static GList *
-get_l_libs (Package *pkg)
-{
-  return pkg->l_libs;
-}
-
-static GList *
-get_L_libs (Package *pkg)
-{
-  return pkg->L_libs;
-}
-
-static GList *
-get_other_libs (Package *pkg)
-{  
-  return pkg->other_libs;
-}
-
-static GList *
-get_I_cflags (Package *pkg)
-{
-  return pkg->I_cflags;
-}
-
-static GList *
-get_other_cflags (Package *pkg)
-{
-  return pkg->other_cflags;
-}
-
-static GList *
-get_conflicts (Package *pkg)
-{
-  return pkg->conflicts;
-}
-
-static GList *
-get_requires (Package *pkg)
-{
-  return pkg->requires;
-}
-
-static GList *
-get_requires_private (Package *pkg)
-{
-  return pkg->requires_private;
 }
 
 static int
@@ -603,15 +522,9 @@ packages_sort_by_path_position (GList *list)
 }
 
 static void
-recursive_fill_list (Package *pkg, GetListFunc func, GList **listp)
+recursive_fill_list (Package *pkg, gboolean include_private, GList **listp)
 {
   GList *tmp;
-
-  /*
-   * This function should only be called to resolve Requires or
-   * Requires.private.
-   */
-  g_assert (func == get_requires || func == get_requires_private);
 
   /*
    * If the package is one of the parents, we can skip it. This allows
@@ -629,9 +542,9 @@ recursive_fill_list (Package *pkg, GetListFunc func, GList **listp)
 
   /* Start from the end of the required package list to maintain order since
    * the recursive list is built by prepending. */
-  for (tmp = g_list_last ((*func) (pkg)); tmp != NULL;
-       tmp = g_list_previous (tmp))
-    recursive_fill_list (tmp->data, func, listp);
+  tmp = include_private ? pkg->requires_private : pkg->requires;
+  for (tmp = g_list_last (tmp); tmp != NULL; tmp = g_list_previous (tmp))
+    recursive_fill_list (tmp->data, include_private, listp);
 
   *listp = g_list_prepend (*listp, pkg);
 
@@ -640,27 +553,37 @@ recursive_fill_list (Package *pkg, GetListFunc func, GList **listp)
 }
 
 /* merge the flags from the individual packages */
-static void
-merge_flag_lists (GList *packages, GetListFunc func, GList **listp)
+static GList *
+merge_flag_lists (GList *packages, FlagType type)
 {
-  GList *pkg;
   GList *last = NULL;
-  GList *flags;
+  GList *merged = NULL;
 
   /* keep track of the last element to avoid traversing the whole list */
-  for (pkg = packages; pkg != NULL; pkg = pkg->next)
+  for (; packages != NULL; packages = g_list_next (packages))
     {
-      for (flags = (*func) (pkg->data); flags != NULL; flags = flags->next)
+      Package *pkg = packages->data;
+      GList *flags = (type & LIBS_ANY) ? pkg->libs : pkg->cflags;
+
+      /* manually copy the elements so we can keep track of the end */
+      for (; flags != NULL; flags = g_list_next (flags))
         {
-          if (last == NULL)
+          Flag *flag = flags->data;
+
+          if (flag->type & type)
             {
-              *listp = g_list_prepend (NULL, flags->data);
-              last = *listp;
+              if (last == NULL)
+                {
+                  merged = g_list_prepend (NULL, flags->data);
+                  last = merged;
+                }
+              else
+                last = g_list_next (g_list_append (last, flags->data));
             }
-          else
-            last = g_list_next (g_list_append (last, flags->data));
         }
     }
+
+  return merged;
 }
 
 /* Work backwards from the end of the package list to remove duplicate
@@ -700,19 +623,18 @@ package_list_strip_duplicates (GList *packages)
   return packages;
 }
 
-static void
-fill_list (GList *packages, GetListFunc func,
-           GList **listp, gboolean in_path_order, gboolean include_private)
+static GList *
+fill_list (GList *packages, FlagType type,
+           gboolean in_path_order, gboolean include_private)
 {
   GList *tmp;
   GList *expanded = NULL;
+  GList *flags;
 
   /* Start from the end of the requested package list to maintain order since
    * the recursive list is built by prepending. */
   for (tmp = g_list_last (packages); tmp != NULL; tmp = g_list_previous (tmp))
-    recursive_fill_list (tmp->data,
-                         include_private ? get_requires_private : get_requires,
-                         &expanded);
+    recursive_fill_list (tmp->data, include_private, &expanded);
 
   /* Remove duplicate packages from the recursive list. This should provide a
    * serialized package list where all interdependencies are resolved
@@ -728,9 +650,10 @@ fill_list (GList *packages, GetListFunc func,
       spew_package_list ("  sorted", expanded);
     }
 
-  merge_flag_lists (expanded, func, listp);
-
+  flags = merge_flag_lists (expanded, type);
   g_list_free (expanded);
+
+  return flags;
 }
 
 static GList *
@@ -829,8 +752,8 @@ verify_package (Package *pkg)
   /* Make sure we didn't drag in any conflicts via Requires
    * (inefficient algorithm, who cares)
    */
-  recursive_fill_list (pkg, get_requires_private, &requires);
-  conflicts = get_conflicts (pkg);
+  recursive_fill_list (pkg, TRUE, &requires);
+  conflicts = pkg->conflicts;
 
   requires_iter = requires;
   while (requires_iter != NULL)
@@ -894,15 +817,19 @@ verify_package (Package *pkg)
     }
 
   count = 0;
-  iter = pkg->I_cflags;
-  while (iter != NULL)
+  for (iter = pkg->cflags; iter != NULL; iter = g_list_next (iter))
     {
       gint offset = 0;
+      Flag *flag = iter->data;
+
+      if (!(flag->type & CFLAGS_I))
+        continue;
+
       /* we put things in canonical -I/usr/include (vs. -I /usr/include) format,
        * but if someone changes it later we may as well be robust
        */
-      if (((strncmp (iter->data, "-I", 2) == 0) && (offset = 2))||
-          ((strncmp (iter->data, "-I ", 3) == 0) && (offset = 3)))
+      if (((strncmp (flag->arg, "-I", 2) == 0) && (offset = 2))||
+          ((strncmp (flag->arg, "-I ", 3) == 0) && (offset = 3)))
         {
 	  if (offset == 0)
 	    {
@@ -914,29 +841,28 @@ verify_package (Package *pkg)
 	  while (system_dir_iter != NULL)
 	    {
 	      if (strcmp (system_dir_iter->data,
-                          ((char*)iter->data) + offset) == 0)
+                          ((char*)flag->arg) + offset) == 0)
 		{
-		  debug_spew ("Package %s has %s in Cflags\n",
-			      pkg->key, (gchar *)iter->data);
+                  debug_spew ("Package %s has %s in Cflags\n",
+			      pkg->key, (gchar *)flag->arg);
 		  if (g_getenv ("PKG_CONFIG_ALLOW_SYSTEM_CFLAGS") == NULL)
 		    {
-		      debug_spew ("Removing %s from cflags for %s\n", iter->data, pkg->key);
+                      debug_spew ("Removing %s from cflags for %s\n",
+                                  flag->arg, pkg->key);
 		      ++count;
 		      iter->data = NULL;
-		      
+
 		      break;
 		    }
 		}
 	      system_dir_iter = system_dir_iter->next;
 	    }
         }
-
-      iter = iter->next;
     }
 
   while (count)
     {
-      pkg->I_cflags = g_list_remove (pkg->I_cflags, NULL);
+      pkg->cflags = g_list_remove (pkg->cflags, NULL);
       --count;
     }
 
@@ -955,15 +881,18 @@ verify_package (Package *pkg)
   system_directories = add_env_variable_to_list (system_directories, search_path);
 
   count = 0;
-  iter = pkg->L_libs;
-  while (iter != NULL)
+  for (iter = pkg->libs; iter != NULL; iter = g_list_next (iter))
     {
       GList *system_dir_iter = system_directories;
+      Flag *flag = iter->data;
+
+      if (!(flag->type & LIBS_L))
+        continue;
 
       while (system_dir_iter != NULL)
         {
           gboolean is_system = FALSE;
-          const char *linker_arg = iter->data;
+          const char *linker_arg = flag->arg;
           const char *system_libpath = system_dir_iter->data;
 
           if (strncmp (linker_arg, "-L ", 3) == 0 &&
@@ -980,7 +909,8 @@ verify_package (Package *pkg)
                 {
                   iter->data = NULL;
                   ++count;
-                  debug_spew ("Removing -L %s from libs for %s\n", system_libpath, pkg->key);
+                  debug_spew ("Removing -L %s from libs for %s\n",
+                              system_libpath, pkg->key);
                   break;
                 }
             }
@@ -992,36 +922,28 @@ verify_package (Package *pkg)
 
   while (count)
     {
-      pkg->L_libs = g_list_remove (pkg->L_libs, NULL);
+      pkg->libs = g_list_remove (pkg->libs, NULL);
       --count;
     }
 }
 
-static char*
-get_multi_merged (GList *pkgs, GetListFunc func, gboolean in_path_order,
-		  gboolean include_private)
+/* Create a merged list of required packages and retrieve the flags from them.
+ * Strip the duplicates from the flags list. The sorting and stripping can be
+ * done in one of two ways: packages sorted by position in the pkg-config path
+ * and stripping done from the beginning of the list, or packages sorted from
+ * most dependent to least dependent and stripping from the end of the list.
+ * The former is done for -I/-L flags, and the latter for all others.
+ */
+static char *
+get_multi_merged (GList *pkgs, FlagType type, gboolean in_path_order,
+                  gboolean include_private)
 {
-  GList *list = NULL;
+  GList *list;
   char *retval;
 
-  fill_list (pkgs, func, &list, in_path_order, include_private);
-  list = string_list_strip_duplicates (list);
-  retval = string_list_to_string (list);
-  g_list_free (list);
-
-  return retval;
-}
-
-static char*
-get_multi_merged_from_back (GList *pkgs, GetListFunc func,
-			    gboolean in_path_order, gboolean include_private)
-{
-  GList *list = NULL;
-  char *retval;
-
-  fill_list (pkgs, func, &list, in_path_order, include_private);
-  list = string_list_strip_duplicates_from_back (list);
-  retval = string_list_to_string (list);
+  list = fill_list (pkgs, type, in_path_order, include_private);
+  list = flag_list_strip_duplicates (list);
+  retval = flag_list_to_string (list);
   g_list_free (list);
 
   return retval;
@@ -1035,42 +957,33 @@ packages_get_flags (GList *pkgs, FlagType flags)
 
   str = g_string_new (NULL);
 
-
-  /* sort flags from beginning and in forward direction except for -l */
+  /* sort packages in path order for -L/-I, dependency order otherwise */
   if (flags & CFLAGS_OTHER)
     {
-      cur = get_multi_merged (pkgs, get_other_cflags, TRUE, TRUE);
+      cur = get_multi_merged (pkgs, CFLAGS_OTHER, FALSE, TRUE);
       debug_spew ("adding CFLAGS_OTHER string \"%s\"\n", cur);
       g_string_append (str, cur);
       g_free (cur);
     }
   if (flags & CFLAGS_I)
     {
-      cur = get_multi_merged (pkgs, get_I_cflags, TRUE, TRUE);
+      cur = get_multi_merged (pkgs, CFLAGS_I, TRUE, TRUE);
       debug_spew ("adding CFLAGS_I string \"%s\"\n", cur);
-      g_string_append (str, cur);
-      g_free (cur);
-    }
-  if (flags & LIBS_OTHER)
-    {
-      cur = get_multi_merged (pkgs, get_other_libs, TRUE,
-                              !ignore_private_libs);
-      debug_spew ("adding LIBS_OTHER string \"%s\"\n", cur);
       g_string_append (str, cur);
       g_free (cur);
     }
   if (flags & LIBS_L)
     {
-      cur = get_multi_merged (pkgs, get_L_libs, TRUE, !ignore_private_libs);
+      cur = get_multi_merged (pkgs, LIBS_L, TRUE, !ignore_private_libs);
       debug_spew ("adding LIBS_L string \"%s\"\n", cur);
       g_string_append (str, cur);
       g_free (cur);
     }
-  if (flags & LIBS_l)
+  if (flags & (LIBS_OTHER | LIBS_l))
     {
-      cur = get_multi_merged_from_back (pkgs, get_l_libs, FALSE,
-                                        !ignore_private_libs);
-      debug_spew ("adding LIBS_l string \"%s\"\n", cur);
+      cur = get_multi_merged (pkgs, flags & (LIBS_OTHER | LIBS_l), FALSE,
+                              !ignore_private_libs);
+      debug_spew ("adding LIBS_OTHER | LIBS_l string \"%s\"\n", cur);
       g_string_append (str, cur);
       g_free (cur);
     }
