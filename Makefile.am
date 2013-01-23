@@ -40,6 +40,8 @@ if HOST_TOOL
 host_tool = $(host)-pkg-config$(EXEEXT)
 install-exec-hook:
 	cd $(DESTDIR)$(bindir) && $(LN) pkg-config$(EXEEXT) $(host_tool)
+uninstall-hook:
+	cd $(DESTDIR)$(bindir) && rm -f $(host_tool)
 endif
 
 # Various data files
