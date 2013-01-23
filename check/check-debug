@@ -8,7 +8,7 @@ set -e
 # more than desirable.
 
 RESULT="PKG_CONFIG_DEBUG_SPEW variable enabling debug spew
-Adding directory '.' from PKG_CONFIG_PATH
+Adding directory '$srcdir' from PKG_CONFIG_PATH
 Global variable definition 'pc_sysrootdir' = '/'
 Global variable definition 'pc_top_builddir' = '\$(top_builddir)'
 Error printing enabled by default due to use of output options besides --exists or --atleast/exact/max-version. Value of --silence-errors: 0
