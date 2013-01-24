@@ -1,3 +1,34 @@
+pkg-config 0.28
+===
+- Fixed a pair of long-standing and intertwined bugs involving unwanted
+  removal of flags. The first is that other Libs flags like -Wl are now
+  kept in context order with -l flags. The second is that aggressive
+  removal of all duplicate arguments has been scaled back so that just
+  consecutive duplicate arguments are removed. One result of this change
+  is that some flags could be repeated in the final output, especially
+  flags from non-pkg-config packages like -lm. Since pkg-config rarely
+  has enough knowledge here about the right thing to do, we throw the
+  duplicate arguments at the compiler/linker and trust it will do the
+  right thing.
+- Fixed an old bug to allow circular Requires. This fix brings along a
+  small behavior change in that pkg-config resolves requires depth
+  first, causing some lower level flags to show up earlier in the output
+  than previously.
+- Cleaned up many corner-case bugs and ambiguous behavior in
+  pkg-config's interface. Thanks to Michał Górny for finding so many of
+  these.
+- New autoconf macro PKG_CHECK_VAR for reading variables from .pc files.
+- Default to suppressing -L/lib and/or -L/lib64 like their /usr
+  counterparts.
+- To help support multiarch scenarios out of the box, $host-pkg-config
+  is now installed unless --disable-host-tool is passed to configure.
+- Added optional gcov usage through the --with-gcov configure option. As
+  a result, many more tests were added to greatly increase the coverage
+  of the code to 86% of executed lines on a Fedora 18 machine.
+- Bugs fixed: 130, 7331, 16101, 17053, 19950, 34504, 48098, 54231,
+  54271, 54379, 54384, 54386, 54388, 54389, 54390, 54391, 54427, 54463,
+  54716, 57078, 58363, 59435.
+
 pkg-config 0.27.1
 ===
 
