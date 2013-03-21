@@ -138,7 +138,7 @@ fi
 AC_SUBST(WARN_CFLAGS)
 
 AC_MSG_CHECKING([for Win32])
-case "$build" in
+case "$host" in
   *-*-mingw*)
     native_win32=yes
   ;;
