@@ -147,6 +147,7 @@ case "$host" in
   ;;
 esac
 AC_MSG_RESULT([$native_win32])
+AC_SUBST([native_win32])
 AM_CONDITIONAL(NATIVE_WIN32, [test "x$native_win32" = xyes])
 
 dnl
