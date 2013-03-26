@@ -190,6 +190,7 @@ output_opt_cb (const char *opt, const char *arg, gpointer data,
         {
           fprintf (stderr, "Ignoring incompatible output option \"%s\"\n",
                    opt);
+          fflush (stderr);
           return TRUE;
         }
     }
@@ -322,6 +323,7 @@ process_package_args (const char *cmdline, GList **packages, FILE *log)
   if (reqs == NULL)
     {
       fprintf (stderr, "Must specify package names on the command line\n");
+      fflush (stderr);
       return FALSE;
     }
 
