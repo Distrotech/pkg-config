@@ -32,6 +32,10 @@ AC_ARG_VAR([TESTS_SHELL], [Path to a POSIX shell to be used for testing])
 conf_path="$PATH:`getconf PATH 2>/dev/null`"
 AC_PATH_PROGS([TESTS_SHELL], [bash ksh sh], [$CONFIG_SHELL], [$conf_path])
 
+dnl The built pkg-config to use for testing. This allows it to be set
+dnl from the make command line if necessary.
+AC_SUBST([TESTS_PKG_CONFIG], ['${top_builddir}/pkg-config${EXEEXT}'])
+
 dnl
 dnl Default pkg-config search path
 dnl
