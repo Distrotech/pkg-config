@@ -34,8 +34,9 @@ set -e
 
 . ${srcdir}/common
 
-order1="$srcdir/sort/sort:$srcdir/sort"
-order2="$srcdir/sort:$srcdir/sort/sort"
+[ "$native_win32" = yes ] && sep=';' || sep=':'
+order1="${srcdir}/sort/sort${sep}${srcdir}/sort"
+order2="${srcdir}/sort${sep}${srcdir}/sort/sort"
 
 export PKG_CONFIG_PATH
 PKG_CONFIG_PATH="$order1"
