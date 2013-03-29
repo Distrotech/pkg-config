@@ -22,7 +22,7 @@ if [ "$native_win32" = yes ]; then
         # Assume we have cmd somewhere to get variable %cd%. Make sure
         # to strip carriage returns.
         pcdir=$(cd $top_builddir/.libs &&
-                cmd /C echo %cd% | sed -r 's/\r//g')
+                $WINE cmd /C echo %cd% | sed -r 's/\r//g')
     fi
     win_path="$pcdir/lib/pkgconfig;$pcdir/share/pkgconfig"
 
