@@ -154,6 +154,13 @@ AC_MSG_RESULT([$native_win32])
 AC_SUBST([native_win32])
 AM_CONDITIONAL(NATIVE_WIN32, [test "x$native_win32" = xyes])
 
+dnl When cross compiling to Windows, Wine might be available to help
+dnl for testing.
+if test "$cross_compiling" = yes && test "$native_win32" = yes; then
+   AC_CHECK_PROG([WINE], [wine], [wine])
+   test "x$WINE" != x && TESTS_PKG_CONFIG='${WINE} '"$TESTS_PKG_CONFIG"
+fi
+
 dnl
 dnl Find glib or use internal copy. Required version is 2.16 for
 dnl g_win32_get_package_installation_directory_of_module().
