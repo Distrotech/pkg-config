@@ -462,9 +462,13 @@ static const GOptionEntry options_table[] = {
     &output_opt_cb, "print which packages the package requires for static "
     "linking", NULL },
 #ifdef G_OS_WIN32
-  { "dont-define-prefix", 0, 0, G_OPTION_ARG_NONE, &dont_define_prefix,
-    "don't try to override the value of prefix for each .pc file found with "
-    "a guesstimated value based on the location of the .pc file", NULL },
+  { "define-prefix", 0, 0, G_OPTION_ARG_NONE, &define_prefix,
+    "try to override the value of prefix for each .pc file found with a "
+    "guesstimated value based on the location of the .pc file", NULL },
+  { "dont-define-prefix", 0, G_OPTION_FLAG_REVERSE, G_OPTION_ARG_NONE,
+    &define_prefix, "don't try to override the value of prefix for each .pc "
+    "file found with a guesstimated value based on the location of the .pc "
+    "file", NULL },
   { "prefix-variable", 0, 0, G_OPTION_ARG_STRING, &prefix_variable,
     "set the name of the variable that pkg-config automatically sets",
     "PREFIX" },

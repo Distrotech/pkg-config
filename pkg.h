@@ -134,9 +134,9 @@ extern char *pcsysrootdir;
 extern char *pkg_config_pc_path;
 
 #ifdef G_OS_WIN32
-/* If TRUE, do not automatically define "prefix"  while
- * parsing each .pc file */
-extern gboolean dont_define_prefix;
+/* If TRUE, define "prefix" in .pc files at runtime. */
+extern gboolean define_prefix;
+
 /* The name of the variable that acts as prefix, unless it is "prefix" */
 extern char *prefix_variable;
 

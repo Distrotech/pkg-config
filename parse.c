@@ -35,7 +35,7 @@
 #include <sys/types.h>
 
 #ifdef G_OS_WIN32
-gboolean dont_define_prefix = FALSE;
+gboolean define_prefix = ENABLE_DEFINE_PREFIX;
 char *prefix_variable = "prefix";
 gboolean msvc_syntax = FALSE;
 #endif
@@ -968,7 +968,7 @@ parse_line (Package *pkg, const char *untrimmed, const char *path,
         pkg->vars = g_hash_table_new (g_str_hash, g_str_equal);
 
 #ifdef G_OS_WIN32
-      if (!dont_define_prefix && strcmp (tag, prefix_variable) == 0)
+      if (define_prefix && strcmp (tag, prefix_variable) == 0)
 	{
 	  /* This is the prefix variable. Try to guesstimate a value for it
 	   * for this package from the location of the .pc file.
@@ -1025,7 +1025,7 @@ parse_line (Package *pkg, const char *untrimmed, const char *path,
 	      goto cleanup;
 	    }
 	}
-      else if (!dont_define_prefix &&
+      else if (define_prefix &&
 	       orig_prefix != NULL &&
 	       strncmp (p, orig_prefix, strlen (orig_prefix)) == 0 &&
 	       G_IS_DIR_SEPARATOR (p[strlen (orig_prefix)]))

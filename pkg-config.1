@@ -208,14 +208,23 @@ prints \fIfoo.lib\fP. Note that the --libs output consists of flags
 for the linker, and should be placed on the cl command line after a
 /link switch.
 .TP
+.I "--define-prefix"
+.TQ
 .I "--dont-define-prefix"
-This option is available only on Windows. It prevents \fIpkg-config\fP
-from automatically trying to override the value of the variable
-"prefix" in each .pc file.
+These options are available only on Windows. They control whether
+.I pkg-config
+overrides the value of the variable "prefix" in each .pc file. With
+\-\-define-prefix,
+.I pkg-config
+uses the installed location of the .pc file to determine the
+prefix. \-\-dont-define-prefix prevents this behavior. The default is
+usually \-\-define-prefix.
 .TP
 .I "--prefix-variable=PREFIX"
-Also this option is available only on Windows. It sets the name of the
-variable that \fIpkg-config\fP automatically sets as described above.
+This option is available only on Windows. It sets the name of the
+variable that
+.I pkg-config
+overrides instead of "prefix" when using the \-\-define-prefix feature.
 .TP
 .I "--static"
 Output libraries suitable for static linking.  That means including

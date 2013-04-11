@@ -161,6 +161,19 @@ if test "$cross_compiling" = yes && test "$native_win32" = yes; then
    test "x$WINE" != x && TESTS_PKG_CONFIG='${WINE} '"$TESTS_PKG_CONFIG"
 fi
 
+dnl On Windows, the prefix variable in .pc files can be redfined at
+dnl runtime. Allow the default behavior to be controlled.
+AC_MSG_CHECKING([if prefix should be redefined at runtime])
+AC_ARG_ENABLE([define_prefix],
+  [AS_HELP_STRING([--enable-define-prefix],
+    [redefine prefix in .pc files @<:@default=yes on Win32@:>@])],
+  [],
+  [enable_define_prefix=$native_win32])
+AC_MSG_RESULT([$enable_define_prefix])
+AC_DEFINE_UNQUOTED([ENABLE_DEFINE_PREFIX],
+  [`test "x$enable_define_prefix" = xyes && echo TRUE || echo FALSE`],
+  [Define ${prefix} in .pc files at runtime])
+
 dnl
 dnl Find glib or use internal copy. Required version is 2.16 for
 dnl g_win32_get_package_installation_directory_of_module().
