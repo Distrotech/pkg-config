@@ -855,10 +855,6 @@ parse_url (Package *pkg, const char *str, const char *path)
   pkg->url = trim_and_sub (pkg, str, path);
 }
 
-#ifdef G_OS_WIN32
-static char *orig_prefix = NULL;
-#endif
-
 static void
 parse_line (Package *pkg, const char *untrimmed, const char *path,
 	    gboolean ignore_requires, gboolean ignore_private_libs,
@@ -971,7 +967,8 @@ parse_line (Package *pkg, const char *untrimmed, const char *path,
               gchar *q;
               gchar *prefix;
 	      
-              orig_prefix = g_strdup (p);
+              /* Keep track of the original prefix value. */
+              pkg->orig_prefix = g_strdup (p);
 
               /* Get grandparent directory for new prefix. */
               q = g_path_get_dirname (pkg->pcfiledir);
@@ -1005,13 +1002,14 @@ parse_line (Package *pkg, const char *untrimmed, const char *path,
 	    }
 	}
       else if (define_prefix &&
-	       orig_prefix != NULL &&
-	       strncmp (p, orig_prefix, strlen (orig_prefix)) == 0 &&
-	       G_IS_DIR_SEPARATOR (p[strlen (orig_prefix)]))
+	       pkg->orig_prefix != NULL &&
+	       strncmp (p, pkg->orig_prefix, strlen (pkg->orig_prefix)) == 0 &&
+	       G_IS_DIR_SEPARATOR (p[strlen (pkg->orig_prefix)]))
 	{
 	  char *oldstr = str;
 
-	  p = str = g_strconcat (g_hash_table_lookup (pkg->vars, prefix_variable), p + strlen (orig_prefix), NULL);
+	  p = str = g_strconcat (g_hash_table_lookup (pkg->vars, prefix_variable),
+				 p + strlen (pkg->orig_prefix), NULL);
 	  g_free (oldstr);
 	}
 #endif
