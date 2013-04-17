@@ -318,15 +318,22 @@ and
 This can be augmented or replaced using the standard environment
 variables described above.
 
-If a .pc file is found in a directory that matches the usual
-conventions (i.e., ends with \\lib\\pkgconfig or \\share\\pkgconfig),
+If a .pc file is found in a directory named
+.IR pkgconfig ,
 the prefix for that package is assumed to be the grandparent of the
-directory where the file was found, and the \fIprefix\fP variable is
-overridden for that file accordingly.
+directory where the file was found, and the
+.I prefix
+variable is overridden for that file accordingly.
 
 If the value of a variable in a .pc file begins with the original,
-non-overridden, value of the \fIprefix\fP variable, then the overridden
-value of \fIprefix\fP is used instead.
+non-overridden, value of the
+.I prefix
+variable, then the overridden value of
+.I prefix
+is used instead. This allows the feature to work even when the variables
+have been expanded in the .pc file.
+
+See the \-\-dont-define-prefix option for disabling this feature.
 .\"
 .SH AUTOCONF MACROS
 .TP

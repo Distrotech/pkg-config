@@ -857,20 +857,6 @@ parse_url (Package *pkg, const char *str, const char *path)
 
 #ifdef G_OS_WIN32
 static char *orig_prefix = NULL;
-
-static int
-pathnamecmp (const char *a,
-	     const char *b)
-{
-  while (*a && *b &&
-	 ((G_IS_DIR_SEPARATOR (*a) && G_IS_DIR_SEPARATOR (*b)) ||
-	  g_ascii_toupper (*a) == g_ascii_toupper (*b)))
-    {
-      a++;
-      b++;
-    }
-  return g_ascii_toupper (*a) - g_ascii_toupper (*b);
-}
 #endif
 
 static void
@@ -973,31 +959,24 @@ parse_line (Package *pkg, const char *untrimmed, const char *path,
 	  /* This is the prefix variable. Try to guesstimate a value for it
 	   * for this package from the location of the .pc file.
 	   */
+          gchar *base;
+          gboolean is_pkgconfigdir;
 
-	  gchar *prefix = pkg->pcfiledir;
-	  const int prefix_len = strlen (prefix);
-	  const char *const lib_pkgconfig = "\\lib\\pkgconfig";
-	  const char *const share_pkgconfig = "\\share\\pkgconfig";
-	  const int lib_pkgconfig_len = strlen (lib_pkgconfig);
-	  const int share_pkgconfig_len = strlen (share_pkgconfig);
-
-	  if ((strlen (prefix) > lib_pkgconfig_len &&
-	       pathnamecmp (prefix + prefix_len - lib_pkgconfig_len, lib_pkgconfig) == 0) ||
-	      (strlen (prefix) > share_pkgconfig_len &&
-	       pathnamecmp (prefix + prefix_len - share_pkgconfig_len, share_pkgconfig) == 0))
-	    {
-	      /* It ends in lib\pkgconfig or share\pkgconfig. Good. */
+          base = g_path_get_basename (pkg->pcfiledir);
+          is_pkgconfigdir = g_ascii_strcasecmp (base, "pkgconfig") == 0;
+          g_free (base);
+          if (is_pkgconfigdir)
+            {
+              /* It ends in pkgconfig. Good. */
+              gchar *q;
+              gchar *prefix;
 	      
-	      gchar *q;
-	      
-	      orig_prefix = g_strdup (p);
+              orig_prefix = g_strdup (p);
 
-	      prefix = g_strdup (prefix);
-	      if (strlen (prefix) > lib_pkgconfig_len &&
-		  pathnamecmp (prefix + prefix_len - lib_pkgconfig_len, lib_pkgconfig) == 0)
-		prefix[prefix_len - lib_pkgconfig_len] = '\0';
-	      else
-		prefix[prefix_len - share_pkgconfig_len] = '\0';
+              /* Get grandparent directory for new prefix. */
+              q = g_path_get_dirname (pkg->pcfiledir);
+              prefix = g_path_get_dirname (q);
+              g_free (q);
 	      
 	      /* Turn backslashes into slashes or
 	       * g_shell_parse_argv() will eat them when ${prefix}
