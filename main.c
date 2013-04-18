@@ -461,7 +461,6 @@ static const GOptionEntry options_table[] = {
   { "print-requires-private", 0, G_OPTION_FLAG_NO_ARG, G_OPTION_ARG_CALLBACK,
     &output_opt_cb, "print which packages the package requires for static "
     "linking", NULL },
-#ifdef G_OS_WIN32
   { "define-prefix", 0, 0, G_OPTION_ARG_NONE, &define_prefix,
     "try to override the value of prefix for each .pc file found with a "
     "guesstimated value based on the location of the .pc file", NULL },
@@ -472,6 +471,7 @@ static const GOptionEntry options_table[] = {
   { "prefix-variable", 0, 0, G_OPTION_ARG_STRING, &prefix_variable,
     "set the name of the variable that pkg-config automatically sets",
     "PREFIX" },
+#ifdef G_OS_WIN32
   { "msvc-syntax", 0, 0, G_OPTION_ARG_NONE, &msvc_syntax,
     "output -l and -L flags for the Microsoft compiler (cl)", NULL },
 #endif

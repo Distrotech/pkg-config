@@ -34,9 +34,10 @@
 #endif
 #include <sys/types.h>
 
-#ifdef G_OS_WIN32
 gboolean define_prefix = ENABLE_DEFINE_PREFIX;
 char *prefix_variable = "prefix";
+
+#ifdef G_OS_WIN32
 gboolean msvc_syntax = FALSE;
 #endif
 
@@ -943,7 +944,6 @@ parse_line (Package *pkg, const char *untrimmed, const char *path,
       if (pkg->vars == NULL)
         pkg->vars = g_hash_table_new (g_str_hash, g_str_equal);
 
-#ifdef G_OS_WIN32
       if (define_prefix && strcmp (tag, prefix_variable) == 0)
 	{
 	  /* This is the prefix variable. Try to guesstimate a value for it
@@ -1006,7 +1006,6 @@ parse_line (Package *pkg, const char *untrimmed, const char *path,
 				 p + strlen (pkg->orig_prefix), NULL);
 	  g_free (oldstr);
 	}
-#endif
 
       if (g_hash_table_lookup (pkg->vars, tag))
         {

@@ -211,20 +211,37 @@ for the linker, and should be placed on the cl command line after a
 .I "--define-prefix"
 .TQ
 .I "--dont-define-prefix"
-These options are available only on Windows. They control whether
+These options control whether
 .I pkg-config
-overrides the value of the variable "prefix" in each .pc file. With
-\-\-define-prefix,
+overrides the value of the variable
+.I prefix
+in each .pc file. With \-\-define-prefix,
 .I pkg-config
 uses the installed location of the .pc file to determine the
 prefix. \-\-dont-define-prefix prevents this behavior. The default is
 usually \-\-define-prefix.
+
+When this feature is enabled and a .pc file is found in a directory named
+.IR pkgconfig ,
+the prefix for that package is assumed to be the grandparent of the
+directory where the file was found, and the
+.I prefix
+variable is overridden for that file accordingly.
+
+If the value of a variable in a .pc file begins with the original,
+non-overridden, value of the
+.I prefix
+variable, then the overridden value of
+.I prefix
+is used instead. This allows the feature to work even when the variables
+have been expanded in the .pc file.
 .TP
 .I "--prefix-variable=PREFIX"
-This option is available only on Windows. It sets the name of the
-variable that
+Set the name of the variable that
 .I pkg-config
-overrides instead of "prefix" when using the \-\-define-prefix feature.
+overrides instead of
+.I prefix
+when using the \-\-define-prefix feature.
 .TP
 .I "--static"
 Output libraries suitable for static linking.  That means including
@@ -317,23 +334,6 @@ and
 .IR share\epkgconfig .
 This can be augmented or replaced using the standard environment
 variables described above.
-
-If a .pc file is found in a directory named
-.IR pkgconfig ,
-the prefix for that package is assumed to be the grandparent of the
-directory where the file was found, and the
-.I prefix
-variable is overridden for that file accordingly.
-
-If the value of a variable in a .pc file begins with the original,
-non-overridden, value of the
-.I prefix
-variable, then the overridden value of
-.I prefix
-is used instead. This allows the feature to work even when the variables
-have been expanded in the .pc file.
-
-See the \-\-dont-define-prefix option for disabling this feature.
 .\"
 .SH AUTOCONF MACROS
 .TP
