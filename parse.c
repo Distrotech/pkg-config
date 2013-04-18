@@ -40,12 +40,6 @@ char *prefix_variable = "prefix";
 gboolean msvc_syntax = FALSE;
 #endif
 
-#ifdef G_OS_WIN32
-#ifndef G_IS_DIR_SEPARATOR
-#define G_IS_DIR_SEPARATOR(c) ((c) == G_DIR_SEPARATOR || (c) == '/')
-#endif
-#endif
-
 /**
  * Read an entire line from a file into a buffer. Lines may
  * be delimited with '\n', '\r', '\n\r', or '\r\n'. The delimiter
