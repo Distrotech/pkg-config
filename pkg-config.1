@@ -311,17 +311,48 @@ Replaces the default
 search directory, usually
 .IR /usr/lib/pkgconfig : /usr/share/pkgconfig .
 .\"
-.SH QUERYING PKG-CONFIG'S DEFAULTS
+.SH PKG-CONFIG DERIVED VARIABLES
 .I pkg-config
-can be used to query itself for the default search path, version number
-and other information, for instance using:
+sets a few metadata variables that can be used in .pc files or queried
+at runtime.
+.TP
+.I pc_path
+The default search path used by
+.I pkg-config
+when searching for .pc files. This can be used in a query for the
+.I pkg-config
+module itself itself:
 .nf
   $ pkg-config --variable pc_path pkg-config
 .fi
-or
+.TP
+.I pcfiledir
+The installed location of the .pc file. This can be used to query the
+location of the .pc file for a particular module, but it can also be
+used to make .pc files relocatable. For instance:
 .nf
-  $ pkg-config --modversion pkg-config
+prefix=${pcfiledir}/../..
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
 .fi
+.TP
+.I pc_sysrootdir
+The sysroot directory set by the user. When the sysroot directory has
+not been set, this value is
+.IR / .
+See the
+.I PKG_CONFIG_SYSROOT_DIR
+environment variable for more details.
+.TP
+.I pc_top_builddir
+Location of the user's top build directory when calling
+.IR pkg-config.
+This is useful to dynamically set paths in uninstalled .pc files. See
+the
+.I PKG_CONFIG_TOP_BUILD_DIR
+environment variable for more details.
+.\"
 .SH WINDOWS SPECIALITIES
 The
 .I pkg-config
