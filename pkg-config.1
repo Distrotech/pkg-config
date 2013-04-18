@@ -294,6 +294,18 @@ or
   $ pkg-config --modversion pkg-config
 .fi
 .SH WINDOWS SPECIALITIES
+The
+.I pkg-config
+default search path is ignored on Windows. Instead, the search path is
+constructed by using the installed directory of
+.I pkg-config
+and then appending
+.I lib\epkgconfig
+and
+.IR share\epkgconfig .
+This can be augmented or replaced using the standard environment
+variables described above.
+
 If a .pc file is found in a directory that matches the usual
 conventions (i.e., ends with \\lib\\pkgconfig or \\share\\pkgconfig),
 the prefix for that package is assumed to be the grandparent of the
