@@ -25,7 +25,8 @@ TESTS = \
 	check-uninstalled \
 	check-debug \
 	check-gtk \
-	check-tilde
+	check-tilde \
+	check-relocatable
 
 EXTRA_DIST = \
 	$(TESTS) \
@@ -92,4 +93,7 @@ EXTRA_DIST = \
 	gtk/xcb.pc \
 	gtk/xproto.pc \
 	gtk/xrender.pc \
-	tilde.pc
+	tilde.pc \
+	pkgconfig/prefixdef.pc \
+	pkgconfig/prefixdef-expanded.pc \
+	pcfiledir.pc
