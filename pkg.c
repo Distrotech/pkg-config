@@ -127,7 +127,7 @@ name_ends_in_uninstalled (const char *str)
  * locations, ignoring duplicates
  */
 static void
-scan_dir (const char *dirname)
+scan_dir (char *dirname)
 {
   DIR *dir;
   struct dirent *dent;
