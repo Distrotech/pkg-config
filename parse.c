@@ -34,6 +34,7 @@
 #endif
 #include <sys/types.h>
 
+gboolean parse_strict = TRUE;
 gboolean define_prefix = ENABLE_DEFINE_PREFIX;
 char *prefix_variable = "prefix";
 
@@ -199,8 +200,8 @@ trim_and_sub (Package *pkg, const char *str, const char *path)
             {
               verbose_error ("Variable '%s' not defined in '%s'\n",
                              varname, path);
-              
-              exit (1);
+              if (parse_strict)
+                exit (1);
             }
 
           g_free (varname);
@@ -229,8 +230,10 @@ parse_name (Package *pkg, const char *str, const char *path)
   if (pkg->name)
     {
       verbose_error ("Name field occurs twice in '%s'\n", path);
-
-      exit (1);
+      if (parse_strict)
+        exit (1);
+      else
+        return;
     }
   
   pkg->name = trim_and_sub (pkg, str, path);
@@ -242,8 +245,10 @@ parse_version (Package *pkg, const char *str, const char *path)
   if (pkg->version)
     {
       verbose_error ("Version field occurs twice in '%s'\n", path);
-
-      exit (1);
+      if (parse_strict)
+        exit (1);
+      else
+        return;
     }
   
   pkg->version = trim_and_sub (pkg, str, path);
@@ -255,8 +260,10 @@ parse_description (Package *pkg, const char *str, const char *path)
   if (pkg->description)
     {
       verbose_error ("Description field occurs twice in '%s'\n", path);
-
-      exit (1);
+      if (parse_strict)
+        exit (1);
+      else
+        return;
     }
   
   pkg->description = trim_and_sub (pkg, str, path);
@@ -408,9 +415,8 @@ parse_module_list (Package *pkg, const char *str, const char *path)
   GList *retval = NULL;
 
   split = split_module_list (str, path);
-  
-  iter = split;
-  while (iter != NULL)
+
+  for (iter = split; iter != NULL; iter = g_list_next (iter))
     {
       RequiredVersion *ver;
       char *p;
@@ -440,8 +446,10 @@ parse_module_list (Package *pkg, const char *str, const char *path)
       if (*start == '\0')
         {
           verbose_error ("Empty package name in Requires or Conflicts in file '%s'\n", path);
-          
-          exit (1);
+          if (parse_strict)
+            exit (1);
+          else
+            continue;
         }
       
       ver->name = g_strdup (start);
@@ -473,9 +481,13 @@ parse_module_list (Package *pkg, const char *str, const char *path)
             ver->comparison = NOT_EQUAL;
           else
             {
-              verbose_error ("Unknown version comparison operator '%s' after package name '%s' in file '%s'\n", start, ver->name, path);
-              
-              exit (1);
+              verbose_error ("Unknown version comparison operator '%s' after "
+                             "package name '%s' in file '%s'\n", start,
+                             ver->name, path);
+              if (parse_strict)
+                exit (1);
+              else
+                continue;
             }
         }
 
@@ -492,9 +504,15 @@ parse_module_list (Package *pkg, const char *str, const char *path)
       
       if (ver->comparison != ALWAYS_MATCH && *start == '\0')
         {
-          verbose_error ("Comparison operator but no version after package name '%s' in file '%s'\n", ver->name, path);
-          
-          exit (1);
+          verbose_error ("Comparison operator but no version after package "
+                         "name '%s' in file '%s'\n", ver->name, path);
+          if (parse_strict)
+            exit (1);
+          else
+            {
+              ver->version = g_strdup ("0");
+              continue;
+            }
         }
 
       if (*start != '\0')
@@ -503,8 +521,6 @@ parse_module_list (Package *pkg, const char *str, const char *path)
         }
 
       g_assert (ver->name);
-      
-      iter = g_list_next (iter);
     }
 
   g_list_foreach (split, (GFunc) g_free, NULL);
@@ -523,8 +539,10 @@ parse_requires (Package *pkg, const char *str, const char *path)
   if (pkg->requires)
     {
       verbose_error ("Requires field occurs twice in '%s'\n", path);
-
-      exit (1);
+      if (parse_strict)
+        exit (1);
+      else
+        return;
     }
 
   trimmed = trim_and_sub (pkg, str, path);
@@ -540,8 +558,10 @@ parse_requires_private (Package *pkg, const char *str, const char *path)
   if (pkg->requires_private)
     {
       verbose_error ("Requires.private field occurs twice in '%s'\n", path);
-
-      exit (1);
+      if (parse_strict)
+        exit (1);
+      else
+        return;
     }
 
   trimmed = trim_and_sub (pkg, str, path);
@@ -557,8 +577,10 @@ parse_conflicts (Package *pkg, const char *str, const char *path)
   if (pkg->conflicts)
     {
       verbose_error ("Conflicts field occurs twice in '%s'\n", path);
-
-      exit (1);
+      if (parse_strict)
+        exit (1);
+      else
+        return;
     }
 
   trimmed = trim_and_sub (pkg, str, path);
@@ -691,8 +713,10 @@ parse_libs (Package *pkg, const char *str, const char *path)
   if (pkg->libs_num > 0)
     {
       verbose_error ("Libs field occurs twice in '%s'\n", path);
-
-      exit (1);
+      if (parse_strict)
+        exit (1);
+      else
+        return;
     }
   
   trimmed = trim_and_sub (pkg, str, path);
@@ -702,7 +726,13 @@ parse_libs (Package *pkg, const char *str, const char *path)
     {
       verbose_error ("Couldn't parse Libs field into an argument vector: %s\n",
                      error ? error->message : "unknown");
-      exit (1);
+      if (parse_strict)
+        exit (1);
+      else
+        {
+          g_free (trimmed);
+          return;
+        }
     }
 
   _do_parse_libs(pkg, argc, argv);
@@ -735,8 +765,10 @@ parse_libs_private (Package *pkg, const char *str, const char *path)
   if (pkg->libs_private_num > 0)
     {
       verbose_error ("Libs.private field occurs twice in '%s'\n", path);
-
-      exit (1);
+      if (parse_strict)
+        exit (1);
+      else
+        return;
     }
   
   trimmed = trim_and_sub (pkg, str, path);
@@ -746,7 +778,13 @@ parse_libs_private (Package *pkg, const char *str, const char *path)
     {
       verbose_error ("Couldn't parse Libs.private field into an argument vector: %s\n",
                      error ? error->message : "unknown");
-      exit (1);
+      if (parse_strict)
+        exit (1);
+      else
+        {
+          g_free (trimmed);
+          return;
+        }
     }
 
   _do_parse_libs(pkg, argc, argv);
@@ -771,8 +809,10 @@ parse_cflags (Package *pkg, const char *str, const char *path)
   if (pkg->cflags)
     {
       verbose_error ("Cflags field occurs twice in '%s'\n", path);
-
-      exit (1);
+      if (parse_strict)
+        exit (1);
+      else
+        return;
     }
   
   trimmed = trim_and_sub (pkg, str, path);
@@ -782,7 +822,13 @@ parse_cflags (Package *pkg, const char *str, const char *path)
     {
       verbose_error ("Couldn't parse Cflags field into an argument vector: %s\n",
                      error ? error->message : "unknown");
-      exit (1);
+      if (parse_strict)
+        exit (1);
+      else
+        {
+          g_free (trimmed);
+          return;
+        }
     }
 
   i = 0;
@@ -843,8 +889,10 @@ parse_url (Package *pkg, const char *str, const char *path)
   if (pkg->url != NULL)
     {
       verbose_error ("URL field occurs twice in '%s'\n", path);
-
-      exit (1);
+      if (parse_strict)
+        exit (1);
+      else
+        return;
     }
 
   pkg->url = trim_and_sub (pkg, str, path);
@@ -1011,8 +1059,10 @@ parse_line (Package *pkg, const char *untrimmed, const char *path,
         {
           verbose_error ("Duplicate definition of variable '%s' in '%s'\n",
                          tag, path);
-
-          exit (1);
+          if (parse_strict)
+            exit (1);
+          else
+            goto cleanup;
         }
 
       varname = g_strdup (tag);

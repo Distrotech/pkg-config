@@ -621,6 +621,10 @@ main (int argc, char **argv)
   if (pkg_flags == 0 && !want_requires && !want_exists)
     disable_requires();
 
+  /* Allow errors in .pc files when listing all. */
+  if (want_list)
+    parse_strict = FALSE;
+
   if (want_my_version)
     {
       printf ("%s\n", VERSION);

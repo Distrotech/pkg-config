@@ -134,6 +134,9 @@ extern char *pcsysrootdir;
  */
 extern char *pkg_config_pc_path;
 
+/* Exit on parse errors if TRUE. */
+extern gboolean parse_strict;
+
 /* If TRUE, define "prefix" in .pc files at runtime. */
 extern gboolean define_prefix;
 

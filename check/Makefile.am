@@ -44,6 +44,7 @@ EXTRA_DIST = \
 	fields-blank.pc \
 	sub/sub1.pc \
 	sub/sub2.pc \
+	sub/broken.pc \
 	inst.pc \
 	inst-uninstalled.pc \
 	other.pc \
