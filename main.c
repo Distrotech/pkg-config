@@ -571,31 +571,32 @@ main (int argc, char **argv)
     }
 
   /* Error printing is determined as follows:
-   *     - for all output options besides --exists and --*-version,
-   *       it's on by default and --silence-errors can turn it off
-   *     - for --exists, --*-version, etc. and no options at all,
+   *     - for --exists, --*-version, --list-all and no options at all,
    *       it's off by default and --print-errors will turn it on
+   *     - for all other output options, it's on by default and
+   *       --silence-errors can turn it off
    */
-  if (!want_exists)
+  if (want_exists || want_list)
+    {
+      debug_spew ("Error printing disabled by default due to use of output "
+                  "options --exists, --atleast/exact/max-version, "
+                  "--list-all or no output option at all. Value of "
+                  "--print-errors: %d\n",
+                  want_verbose_errors);
+
+      /* Leave want_verbose_errors unchanged, reflecting --print-errors */
+    }
+  else
     {
       debug_spew ("Error printing enabled by default due to use of output "
-                  "options besides --exists or --atleast/exact/max-version. "
-                  "Value of --silence-errors: %d\n",
+                  "options besides --exists, --atleast/exact/max-version or "
+                  "--list-all. Value of --silence-errors: %d\n",
                   want_silence_errors);
 
       if (want_silence_errors && getenv ("PKG_CONFIG_DEBUG_SPEW") == NULL)
         want_verbose_errors = FALSE;
       else
         want_verbose_errors = TRUE;
-    }
-  else
-    {
-      debug_spew ("Error printing disabled by default due to use of output "
-                  "options --exists, --atleast/exact/max-version or no "
-                  "output option at all. Value of --print-errors: %d\n",
-                  want_verbose_errors);
-
-      /* Leave want_verbose_errors unchanged, reflecting --print-errors */
     }
 
   if (want_verbose_errors)
