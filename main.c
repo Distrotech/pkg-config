@@ -50,6 +50,7 @@ static gboolean want_exists = FALSE;
 static gboolean want_provides = FALSE;
 static gboolean want_requires = FALSE;
 static gboolean want_requires_private = FALSE;
+static gboolean want_validate = FALSE;
 static char *required_atleast_version = NULL;
 static char *required_exact_version = NULL;
 static char *required_max_version = NULL;
@@ -247,6 +248,8 @@ output_opt_cb (const char *opt, const char *arg, gpointer data,
     want_requires = TRUE;
   else if (strcmp (opt, "--print-requires-private") == 0)
     want_requires_private = TRUE;
+  else if (strcmp (opt, "--validate") == 0)
+    want_validate = TRUE;
   else
     return FALSE;
 
@@ -461,6 +464,8 @@ static const GOptionEntry options_table[] = {
   { "print-requires-private", 0, G_OPTION_FLAG_NO_ARG, G_OPTION_ARG_CALLBACK,
     &output_opt_cb, "print which packages the package requires for static "
     "linking", NULL },
+  { "validate", 0, G_OPTION_FLAG_NO_ARG, G_OPTION_ARG_CALLBACK,
+    &output_opt_cb, "validate a package's .pc file", NULL },
   { "define-prefix", 0, 0, G_OPTION_ARG_NONE, &define_prefix,
     "try to override the value of prefix for each .pc file found with a "
     "guesstimated value based on the location of the .pc file", NULL },
@@ -682,8 +687,10 @@ main (int argc, char **argv)
 
   g_string_free (str, TRUE);
 
-  if (want_exists)
-    return 0; /* if we got here, all the packages existed. */
+  /* If the user just wants to check package existence or validate its .pc
+   * file, we're all done. */
+  if (want_exists || want_validate)
+    return 0;
 
   if (want_variable_list)
     {

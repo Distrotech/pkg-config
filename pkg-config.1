@@ -21,7 +21,7 @@ pkg-config \- Return metainformation about installed libraries
 [\-\-print-variables]
 [\-\-uninstalled]
 [\-\-exists] [\-\-atleast-version=VERSION] [\-\-exact-version=VERSION]
-[\-\-max-version=VERSION] [\-\-list\-all] [\-\-print-provides]
+[\-\-max-version=VERSION] [\-\-validate] [\-\-list\-all] [\-\-print-provides]
 [\-\-print-requires] [\-\-print-requires-private] [LIBRARIES...]
 .SH DESCRIPTION
 
@@ -213,6 +213,18 @@ constraint after each package name, for example:
 .fi
 Remember to use \-\-print-errors if you want error messages. When no
 output options are supplied to \fIpkg-config\fP, \-\-exists is implied.
+.TP
+.I "--validate"
+Checks the syntax of a package's
+.I .pc
+file for validity. This is the same as \-\-exists except that
+dependencies are not verified. This can be useful for package developers
+to test their
+.I .pc
+file prior to release:
+.nf
+  $ pkg-config --validate ./my-package.pc
+.fi
 .TP
 .I "--msvc-syntax"
 This option is available only on Windows. It causes \fIpkg-config\fP
