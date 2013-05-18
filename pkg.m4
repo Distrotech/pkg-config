@@ -159,6 +159,25 @@ fi[]dnl
 ])# PKG_CHECK_MODULES
 
 
+# PKG_CHECK_MODULES_STATIC(VARIABLE-PREFIX, MODULES, [ACTION-IF-FOUND],
+# [ACTION-IF-NOT-FOUND])
+# ---------------------------------------------------------------------
+# Checks for existence of MODULES and gathers its build flags with
+# static libraries enabled. Sets VARIABLE-PREFIX_CFLAGS from --cflags
+# and VARIABLE-PREFIX_LIBS from --libs.
+#
+# Note that if there is a possibility the first call to
+# PKG_CHECK_MODULES_STATIC might not happen, you should be sure to include
+# an explicit call to PKG_PROG_PKG_CONFIG in your configure.ac.
+AC_DEFUN([PKG_CHECK_MODULES_STATIC],
+[AC_REQUIRE([PKG_PROG_PKG_CONFIG])dnl
+_save_PKG_CONFIG=$PKG_CONFIG
+PKG_CONFIG="$PKG_CONFIG --static"
+PKG_CHECK_MODULES($@)
+PKG_CONFIG=$_save_PKG_CONFIG[]dnl
+])
+
+
 # PKG_INSTALLDIR(DIRECTORY)
 # -------------------------
 # Substitutes the variable pkgconfigdir as the location where a module
