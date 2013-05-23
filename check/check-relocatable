@@ -7,6 +7,14 @@ set -e
 RESULT="-I${srcdir}/include -L${srcdir}/lib -lfoo"
 run_test --cflags --libs pcfiledir
 
+# Convert abs_top_srcdir to Windows format if necessary.
+if [ "$native_win32" = yes ]; then
+    # Assume we have cmd to do the conversion, except we have to escape
+    # the command switch on MSYS.
+    [ "$OSTYPE" = msys ] && opt="\\/C" || opt="/C"
+    abs_top_srcdir=$($WINE cmd $opt echo "$abs_top_srcdir")
+fi
+
 # Test prefix redefinition for .pc files in pkgconfig directory. Try .pc
 # files with both unexpanded and expanded variables. Use the absolute
 # directory for the search path so that pkg-config can strip enough
