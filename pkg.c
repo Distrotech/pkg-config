@@ -989,6 +989,10 @@ packages_get_flags (GList *pkgs, FlagType flags)
       g_free (cur);
     }
 
+  /* Strip trailing space. */
+  if (str->len > 0 && str->str[str->len - 1] == ' ')
+    g_string_truncate (str, str->len - 1);
+
   debug_spew ("returning flags string \"%s\"\n", str->str);
   return g_string_free (str, FALSE);
 }
