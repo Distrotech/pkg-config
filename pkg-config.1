@@ -9,10 +9,13 @@ pkg-config \- Return metainformation about installed libraries
 .SH SYNOPSIS
 .PP
 .B pkg-config
-[\-\-modversion] [\-\-version] [\-\-help] [\-\-print-errors]
+[\-\-modversion] [\-\-version] [\-\-help]
+[\-\-atleast-pkgconfig-version=VERSION]
+[\-\-print-errors] [\-\-short-errors]
 [\-\-silence-errors] [\-\-errors-to-stdout] [\-\-debug]
 [\-\-cflags] [\-\-libs] [\-\-libs-only-L]
 [\-\-libs-only-l] [\-\-cflags-only-I]
+[\-\-libs-only-other] [\-\-cflags-only-other]
 [\-\-variable=VARIABLENAME]
 [\-\-define-variable=VARIABLENAME=VARIABLEVALUE]
 [\-\-print-variables]
@@ -71,6 +74,9 @@ Displays the version of
 .I pkg-config
 and terminates.
 .TP
+.I "--atleast-pkgconfig-version=VERSION"
+Requires at least the given version of pkg-config.
+.TP
 .I "--help"
 Displays a help message and terminates.
 .TP
@@ -85,6 +91,9 @@ in scripts that want to control what's output. This option can be used
 alone (to just print errors encountered locating modules on the 
 command line) or with other options. The PKG_CONFIG_DEBUG_SPEW
 environment variable overrides this option.
+.TP
+.I "--short-errors"
+Print short error messages.
 .TP
 .I "--silence-errors"
 If one or more of the modules on the command line, or their
@@ -119,7 +128,10 @@ line.
 .I "--cflags-only-I"
 This prints the -I part of "--cflags". That is, it defines the header
 search path but doesn't specify anything else.
-.TP 
+.TP
+.I "--cflags-only-other"
+This prints parts of "--cflags" not covered by "--cflags-only-I".
+.TP
 .I "--libs"
 This option is identical to "--cflags", only it prints the link
 flags. As with "--cflags", duplicate flags are merged (maintaining
@@ -135,6 +147,10 @@ This prints the -l part of "--libs" for the libraries specified on
 the command line. Note that the union of "--libs-only-l" and
 "--libs-only-L" may be smaller than "--libs", due to flags such as
 -rdynamic.
+.TP
+.I "--libs-only-other"
+This prints the parts of "--libs" not covered by "--libs-only-L" and
+"--libs-only-l", such as "--pthread".
 .TP
 .I "--variable=VARIABLENAME"
 This returns the value of a variable defined in a package's \fI.pc\fP
