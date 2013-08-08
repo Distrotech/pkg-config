@@ -1042,6 +1042,7 @@ packages_get_var (GList     *pkgs,
   GList *tmp;
   GString *str;
   char *retval;
+  GError *error = NULL;
   
   str = g_string_new ("");
   
@@ -1049,14 +1050,25 @@ packages_get_var (GList     *pkgs,
   while (tmp != NULL)
     {
       Package *pkg = tmp->data;
-      char *var;
+      char *var, *unquoted_var;
 
       var = package_get_var (pkg, varname);
-      
       if (var)
         {
-          g_string_append (str, var);
-          g_string_append_c (str, ' ');                
+          unquoted_var = g_shell_unquote (var, &error);
+          if (unquoted_var != NULL)
+            {
+              g_string_append (str, unquoted_var);
+              g_string_append_c (str, ' ');
+              g_free (unquoted_var);
+            }
+          else
+            {
+              verbose_error ("Couldn't unquote value of \"%s\": %s\n",
+                             varname, error ? error->message : "unknown");
+              g_clear_error (&error);
+            }
+
           g_free (var);
         }
 
