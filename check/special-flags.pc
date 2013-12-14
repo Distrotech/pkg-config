@@ -3,10 +3,9 @@ exec_prefix=${prefix}
 libdir=${exec_prefix}/lib
 includedir=${prefix}/include
 
-Name: idirafter test
+Name: Special flags test
 Description: Dummy pkgconfig test package for testing pkgconfig
 Version: 1.0.0
 Requires:
-Libs: -lsimple
-Libs.private: -lm
-Cflags: -I/foo -idirafter -I/after -I/bar
+Libs: -framework Foo -lsimple -framework Bar
+Cflags: -I/foo -idirafter /after1 -I/bar -idirafter /after2

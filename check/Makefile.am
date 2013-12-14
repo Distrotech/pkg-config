@@ -12,7 +12,7 @@ TESTS = \
 	check-includedir \
 	check-conflicts \
 	check-missing \
-	check-idirafter \
+	check-special-flags \
 	check-sort-order \
 	check-duplicate-flags \
 	check-whitespace \
@@ -38,7 +38,7 @@ EXTRA_DIST = \
 	includedir.pc \
 	missing-requires-private.pc \
 	missing-requires.pc \
-	idirafter.pc \
+	special-flags.pc \
 	conflicts-test.pc \
 	whitespace.pc \
 	fields-blank.pc \
