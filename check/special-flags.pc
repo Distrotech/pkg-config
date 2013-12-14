@@ -8,4 +8,4 @@ Description: Dummy pkgconfig test package for testing pkgconfig
 Version: 1.0.0
 Requires:
 Libs: -framework Foo -lsimple -framework Bar
-Cflags: -I/foo -idirafter /after1 -I/bar -idirafter /after2
+Cflags: -I/foo -isystem /system1 -idirafter /after1 -I/bar -idirafter /after2 -isystem /system2

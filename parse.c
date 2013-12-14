@@ -851,17 +851,19 @@ parse_cflags (Package *pkg, const char *str, const char *path)
           flag->arg = g_strconcat ("-I", p, NULL);
           pkg->cflags = g_list_prepend (pkg->cflags, flag);
         }
-      else if (strcmp("-idirafter", arg) == 0 && i+1 < argc)
+      else if ((strcmp ("-idirafter", arg) == 0 ||
+                strcmp ("-isystem", arg) == 0) &&
+               i+1 < argc)
         {
-          char *dirafter, *tmp;
+          char *option, *tmp;
 
           tmp = trim_string (argv[i+1]);
-          dirafter = strdup_escape_shell (tmp);
+          option = strdup_escape_shell (tmp);
           flag->type = CFLAGS_OTHER;
-          flag->arg = g_strconcat (arg, " ", dirafter, NULL);
+          flag->arg = g_strconcat (arg, " ", option, NULL);
           pkg->cflags = g_list_prepend (pkg->cflags, flag);
           i++;
-          g_free (dirafter);
+          g_free (option);
           g_free (tmp);
         }
       else if (*arg != '\0')

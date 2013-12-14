@@ -4,7 +4,7 @@ set -e
 
 . ${srcdir}/common
 
-RESULT="-idirafter /after1 -idirafter /after2 -I/foo -I/bar"
+RESULT="-isystem /system1 -idirafter /after1 -idirafter /after2 -isystem /system2 -I/foo -I/bar"
 run_test --cflags special-flags
 
 RESULT="-framework Foo -lsimple -framework Bar"
