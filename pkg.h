@@ -45,17 +45,17 @@ typedef enum
   ALWAYS_MATCH
 } ComparisonType;
 
-typedef struct _Flag Flag;
-typedef struct _Package Package;
-typedef struct _RequiredVersion RequiredVersion;
+typedef struct Flag_ Flag;
+typedef struct Package_ Package;
+typedef struct RequiredVersion_ RequiredVersion;
 
-struct _Flag
+struct Flag_
 {
   FlagType type;
   char *arg;
 };
 
-struct _RequiredVersion
+struct RequiredVersion_
 {
   char *name;
   ComparisonType comparison;
@@ -63,7 +63,7 @@ struct _RequiredVersion
   Package *owner;
 };
 
-struct _Package
+struct Package_
 {
   char *key;  /* filename name */
   char *name; /* human-readable name */
