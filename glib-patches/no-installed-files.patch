@@ -1,5 +1,5 @@
 diff --git a/glib/glib/Makefile.am b/glib/glib/Makefile.am
-index 07b0141..c16051d 100644
+index 07b0141..8edc404 100644
 --- a/glib/glib/Makefile.am
 +++ b/glib/glib/Makefile.am
 @@ -12,7 +12,7 @@ include $(top_srcdir)/glib.mk
@@ -27,7 +27,7 @@ index 07b0141..c16051d 100644
  	glib.rc
  
 -lib_LTLIBRARIES = libglib-2.0.la
-+noinst_LTLIBRARIES = libglib-2.0.la
++noinst_LTLIBRARIES += libglib-2.0.la
  
  if OS_WIN32_AND_DLL_COMPILATION
  if MS_LIB_AVAILABLE
@@ -198,7 +198,7 @@ index 642f75c..abf32cb 100644
  charset.alias: config.charset
  	$(AM_V_GEN) $(SHELL) $(srcdir)/config.charset '@host@' > t-$@
 diff --git a/glib/m4macros/Makefile.am b/glib/m4macros/Makefile.am
-index 971871c..0e6164c 100644
+index 971871c..c91daa8 100644
 --- a/glib/m4macros/Makefile.am
 +++ b/glib/m4macros/Makefile.am
 @@ -5,4 +5,4 @@ installed_m4= glib-2.0.m4 glib-gettext.m4 gsettings.m4
@@ -206,4 +206,4 @@ index 971871c..0e6164c 100644
  
  m4datadir = $(datadir)/aclocal
 -m4data_DATA = $(installed_m4)
-+noinst_DATA = $(installed_m4)
++noinst_DATA += $(installed_m4)

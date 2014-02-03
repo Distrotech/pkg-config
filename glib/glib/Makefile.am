@@ -59,7 +59,7 @@ EXTRA_DIST += 			\
 BUILT_EXTRA_DIST += 		\
 	glib.rc
 
-noinst_LTLIBRARIES = libglib-2.0.la
+noinst_LTLIBRARIES += libglib-2.0.la
 
 if OS_WIN32_AND_DLL_COMPILATION
 if MS_LIB_AVAILABLE
