@@ -42,7 +42,9 @@
 #ifdef G_OS_WIN32
 #include <io.h>
 
+#undef fstat
 #define fstat(a,b) _fstati64(a,b)
+#undef stat
 #define stat _stati64
 
 #ifndef S_ISREG
@@ -554,12 +556,7 @@ static void                  g_key_file_parse_data             (GKeyFile        
 static void                  g_key_file_flush_parse_buffer     (GKeyFile               *key_file,
 								GError                **error);
 
-
-GQuark
-g_key_file_error_quark (void)
-{
-  return g_quark_from_static_string ("g-key-file-error-quark");
-}
+G_DEFINE_QUARK (g-key-file-error-quark, g_key_file_error)
 
 static void
 g_key_file_init (GKeyFile *key_file)
@@ -861,7 +858,7 @@ g_key_file_load_from_file (GKeyFile       *key_file,
 /**
  * g_key_file_load_from_data:
  * @key_file: an empty #GKeyFile struct
- * @data: (length length): key file loaded in memory
+ * @data: key file loaded in memory
  * @length: the length of @data in bytes (or -1 if data is nul-terminated)
  * @flags: flags from #GKeyFileFlags
  * @error: return location for a #GError, or %NULL

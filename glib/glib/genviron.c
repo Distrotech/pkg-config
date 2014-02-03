@@ -40,6 +40,7 @@
 #include <windows.h>
 #endif
 
+#include "glib-private.h"
 #include "gmem.h"
 #include "gmessages.h"
 #include "gstrfuncs.h"
@@ -466,7 +467,11 @@ g_getenv (const gchar *variable)
   if (len == 0)
     {
       g_free (wname);
-      return NULL;
+      if (GetLastError () == ERROR_ENVVAR_NOT_FOUND)
+        return NULL;
+
+      quark = g_quark_from_static_string ("");
+      return g_quark_to_string (quark);
     }
   else if (len == 1)
     len = 2;
@@ -633,10 +638,15 @@ g_get_environ (void)
   gint i, n;
 
   strings = GetEnvironmentStringsW ();
-  for (n = 0; strings[n]; n += wcslen (strings + n) + 1);
-  result = g_new (char *, n + 1);
-  for (i = 0; strings[i]; i += wcslen (strings + i) + 1)
-    result[i] = g_utf16_to_utf8 (strings + i, -1, NULL, NULL, NULL);
+  for (n = 0, i = 0; strings[n]; i++)
+    n += wcslen (strings + n) + 1;
+
+  result = g_new (char *, i + 1);
+  for (n = 0, i = 0; strings[n]; i++)
+    {
+      result[i] = g_utf16_to_utf8 (strings + n, -1, NULL, NULL, NULL);
+      n += wcslen (strings + n) + 1;
+    }
   FreeEnvironmentStringsW (strings);
   result[i] = NULL;
 

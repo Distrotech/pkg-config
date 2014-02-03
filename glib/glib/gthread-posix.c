@@ -66,6 +66,9 @@
 #ifdef HAVE_SYS_PRCTL_H
 #include <sys/prctl.h>
 #endif
+#ifdef G_OS_WIN32
+#include <windows.h>
+#endif
 
 static void
 g_thread_abort (gint         status,
@@ -90,10 +93,12 @@ g_mutex_impl_new (void)
     g_thread_abort (errno, "malloc");
 
 #ifdef PTHREAD_ADAPTIVE_MUTEX_INITIALIZER_NP
-  pthread_mutexattr_t attr;
-  pthread_mutexattr_init (&attr);
-  pthread_mutexattr_settype (&attr, PTHREAD_MUTEX_ADAPTIVE_NP);
-  pattr = &attr;
+  {
+    pthread_mutexattr_t attr;
+    pthread_mutexattr_init (&attr);
+    pthread_mutexattr_settype (&attr, PTHREAD_MUTEX_ADAPTIVE_NP);
+    pattr = &attr;
+  }
 #endif
 
   if G_UNLIKELY ((status = pthread_mutex_init (mutex, pattr)) != 0)
@@ -116,7 +121,7 @@ g_mutex_impl_free (pthread_mutex_t *mutex)
 static pthread_mutex_t *
 g_mutex_get_impl (GMutex *mutex)
 {
-  pthread_mutex_t *impl = mutex->p;
+  pthread_mutex_t *impl = g_atomic_pointer_get (&mutex->p);
 
   if G_UNLIKELY (impl == NULL)
     {
@@ -139,7 +144,7 @@ g_mutex_get_impl (GMutex *mutex)
  * This function is useful to initialize a mutex that has been
  * allocated on the stack, or as part of a larger structure.
  * It is not necessary to initialize a mutex that has been
- * created that has been statically allocated.
+ * statically allocated.
  *
  * |[
  *   typedef struct {
@@ -285,7 +290,7 @@ g_rec_mutex_impl_free (pthread_mutex_t *mutex)
 static pthread_mutex_t *
 g_rec_mutex_get_impl (GRecMutex *rec_mutex)
 {
-  pthread_mutex_t *impl = rec_mutex->p;
+  pthread_mutex_t *impl = g_atomic_pointer_get (&rec_mutex->p);
 
   if G_UNLIKELY (impl == NULL)
     {
@@ -445,7 +450,7 @@ g_rw_lock_impl_free (pthread_rwlock_t *rwlock)
 static pthread_rwlock_t *
 g_rw_lock_get_impl (GRWLock *lock)
 {
-  pthread_rwlock_t *impl = lock->p;
+  pthread_rwlock_t *impl = g_atomic_pointer_get (&lock->p);
 
   if G_UNLIKELY (impl == NULL)
     {
@@ -662,7 +667,7 @@ g_cond_impl_free (pthread_cond_t *cond)
 static pthread_cond_t *
 g_cond_get_impl (GCond *cond)
 {
-  pthread_cond_t *impl = cond->p;
+  pthread_cond_t *impl = g_atomic_pointer_get (&cond->p);
 
   if G_UNLIKELY (impl == NULL)
     {
@@ -725,6 +730,8 @@ g_cond_clear (GCond *cond)
  * @mutex: a #GMutex that is currently locked
  *
  * Atomically releases @mutex and waits until @cond is signalled.
+ * When this function returns, @mutex is locked again and owned by the
+ * calling thread.
  *
  * When using condition variables, it is possible that a spurious wakeup
  * may occur (ie: g_cond_wait() returns even though g_cond_signal() was
@@ -852,8 +859,17 @@ g_cond_wait_until (GCond  *cond,
   ts.tv_sec = end_time / 1000000;
   ts.tv_nsec = (end_time % 1000000) * 1000;
 
+#if defined(HAVE_PTHREAD_COND_TIMEDWAIT_MONOTONIC)
+  if ((status = pthread_cond_timedwait_monotonic (g_cond_get_impl (cond), g_mutex_get_impl (mutex), &ts)) == 0)
+    return TRUE;
+#elif defined(HAVE_PTHREAD_COND_TIMEDWAIT_MONOTONIC_NP)
+  if ((status = pthread_cond_timedwait_monotonic_np (g_cond_get_impl (cond), g_mutex_get_impl (mutex), &ts)) == 0)
+    return TRUE;
+#else
+  /* Pray that the cond is actually using the monotonic clock */
   if ((status = pthread_cond_timedwait (g_cond_get_impl (cond), g_mutex_get_impl (mutex), &ts)) == 0)
     return TRUE;
+#endif
 
   if G_UNLIKELY (status != ETIMEDOUT)
     g_thread_abort (status, "pthread_cond_timedwait");
@@ -969,7 +985,7 @@ g_private_impl_free (pthread_key_t *key)
 static pthread_key_t *
 g_private_get_impl (GPrivate *key)
 {
-  pthread_key_t *impl = key->p;
+  pthread_key_t *impl = g_atomic_pointer_get (&key->p);
 
   if G_UNLIKELY (impl == NULL)
     {
@@ -1172,7 +1188,9 @@ void
 g_system_thread_set_name (const gchar *name)
 {
 #ifdef HAVE_SYS_PRCTL_H
+#ifdef PR_SET_NAME
   prctl (PR_SET_NAME, name, 0, 0, 0, 0);
+#endif
 #endif
 }
 

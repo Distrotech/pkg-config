@@ -82,50 +82,14 @@
  *
  * To destroy a #GHashTable use g_hash_table_destroy().
  *
- * <example>
- * <title>Using a GHashTable as a set</title>
- * <para>
- * A common use-case for hash tables is to store information about
- * a set of keys, without associating any particular value with each
+ * A common use-case for hash tables is to store information about a
+ * set of keys, without associating any particular value with each
  * key. GHashTable optimizes one way of doing so: If you store only
  * key-value pairs where key == value, then GHashTable does not
  * allocate memory to store the values, which can be a considerable
- * space saving, if your set is large.
- * </para>
- * <programlisting>
- * GHashTable *
- * set_new (GHashFunc      hash_func,
- *          GEqualFunc     equal_func,
- *          GDestroyNotify destroy)
- * {
- *   return g_hash_table_new_full (hash_func, equal_func, destroy, NULL);
- * }
- *
- * void
- * set_add (GHashTable *set,
- *          gpointer    element)
- * {
- *   g_hash_table_replace (set, element, element);
- * }
- *
- * gboolean
- * set_contains (GHashTable *set,
- *               gpointer    element)
- * {
- *   return g_hash_table_lookup_extended (set, element, NULL, NULL);
- * }
- *
- * gboolean
- * set_remove (GHashTable *set,
- *             gpointer    element)
- * {
- *   return g_hash_table_remove (set, element);
- * }
- * </programlisting>
- * </example>
- *
- * As of version 2.32, there is also a g_hash_table_add() function to
- * add a key to a #GHashTable that is being used as a set.
+ * space saving, if your set is large. The functions
+ * g_hash_table_add() and g_hash_table_contains() are designed to be
+ * used when using #GHashTable this way.
  */
 
 /**
@@ -870,34 +834,72 @@ static void
 g_hash_table_insert_node (GHashTable *hash_table,
                           guint       node_index,
                           guint       key_hash,
-                          gpointer    key,
-                          gpointer    value,
+                          gpointer    new_key,
+                          gpointer    new_value,
                           gboolean    keep_new_key,
                           gboolean    reusing_key)
 {
+  gboolean already_exists;
   guint old_hash;
-  gpointer old_key;
-  gpointer old_value;
-
-  if (G_UNLIKELY (hash_table->keys == hash_table->values && key != value))
-    hash_table->values = g_memdup (hash_table->keys, sizeof (gpointer) * hash_table->size);
+  gpointer key_to_free = NULL;
+  gpointer value_to_free = NULL;
 
   old_hash = hash_table->hashes[node_index];
-  old_key = hash_table->keys[node_index];
-  old_value = hash_table->values[node_index];
+  already_exists = HASH_IS_REAL (old_hash);
 
-  if (HASH_IS_REAL (old_hash))
+  /* Proceed in three steps.  First, deal with the key because it is the
+   * most complicated.  Then consider if we need to split the table in
+   * two (because writing the value will result in the set invariant
+   * becoming broken).  Then deal with the value.
+   *
+   * There are three cases for the key:
+   *
+   *  - entry already exists in table, reusing key:
+   *    free the just-passed-in new_key and use the existing value
+   *
+   *  - entry already exists in table, not reusing key:
+   *    free the entry in the table, use the new key
+   *
+   *  - entry not already in table:
+   *    use the new key, free nothing
+   *
+   * We update the hash at the same time...
+   */
+  if (already_exists)
     {
+      /* Note: we must record the old value before writing the new key
+       * because we might change the value in the event that the two
+       * arrays are shared.
+       */
+      value_to_free = hash_table->values[node_index];
+
       if (keep_new_key)
-        hash_table->keys[node_index] = key;
-      hash_table->values[node_index] = value;
+        {
+          key_to_free = hash_table->keys[node_index];
+          hash_table->keys[node_index] = new_key;
+        }
+      else
+        key_to_free = new_key;
     }
   else
     {
-      hash_table->keys[node_index] = key;
-      hash_table->values[node_index] = value;
       hash_table->hashes[node_index] = key_hash;
+      hash_table->keys[node_index] = new_key;
+    }
 
+  /* Step two: check if the value that we are about to write to the
+   * table is the same as the key in the same position.  If it's not,
+   * split the table.
+   */
+  if (G_UNLIKELY (hash_table->keys == hash_table->values && hash_table->keys[node_index] != new_value))
+    hash_table->values = g_memdup (hash_table->keys, sizeof (gpointer) * hash_table->size);
+
+  /* Step 3: Actually do the write */
+  hash_table->values[node_index] = new_value;
+
+  /* Now, the bookkeeping... */
+  if (!already_exists)
+    {
       hash_table->nnodes++;
 
       if (HASH_IS_UNUSED (old_hash))
@@ -912,12 +914,12 @@ g_hash_table_insert_node (GHashTable *hash_table,
 #endif
     }
 
-  if (HASH_IS_REAL (old_hash))
+  if (already_exists)
     {
       if (hash_table->key_destroy_func && !reusing_key)
-        hash_table->key_destroy_func (keep_new_key ? old_key : key);
+        (* hash_table->key_destroy_func) (key_to_free);
       if (hash_table->value_destroy_func)
-        hash_table->value_destroy_func (old_value);
+        (* hash_table->value_destroy_func) (value_to_free);
     }
 }
 
@@ -1615,8 +1617,8 @@ g_hash_table_size (GHashTable *hash_table)
  * g_hash_table_get_keys:
  * @hash_table: a #GHashTable
  *
- * Retrieves every key inside @hash_table. The returned data
- * is valid until @hash_table is modified.
+ * Retrieves every key inside @hash_table. The returned data is valid
+ * until changes to the hash release those keys.
  *
  * Return value: a #GList containing all the keys inside the hash
  *     table. The content of the list is owned by the hash table and

@@ -223,6 +223,10 @@ glib_init (void)
 
 #if defined (G_OS_WIN32)
 
+BOOL WINAPI DllMain (HINSTANCE hinstDLL,
+                     DWORD     fdwReason,
+                     LPVOID    lpvReserved);
+
 HMODULE glib_dll;
 
 #endif
@@ -239,12 +243,16 @@ DllMain (HINSTANCE hinstDLL,
     case DLL_PROCESS_ATTACH:
       glib_dll = hinstDLL;
       g_clock_win32_init ();
+#ifdef THREADS_WIN32
       g_thread_win32_init ();
+#endif
       glib_init ();
       break;
 
     case DLL_THREAD_DETACH:
+#ifdef THREADS_WIN32
       g_thread_win32_thread_detach ();
+#endif
       break;
 
     default:

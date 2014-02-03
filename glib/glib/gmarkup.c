@@ -29,12 +29,14 @@
 
 #include "gmarkup.h"
 
+#include "gatomic.h"
 #include "gslice.h"
 #include "galloca.h"
 #include "gstrfuncs.h"
 #include "gstring.h"
 #include "gtestutils.h"
 #include "glibintl.h"
+#include "gthread.h"
 
 /**
  * SECTION:markup
@@ -82,11 +84,7 @@
  * </itemizedlist>
  */
 
-GQuark
-g_markup_error_quark (void)
-{
-  return g_quark_from_static_string ("g-markup-error-quark");
-}
+G_DEFINE_QUARK (g-markup-error-quark, g_markup_error)
 
 typedef enum
 {
@@ -119,6 +117,8 @@ typedef struct
 struct _GMarkupParseContext
 {
   const GMarkupParser *parser;
+
+  volatile gint ref_count;
 
   GMarkupParseFlags flags;
 
@@ -227,6 +227,7 @@ g_markup_parse_context_new (const GMarkupParser *parser,
 
   context = g_new (GMarkupParseContext, 1);
 
+  context->ref_count = 1;
   context->parser = parser;
   context->flags = flags;
   context->user_data = user_data;
@@ -267,6 +268,46 @@ g_markup_parse_context_new (const GMarkupParser *parser,
   context->balance = 0;
 
   return context;
+}
+
+/**
+ * g_markup_parse_context_ref:
+ * @context: a #GMarkupParseContext
+ *
+ * Increases the reference count of @context.
+ *
+ * Returns: the same @context
+ *
+ * Since: 2.36
+ **/
+GMarkupParseContext *
+g_markup_parse_context_ref (GMarkupParseContext *context)
+{
+  g_return_val_if_fail (context != NULL, NULL);
+  g_return_val_if_fail (context->ref_count > 0, NULL);
+
+  g_atomic_int_inc (&context->ref_count);
+
+  return context;
+}
+
+/**
+ * g_markup_parse_context_unref:
+ * @context: a #GMarkupParseContext
+ *
+ * Decreases the reference count of @context.  When its reference count
+ * drops to 0, it is freed.
+ *
+ * Since: 2.36
+ **/
+void
+g_markup_parse_context_unref (GMarkupParseContext *context)
+{
+  g_return_if_fail (context != NULL);
+  g_return_if_fail (context->ref_count > 0);
+
+  if (g_atomic_int_dec_and_test (&context->ref_count))
+    g_markup_parse_context_free (context);
 }
 
 static void
@@ -362,6 +403,7 @@ set_error_literal (GMarkupParseContext  *context,
   g_propagate_error (error, tmp_error);
 }
 
+G_GNUC_PRINTF(4, 5)
 static void
 set_error (GMarkupParseContext  *context,
            GError              **error,
@@ -427,7 +469,7 @@ slow_name_validate (GMarkupParseContext  *context,
           g_unichar_isalpha (g_utf8_get_char (p))))))
     {
       set_error (context, error, G_MARKUP_ERROR_PARSE,
-                 _("'%s' is not a valid name "), name);
+                 _("'%s' is not a valid name"), name);
       return FALSE;
     }
 
@@ -443,7 +485,7 @@ slow_name_validate (GMarkupParseContext  *context,
               g_unichar_isalpha (g_utf8_get_char (p))))))
         {
           set_error (context, error, G_MARKUP_ERROR_PARSE,
-                     _("'%s' is not a valid name: '%c' "), name, *p);
+                     _("'%s' is not a valid name: '%c'"), name, *p);
           return FALSE;
         }
     }
@@ -523,6 +565,7 @@ utf8_str (const gchar *utf8,
   return buf;
 }
 
+G_GNUC_PRINTF(5, 6)
 static void
 set_unescape_error (GMarkupParseContext  *context,
                     GError              **error,
@@ -641,7 +684,7 @@ unescape_gstring_inplace (GMarkupParseContext  *context,
                                         "inside a character reference "
                                         "(&#234; for example) - perhaps "
                                         "the digit is too large"),
-                                      end - from, from);
+                                      (int)(end - from), from);
                   return FALSE;
                 }
               else if (*end != ';')
@@ -676,7 +719,7 @@ unescape_gstring_inplace (GMarkupParseContext  *context,
                                           from, G_MARKUP_ERROR_PARSE,
                                           _("Character reference '%-.*s' does not "
                                             "encode a permitted character"),
-                                          end - from, from);
+                                          (int)(end - from), from);
                       return FALSE;
                     }
                 }
@@ -721,7 +764,7 @@ unescape_gstring_inplace (GMarkupParseContext  *context,
                     set_unescape_error (context, error,
                                         from, G_MARKUP_ERROR_PARSE,
                                         _("Entity name '%-.*s' is not known"),
-                                        end-from, from);
+                                        (int)(end - from), from);
                   else
                     set_unescape_error (context, error,
                                         from, G_MARKUP_ERROR_PARSE,
@@ -2323,6 +2366,9 @@ find_conversion (const char  *format,
  *
  * Since: 2.4
  */
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wformat-nonliteral"
+
 gchar *
 g_markup_vprintf_escaped (const gchar *format,
                           va_list      args)
@@ -2341,7 +2387,7 @@ g_markup_vprintf_escaped (const gchar *format,
    * then use the normal g_strdup_vprintf() to format the arguments
    * with the two new format strings. By comparing the results,
    * we can figure out what segments of the output come from
-   * the the original format string, and what from the arguments,
+   * the original format string, and what from the arguments,
    * and thus know what portions of the string to escape.
    *
    * For instance, for:
@@ -2387,6 +2433,7 @@ g_markup_vprintf_escaped (const gchar *format,
   G_VA_COPY (args2, args);
 
   output1 = g_strdup_vprintf (format1->str, args);
+
   if (!output1)
     {
       va_end (args2);
@@ -2397,7 +2444,6 @@ g_markup_vprintf_escaped (const gchar *format,
   va_end (args2);
   if (!output2)
     goto cleanup;
-
   result = g_string_new (NULL);
 
   /* Iterate through the original format string again,
@@ -2448,6 +2494,8 @@ g_markup_vprintf_escaped (const gchar *format,
   else
     return NULL;
 }
+
+#pragma GCC diagnostic pop
 
 /**
  * g_markup_printf_escaped:

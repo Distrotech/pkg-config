@@ -18,12 +18,12 @@
  * Boston, MA 02111-1307, USA.
  */
 
+#ifndef __G_SPAWN_H__
+#define __G_SPAWN_H__
+
 #if !defined (__GLIB_H_INSIDE__) && !defined (GLIB_COMPILATION)
 #error "Only <glib.h> can be included directly."
 #endif
-
-#ifndef __G_SPAWN_H__
-#define __G_SPAWN_H__
 
 #include <glib/gerror.h>
 
@@ -97,6 +97,14 @@ typedef enum
 } GSpawnError;
 
 /**
+ * G_SPAWN_EXIT_ERROR:
+ *
+ * Error domain used by g_spawn_check_exit_status().  The code
+ * will be the program exit code.
+ */
+#define G_SPAWN_EXIT_ERROR g_spawn_exit_error_quark ()
+
+/**
  * GSpawnChildSetupFunc:
  * @user_data: user data to pass to the function.
  *
@@ -136,6 +144,7 @@ typedef void (* GSpawnChildSetupFunc) (gpointer user_data);
 
 /**
  * GSpawnFlags:
+ * @G_SPAWN_DEFAULT: no flags, default behaviour
  * @G_SPAWN_LEAVE_DESCRIPTORS_OPEN: the parent's open file descriptors will be
  *   inherited by the child; otherwise all descriptors except stdin/stdout/stderr
  *   will be closed before calling exec() in the child.
@@ -155,11 +164,15 @@ typedef void (* GSpawnChildSetupFunc) (gpointer user_data);
  *   vector to pass to the file. Normally g_spawn_async_with_pipes() uses
  *   <literal>argv[0]</literal> as the file to execute, and passes all of
  *   <literal>argv</literal> to the child.
+ * @G_SPAWN_SEARCH_PATH_FROM_ENVP: if <literal>argv[0]</literal> is not an abolute path,
+ *   it will be looked for in the <envar>PATH</envar> from the passed child 
+ *   environment. Since: 2.34
  *
  * Flags passed to g_spawn_sync(), g_spawn_async() and g_spawn_async_with_pipes().
  */
 typedef enum
 {
+  G_SPAWN_DEFAULT                = 0,
   G_SPAWN_LEAVE_DESCRIPTORS_OPEN = 1 << 0,
   G_SPAWN_DO_NOT_REAP_CHILD      = 1 << 1,
   /* look for argv[0] in the path i.e. use execvp() */
@@ -168,21 +181,16 @@ typedef enum
   G_SPAWN_STDOUT_TO_DEV_NULL     = 1 << 3,
   G_SPAWN_STDERR_TO_DEV_NULL     = 1 << 4,
   G_SPAWN_CHILD_INHERITS_STDIN   = 1 << 5,
-  G_SPAWN_FILE_AND_ARGV_ZERO     = 1 << 6
+  G_SPAWN_FILE_AND_ARGV_ZERO     = 1 << 6,
+  G_SPAWN_SEARCH_PATH_FROM_ENVP  = 1 << 7
 } GSpawnFlags;
 
+GLIB_AVAILABLE_IN_ALL
 GQuark g_spawn_error_quark (void);
+GLIB_AVAILABLE_IN_ALL
+GQuark g_spawn_exit_error_quark (void);
 
-#ifndef __GTK_DOC_IGNORE__
-#ifdef G_OS_WIN32
-#define g_spawn_async g_spawn_async_utf8
-#define g_spawn_async_with_pipes g_spawn_async_with_pipes_utf8
-#define g_spawn_sync g_spawn_sync_utf8
-#define g_spawn_command_line_sync g_spawn_command_line_sync_utf8
-#define g_spawn_command_line_async g_spawn_command_line_async_utf8
-#endif
-#endif
-
+GLIB_AVAILABLE_IN_ALL
 gboolean g_spawn_async (const gchar           *working_directory,
                         gchar                **argv,
                         gchar                **envp,
@@ -196,6 +204,7 @@ gboolean g_spawn_async (const gchar           *working_directory,
 /* Opens pipes for non-NULL standard_output, standard_input, standard_error,
  * and returns the parent's end of the pipes.
  */
+GLIB_AVAILABLE_IN_ALL
 gboolean g_spawn_async_with_pipes (const gchar          *working_directory,
                                    gchar               **argv,
                                    gchar               **envp,
@@ -213,6 +222,7 @@ gboolean g_spawn_async_with_pipes (const gchar          *working_directory,
  * standard output or error of the command will be placed there.
  */
 
+GLIB_AVAILABLE_IN_ALL
 gboolean g_spawn_sync         (const gchar          *working_directory,
                                gchar               **argv,
                                gchar               **envp,
@@ -224,15 +234,73 @@ gboolean g_spawn_sync         (const gchar          *working_directory,
                                gint                 *exit_status,
                                GError              **error);
 
+GLIB_AVAILABLE_IN_ALL
 gboolean g_spawn_command_line_sync  (const gchar          *command_line,
                                      gchar               **standard_output,
                                      gchar               **standard_error,
                                      gint                 *exit_status,
                                      GError              **error);
+GLIB_AVAILABLE_IN_ALL
 gboolean g_spawn_command_line_async (const gchar          *command_line,
                                      GError              **error);
 
+GLIB_AVAILABLE_IN_2_34
+gboolean g_spawn_check_exit_status (gint      exit_status,
+				    GError  **error);
+
+GLIB_AVAILABLE_IN_ALL
 void g_spawn_close_pid (GPid pid);
+
+#ifdef G_OS_WIN32
+#define g_spawn_async              g_spawn_async_utf8
+#define g_spawn_async_with_pipes   g_spawn_async_with_pipes_utf8
+#define g_spawn_sync               g_spawn_sync_utf8
+#define g_spawn_command_line_sync  g_spawn_command_line_sync_utf8
+#define g_spawn_command_line_async g_spawn_command_line_async_utf8
+
+GLIB_AVAILABLE_IN_ALL
+gboolean g_spawn_async_utf8              (const gchar           *working_directory,
+                                          gchar                **argv,
+                                          gchar                **envp,
+                                          GSpawnFlags            flags,
+                                          GSpawnChildSetupFunc   child_setup,
+                                          gpointer               user_data,
+                                          GPid                  *child_pid,
+                                          GError               **error);
+GLIB_AVAILABLE_IN_ALL
+gboolean g_spawn_async_with_pipes_utf8   (const gchar           *working_directory,
+                                          gchar                **argv,
+                                          gchar                **envp,
+                                          GSpawnFlags            flags,
+                                          GSpawnChildSetupFunc   child_setup,
+                                          gpointer               user_data,
+                                          GPid                  *child_pid,
+                                          gint                  *standard_input,
+                                          gint                  *standard_output,
+                                          gint                  *standard_error,
+                                          GError               **error);
+GLIB_AVAILABLE_IN_ALL
+gboolean g_spawn_sync_utf8               (const gchar           *working_directory,
+                                          gchar                **argv,
+                                          gchar                **envp,
+                                          GSpawnFlags            flags,
+                                          GSpawnChildSetupFunc   child_setup,
+                                          gpointer               user_data,
+                                          gchar                **standard_output,
+                                          gchar                **standard_error,
+                                          gint                  *exit_status,
+                                          GError               **error);
+
+GLIB_AVAILABLE_IN_ALL
+gboolean g_spawn_command_line_sync_utf8  (const gchar           *command_line,
+                                          gchar                **standard_output,
+                                          gchar                **standard_error,
+                                          gint                  *exit_status,
+                                          GError               **error);
+GLIB_AVAILABLE_IN_ALL
+gboolean g_spawn_command_line_async_utf8 (const gchar           *command_line,
+                                          GError               **error);
+#endif
 
 G_END_DECLS
 

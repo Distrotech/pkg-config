@@ -486,14 +486,11 @@
 static gboolean
 g_variant_type_check (const GVariantType *type)
 {
-  const gchar *type_string;
-
   if (type == NULL)
     return FALSE;
 
-  type_string = (const gchar *) type;
-#ifndef G_DISABLE_CHECKS
-  return g_variant_type_string_scan (type_string, NULL, NULL);
+#if 0
+  return g_variant_type_string_scan ((const gchar *) type, NULL, NULL);
 #else
   return TRUE;
 #endif
@@ -1418,7 +1415,7 @@ g_variant_type_new_tuple (const GVariantType * const *items,
 }
 
 /**
- * g_variant_type_new_array:
+ * g_variant_type_new_array: (constructor)
  * @element: a #GVariantType
  *
  * Constructs the type corresponding to an array of elements of the
@@ -1448,7 +1445,7 @@ g_variant_type_new_array (const GVariantType *element)
 }
 
 /**
- * g_variant_type_new_maybe:
+ * g_variant_type_new_maybe: (constructor)
  * @element: a #GVariantType
  *
  * Constructs the type corresponding to a maybe instance containing
@@ -1478,7 +1475,7 @@ g_variant_type_new_maybe (const GVariantType *element)
 }
 
 /**
- * g_variant_type_new_dict_entry:
+ * g_variant_type_new_dict_entry: (constructor)
  * @key: a basic #GVariantType
  * @value: a #GVariantType
  *

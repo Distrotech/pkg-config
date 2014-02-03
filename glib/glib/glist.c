@@ -32,6 +32,7 @@
 
 #include "glist.h"
 #include "gslice.h"
+#include "gmessages.h"
 
 #include "gtestutils.h"
 
@@ -97,18 +98,20 @@
 /**
  * g_list_previous:
  * @list: an element in a #GList.
- * @Returns: the previous element, or %NULL if there are no previous
- *           elements.
  *
  * A convenience macro to get the previous element in a #GList.
+ *
+ * Returns: the previous element, or %NULL if there are no previous
+ *          elements.
  **/
 
 /**
  * g_list_next:
  * @list: an element in a #GList.
- * @Returns: the next element, or %NULL if there are no more elements.
  *
  * A convenience macro to get the next element in a #GList.
+ *
+ * Returns: the next element, or %NULL if there are no more elements.
  **/
 
 #define _g_list_alloc()         g_slice_new (GList)
@@ -117,11 +120,12 @@
 
 /**
  * g_list_alloc:
- * @Returns: a pointer to the newly-allocated #GList element.
  *
  * Allocates space for one #GList element. It is called by
  * g_list_append(), g_list_prepend(), g_list_insert() and
  * g_list_insert_sorted() and so is rarely used on its own.
+ *
+ * Returns: a pointer to the newly-allocated #GList element.
  **/
 GList*
 g_list_alloc (void)
@@ -417,6 +421,37 @@ g_list_concat (GList *list1, GList *list2)
   return list1;
 }
 
+static inline GList*
+_g_list_remove_link (GList *list,
+		     GList *link)
+{
+  if (link == NULL)
+    return list;
+
+  if (link->prev)
+    {
+      if (link->prev->next == link)
+        link->prev->next = link->next;
+      else
+        g_warning ("corrupted double-linked list detected");
+    }
+  if (link->next)
+    {
+      if (link->next->prev == link)
+        link->next->prev = link->prev;
+      else
+        g_warning ("corrupted double-linked list detected");
+    }
+
+  if (link == list)
+    list = list->next;
+
+  link->next = NULL;
+  link->prev = NULL;
+
+  return list;
+}
+
 /**
  * g_list_remove:
  * @list: a #GList
@@ -433,7 +468,7 @@ g_list_remove (GList	     *list,
 	       gconstpointer  data)
 {
   GList *tmp;
-  
+
   tmp = list;
   while (tmp)
     {
@@ -441,16 +476,9 @@ g_list_remove (GList	     *list,
 	tmp = tmp->next;
       else
 	{
-	  if (tmp->prev)
-	    tmp->prev->next = tmp->next;
-	  if (tmp->next)
-	    tmp->next->prev = tmp->prev;
-	  
-	  if (list == tmp)
-	    list = list->next;
-	  
+          list = _g_list_remove_link (list, tmp);
 	  _g_list_free1 (tmp);
-	  
+
 	  break;
 	}
     }
@@ -462,9 +490,9 @@ g_list_remove (GList	     *list,
  * @list: a #GList
  * @data: data to remove
  *
- * Removes all list nodes with data equal to @data. 
- * Returns the new head of the list. Contrast with 
- * g_list_remove() which removes only the first node 
+ * Removes all list nodes with data equal to @data.
+ * Returns the new head of the list. Contrast with
+ * g_list_remove() which removes only the first node
  * matching the given data.
  *
  * Returns: new head of @list
@@ -494,27 +522,6 @@ g_list_remove_all (GList	*list,
 	  tmp = next;
 	}
     }
-  return list;
-}
-
-static inline GList*
-_g_list_remove_link (GList *list,
-		     GList *link)
-{
-  if (link)
-    {
-      if (link->prev)
-	link->prev->next = link->next;
-      if (link->next)
-	link->next->prev = link->prev;
-      
-      if (link == list)
-	list = list->next;
-      
-      link->next = NULL;
-      link->prev = NULL;
-    }
-  
   return list;
 }
 
@@ -566,13 +573,49 @@ g_list_delete_link (GList *list,
  * <note><para>
  * Note that this is a "shallow" copy. If the list elements 
  * consist of pointers to data, the pointers are copied but 
- * the actual data is not.
+ * the actual data is not. See g_list_copy_deep() if you need
+ * to copy the data as well.
  * </para></note>
  *
  * Returns: a copy of @list
  */
 GList*
 g_list_copy (GList *list)
+{
+  return g_list_copy_deep (list, NULL, NULL);
+}
+
+/**
+ * g_list_copy_deep:
+ * @list: a #GList
+ * @func: a copy function used to copy every element in the list
+ * @user_data: user data passed to the copy function @func, or #NULL
+ *
+ * Makes a full (deep) copy of a #GList.
+ *
+ * In contrast with g_list_copy(), this function uses @func to make a copy of
+ * each list element, in addition to copying the list container itself.
+ *
+ * @func, as a #GCopyFunc, takes two arguments, the data to be copied and a user
+ * pointer. It's safe to pass #NULL as user_data, if the copy function takes only
+ * one argument.
+ *
+ * For instance, if @list holds a list of GObjects, you can do:
+ * |[
+ * another_list = g_list_copy_deep (list, (GCopyFunc) g_object_ref, NULL);
+ * ]|
+ *
+ * And, to entirely free the new list, you could do:
+ * |[
+ * g_list_free_full (another_list, g_object_unref);
+ * ]|
+ *
+ * Returns: a full copy of @list, use #g_list_free_full to free it
+ *
+ * Since: 2.34
+ */
+GList*
+g_list_copy_deep (GList *list, GCopyFunc func, gpointer user_data)
 {
   GList *new_list = NULL;
 
@@ -581,7 +624,10 @@ g_list_copy (GList *list)
       GList *last;
 
       new_list = _g_list_alloc ();
-      new_list->data = list->data;
+      if (func)
+        new_list->data = func (list->data, user_data);
+      else
+        new_list->data = list->data;
       new_list->prev = NULL;
       last = new_list;
       list = list->next;
@@ -590,7 +636,10 @@ g_list_copy (GList *list)
 	  last->next = _g_list_alloc ();
 	  last->next->prev = last;
 	  last = last->next;
-	  last->data = list->data;
+	  if (func)
+	    last->data = func (list->data, user_data);
+	  else
+	    last->data = list->data;
 	  list = list->next;
 	}
       last->next = NULL;
@@ -1084,13 +1133,14 @@ g_list_sort_real (GList    *list,
  * GCompareFunc:
  * @a: a value.
  * @b: a value to compare with.
- * @Returns: negative value if @a &lt; @b; zero if @a = @b; positive
- *           value if @a > @b.
  *
  * Specifies the type of a comparison function used to compare two
  * values.  The function should return a negative integer if the first
  * value comes before the second, 0 if they are equal, or a positive
  * integer if the first value comes after the second.
+ *
+ * Returns: negative value if @a &lt; @b; zero if @a = @b; positive
+ *          value if @a > @b.
  **/
 GList *
 g_list_sort (GList        *list,
@@ -1116,13 +1166,14 @@ g_list_sort (GList        *list,
  * @a: a value.
  * @b: a value to compare with.
  * @user_data: user data to pass to comparison function.
- * @Returns: negative value if @a &lt; @b; zero if @a = @b; positive
- *           value if @a > @b.
  *
  * Specifies the type of a comparison function used to compare two
  * values.  The function should return a negative integer if the first
  * value comes before the second, 0 if they are equal, or a positive
  * integer if the first value comes after the second.
+ *
+ * Returns: negative value if @a &lt; @b; zero if @a = @b; positive
+ *          value if @a > @b.
  **/
 GList *
 g_list_sort_with_data (GList            *list,

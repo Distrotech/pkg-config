@@ -215,10 +215,11 @@
 /**
  * G_TRYLOCK:
  * @name: the name of the lock
- * @Returns: %TRUE, if the lock could be locked.
  *
  * Works like g_mutex_trylock(), but for a lock defined with
  * #G_LOCK_DEFINE.
+ *
+ * Returns: %TRUE, if the lock could be locked.
  */
 
 /**
@@ -518,11 +519,7 @@
  *
  * The error domain of the GLib thread subsystem.
  **/
-GQuark
-g_thread_error_quark (void)
-{
-  return g_quark_from_static_string ("g_thread_error");
-}
+G_DEFINE_QUARK (g_thread_error, g_thread_error)
 
 /* Local Data {{{1 -------------------------------------------------------- */
 
@@ -805,7 +802,7 @@ g_thread_proxy (gpointer data)
 
 /**
  * g_thread_new:
- * @name: a name for the new thread
+ * @name: (allow-none): an (optional) name for the new thread
  * @func: a function to execute in the new thread
  * @data: an argument to supply to the new thread
  *
@@ -816,6 +813,7 @@ g_thread_proxy (gpointer data)
  * with g_thread_join().
  *
  * The @name can be useful for discriminating threads in a debugger.
+ * It is not used for other purposes and does not have to be unique.
  * Some systems restrict the length of @name to 16 bytes.
  *
  * If the thread can not be created the program aborts. See
@@ -846,7 +844,7 @@ g_thread_new (const gchar *name,
 
 /**
  * g_thread_try_new:
- * @name: a name for the new thread
+ * @name: (allow-none): an (optional) name for the new thread
  * @func: a function to execute in the new thread
  * @data: an argument to supply to the new thread
  * @error: return location for error, or %NULL
@@ -1008,6 +1006,62 @@ g_thread_self (void)
     }
 
   return (GThread*) thread;
+}
+
+/**
+ * g_get_num_processors:
+ *
+ * Determine the approximate number of threads that the system will
+ * schedule simultaneously for this process.  This is intended to be
+ * used as a parameter to g_thread_pool_new() for CPU bound tasks and
+ * similar cases.
+ *
+ * Returns: Number of schedulable threads, always greater than 0
+ *
+ * Since: 2.36
+ */
+guint
+g_get_num_processors (void)
+{
+#ifdef G_OS_WIN32
+  DWORD_PTR process_cpus;
+  DWORD_PTR system_cpus;
+
+  if (GetProcessAffinityMask (GetCurrentProcess (),
+                              &process_cpus, &system_cpus))
+    {
+      unsigned int count;
+
+      for (count = 0; process_cpus != 0; process_cpus >>= 1)
+        if (process_cpus & 1)
+          count++;
+
+      if (count > 0)
+        return count;
+    }
+#elif defined(HAVE_UNISTD_H) && defined(_SC_NPROCESSORS_ONLN)
+  {
+    int count;
+
+    count = sysconf (_SC_NPROCESSORS_ONLN);
+    if (count > 0)
+      return count;
+  }
+#elif defined HW_NCPU
+  {
+    int mib[2], count = 0;
+    size_t len;
+
+    mib[0] = CTL_HW;
+    mib[1] = HW_NCPU;
+    len = sizeof(count);
+
+    if (sysctl (mib, 2, &count, &len, NULL, 0) == 0 && count > 0)
+      return count;
+  }
+#endif
+
+  return 1; /* Fallback */
 }
 
 /* Epilogue {{{1 */

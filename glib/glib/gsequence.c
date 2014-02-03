@@ -79,13 +79,14 @@
  * @a: a #GSequenceIter
  * @b: a #GSequenceIter
  * @data: user data
- * @Returns: zero if the iterators are equal, a negative value if @a
- *           comes before @b, and a positive value if @b comes before
- *           @a.
  *
  * A #GSequenceIterCompareFunc is a function used to compare iterators.
  * It must return zero if the iterators compare equal, a negative value
  * if @a comes before @b, and a positive value if @b comes before @a.
+ *
+ * Returns: zero if the iterators are equal, a negative value if @a
+ *          comes before @b, and a positive value if @b comes before
+ *          @a.
  **/
 
 typedef struct _GSequenceNode GSequenceNode;
@@ -828,7 +829,8 @@ g_sequence_search (GSequence        *seq,
  * </para></note>
  *
  * Return value: an #GSequenceIter pointing to the position of the
- *     first item found equal to @data according to @cmp_func and @cmp_data.
+ *     first item found equal to @data according to @cmp_func and
+ *     @cmp_data, or %NULL if no such item exists.
  *
  * Since: 2.28
  **/
@@ -1122,7 +1124,7 @@ g_sequence_search_iter (GSequence                *seq,
  *
  * Return value: an #GSequenceIter pointing to the position of
  *     the first item found equal to @data according to @cmp_func
- *     and @cmp_data.
+ *     and @cmp_data, or %NULL if no such item exists.
  *
  * Since: 2.28
  **/

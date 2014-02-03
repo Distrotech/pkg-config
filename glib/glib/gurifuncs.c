@@ -139,7 +139,8 @@ g_uri_unescape_segment (const char *escaped_string,
 /**
  * g_uri_unescape_string:
  * @escaped_string: an escaped string to be unescaped.
- * @illegal_characters: an optional string of illegal characters not to be allowed.
+ * @illegal_characters: (allow-none): a string of illegal characters not to be
+ *      allowed, or %NULL.
  * 
  * Unescapes a whole escaped string.
  * 
@@ -217,8 +218,8 @@ g_uri_parse_scheme (const char  *uri)
 /**
  * g_uri_escape_string:
  * @unescaped: the unescaped input string.
- * @reserved_chars_allowed: a string of reserved characters that are
- *      allowed to be used, or %NULL.
+ * @reserved_chars_allowed: (allow-none): a string of reserved characters that
+ *      are allowed to be used, or %NULL.
  * @allow_utf8: %TRUE if the result can include UTF-8 characters.
  * 
  * Escapes a string for use in a URI.

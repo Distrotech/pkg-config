@@ -196,6 +196,7 @@ g_thread_get_initialized (void)
 }
 
 /* We need this for ABI compatibility */
+GLIB_AVAILABLE_IN_ALL
 void g_thread_init_glib (void);
 void g_thread_init_glib (void) { }
 
@@ -351,9 +352,10 @@ g_thread_create (GThreadFunc   func,
  * @bound: ignored
  * @priority: ignored
  * @error: return location for error.
- * @Returns: the new #GThread on success.
  *
  * This function creates a new thread.
+ *
+ * Returns: the new #GThread on success.
  *
  * Deprecated:2.32: The @bound and @priority arguments are now ignored.
  * Use g_thread_new().
@@ -372,7 +374,7 @@ g_thread_create_full (GThreadFunc       func,
   thread = g_thread_new_internal (NULL, g_deprecated_thread_proxy,
                                   func, data, stack_size, error);
 
-  if (!joinable)
+  if (thread && !joinable)
     {
       thread->joinable = FALSE;
       g_thread_unref (thread);
@@ -501,11 +503,12 @@ g_static_mutex_init (GStaticMutex *mutex)
 /**
  * g_static_mutex_get_mutex:
  * @mutex: a #GStaticMutex.
- * @Returns: the #GMutex corresponding to @mutex.
  *
  * For some operations (like g_cond_wait()) you must have a #GMutex
  * instead of a #GStaticMutex. This function will return the
  * corresponding #GMutex for @mutex.
+ *
+ * Returns: the #GMutex corresponding to @mutex.
  *
  * Deprecated: 2.32: Just use a #GMutex
  */
@@ -556,9 +559,10 @@ g_static_mutex_get_mutex_impl (GStaticMutex* mutex)
 /**
  * g_static_mutex_trylock:
  * @mutex: a #GStaticMutex.
- * @Returns: %TRUE, if the #GStaticMutex could be locked.
  *
  * Works like g_mutex_trylock(), but for a #GStaticMutex.
+ *
+ * Returns: %TRUE, if the #GStaticMutex could be locked.
  *
  * Deprecated: 2.32: Use g_mutex_trylock()
  */
@@ -586,7 +590,7 @@ g_static_mutex_get_mutex_impl (GStaticMutex* mutex)
  * <note><para>Calling g_static_mutex_free() on a locked mutex may
  * result in undefined behaviour.</para></note>
  *
- * Deprecated: 2.32: Use g_mutex_free()
+ * Deprecated: 2.32: Use g_mutex_clear()
  */
 void
 g_static_mutex_free (GStaticMutex* mutex)
@@ -716,13 +720,14 @@ g_static_rec_mutex_lock (GStaticRecMutex* mutex)
 /**
  * g_static_rec_mutex_trylock:
  * @mutex: a #GStaticRecMutex to lock.
- * @Returns: %TRUE, if @mutex could be locked.
  *
  * Tries to lock @mutex. If @mutex is already locked by another thread,
  * it immediately returns %FALSE. Otherwise it locks @mutex and returns
  * %TRUE. If @mutex is already locked by the calling thread, this
  * functions increases the depth of @mutex and immediately returns
  * %TRUE.
+ *
+ * Returns: %TRUE, if @mutex could be locked.
  *
  * Deprecated: 2.32: Use g_rec_mutex_trylock()
  */
@@ -789,8 +794,6 @@ g_static_rec_mutex_lock_full (GStaticRecMutex *mutex,
 /**
  * g_static_rec_mutex_unlock_full:
  * @mutex: a #GStaticRecMutex to completely unlock.
- * @Returns: number of times @mutex has been locked by the current
- *           thread.
  *
  * Completely unlocks @mutex. If another thread is blocked in a
  * g_static_rec_mutex_lock() call for @mutex, it will be woken and can
@@ -799,6 +802,9 @@ g_static_rec_mutex_lock_full (GStaticRecMutex *mutex,
  * before the call to g_static_rec_mutex_unlock_full() you can call
  * g_static_rec_mutex_lock_full() with the depth returned by this
  * function.
+ *
+ * Returns: number of times @mutex has been locked by the current
+ *          thread.
  *
  * Deprecated: 2.32: Use g_rec_mutex_unlock()
  */
@@ -1024,13 +1030,14 @@ g_static_rw_lock_reader_lock (GStaticRWLock* lock)
 /**
  * g_static_rw_lock_reader_trylock:
  * @lock: a #GStaticRWLock to lock for reading.
- * @Returns: %TRUE, if @lock could be locked for reading.
  *
  * Tries to lock @lock for reading. If @lock is already locked for
  * writing by another thread or if another thread is already waiting to
  * lock @lock for writing, immediately returns %FALSE. Otherwise locks
  * @lock for reading and returns %TRUE. This lock has to be unlocked by
  * g_static_rw_lock_reader_unlock().
+ *
+ * Returns: %TRUE, if @lock could be locked for reading.
  *
  * Deprectated: 2.32: Use g_rw_lock_reader_trylock() instead
  */
@@ -1113,12 +1120,13 @@ g_static_rw_lock_writer_lock (GStaticRWLock* lock)
 /**
  * g_static_rw_lock_writer_trylock:
  * @lock: a #GStaticRWLock to lock for writing.
- * @Returns: %TRUE, if @lock could be locked for writing.
  *
  * Tries to lock @lock for writing. If @lock is already locked (for
  * either reading or writing) by another thread, it immediately returns
  * %FALSE. Otherwise it locks @lock for writing and returns %TRUE. This
  * lock has to be unlocked by g_static_rw_lock_writer_unlock().
+ *
+ * Returns: %TRUE, if @lock could be locked for writing.
  *
  * Deprectated: 2.32: Use g_rw_lock_writer_trylock() instead
  */
@@ -1461,7 +1469,7 @@ g_static_private_free (GStaticPrivate *private_key)
  *
  * Returns: a newly allocated #GMutex. Use g_mutex_free() to free
  *
- * Deprecated:3.32:GMutex can now be statically allocated, or embedded
+ * Deprecated: 2.32: GMutex can now be statically allocated, or embedded
  * in structures and initialised with g_mutex_init().
  */
 GMutex *
@@ -1484,7 +1492,7 @@ g_mutex_new (void)
  * Calling g_mutex_free() on a locked mutex may result
  * in undefined behaviour.
  *
- * Deprecated:3.32:GMutex can now be statically allocated, or embedded
+ * Deprecated: 2.32: GMutex can now be statically allocated, or embedded
  * in structures and initialised with g_mutex_init().
  */
 void
@@ -1503,7 +1511,7 @@ g_mutex_free (GMutex *mutex)
  *
  * Returns: a newly allocated #GCond. Free with g_cond_free()
  *
- * Deprecated:3.32:GCond can now be statically allocated, or embedded
+ * Deprecated: 2.32: GCond can now be statically allocated, or embedded
  * in structures and initialised with g_cond_init().
  */
 GCond *
@@ -1526,7 +1534,7 @@ g_cond_new (void)
  * Calling g_cond_free() for a #GCond on which threads are
  * blocking leads to undefined behaviour.
  *
- * Deprecated:3.32:GCond can now be statically allocated, or embedded
+ * Deprecated: 2.32: GCond can now be statically allocated, or embedded
  * in structures and initialised with g_cond_init().
  */
 void

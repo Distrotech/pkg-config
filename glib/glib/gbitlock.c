@@ -20,6 +20,8 @@
  * Author: Ryan Lortie <desrt@desrt.ca>
  */
 
+#include "config.h"
+
 #include "gbitlock.h"
 
 #include <glib/gmessages.h>
@@ -29,10 +31,9 @@
 #include <glib/gslice.h>
 
 #include "gthreadprivate.h"
-#include "config.h"
 
-#undef HAVE_FUTEX
 #ifdef G_BIT_LOCK_FORCE_FUTEX_EMULATION
+#undef HAVE_FUTEX
 #endif
 
 #ifndef HAVE_FUTEX

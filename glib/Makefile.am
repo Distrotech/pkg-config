@@ -1,5 +1,5 @@
 ## Process this file with automake to produce Makefile.in
-include $(top_srcdir)/Makefile.decl
+include $(top_srcdir)/glib.mk
 
 # http://people.gnome.org/~walters/docs/build-api.txt
 .buildapi-allow-builddir:
@@ -18,20 +18,21 @@ AM_CPPFLAGS = 					\
 EXTRA_DIST += 			\
 	acglib.m4		\
 	README.in		\
-	Makefile.decl		\
-	mkinstalldirs
+	glib.mk			\
+	$(NULL)
 
 
 # These may be in the builddir too
-BUILT_EXTRA_DIST = 		\
-	README
+BUILT_EXTRA_DIST += 		\
+	README			\
+	$(NULL)
 
 CONFIGURE_DEPENDENCIES = acglib.m4
 
 # build documentation when doing distcheck
 DISTCHECK_CONFIGURE_FLAGS = --enable-debug --enable-gtk-doc --enable-man --disable-maintainer-mode
 
-DISTCLEANFILES = config.lt
+DISTCLEANFILES += config.lt
 
 distclean-local: lcov-clean
 	if test $(srcdir) = .; then :; else \

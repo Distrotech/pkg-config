@@ -43,6 +43,7 @@
 #include "config.h"
 
 #include "glib.h"
+#include "glib-init.h"
 #include "gthread.h"
 #include "gthreadprivate.h"
 #include "gslice.h"
@@ -982,7 +983,7 @@ g_thread_lookup_native_funcs (void)
   return TRUE;
 }
 
-G_GNUC_INTERNAL void
+void
 g_thread_win32_init (void)
 {
   if (!g_thread_lookup_native_funcs ())
@@ -991,7 +992,7 @@ g_thread_win32_init (void)
   InitializeCriticalSection (&g_private_lock);
 }
 
-G_GNUC_INTERNAL void
+void
 g_thread_win32_thread_detach (void)
 {
   gboolean dtors_called;

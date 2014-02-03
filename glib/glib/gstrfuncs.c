@@ -317,7 +317,15 @@ static const guint16 ascii_table_data[256] = {
 
 const guint16 * const g_ascii_table = ascii_table_data;
 
-#ifdef HAVE_NEWLOCALE
+#if defined (HAVE_NEWLOCALE) && \
+    defined (HAVE_USELOCALE) && \
+    defined (HAVE_STRTOD_L) && \
+    defined (HAVE_STRTOULL_L) && \
+    defined (HAVE_STRTOLL_L)
+#define USE_XLOCALE 1
+#endif
+
+#ifdef USE_XLOCALE
 static locale_t
 get_C_locale (void)
 {
@@ -683,7 +691,7 @@ gdouble
 g_ascii_strtod (const gchar *nptr,
                 gchar      **endptr)
 {
-#ifdef HAVE_STRTOD_L
+#ifdef USE_XLOCALE
 
   g_return_val_if_fail (nptr != NULL, 0);
 
@@ -695,7 +703,9 @@ g_ascii_strtod (const gchar *nptr,
 
   gchar *fail_pos;
   gdouble val;
+#ifndef __BIONIC__
   struct lconv *locale_data;
+#endif
   const char *decimal_point;
   int decimal_point_len;
   const char *p, *decimal_point_pos;
@@ -706,9 +716,14 @@ g_ascii_strtod (const gchar *nptr,
 
   fail_pos = NULL;
 
+#ifndef __BIONIC__
   locale_data = localeconv ();
   decimal_point = locale_data->decimal_point;
   decimal_point_len = strlen (decimal_point);
+#else
+  decimal_point = ".";
+  decimal_point_len = 1;
+#endif
 
   g_assert (decimal_point_len != 0);
 
@@ -866,6 +881,9 @@ g_ascii_dtostr (gchar       *buffer,
   return g_ascii_formatd (buffer, buf_len, "%.17g", d);
 }
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wformat-nonliteral"
+
 /**
  * g_ascii_formatd:
  * @buffer: A buffer to place the resulting string in
@@ -890,16 +908,18 @@ g_ascii_formatd (gchar       *buffer,
                  const gchar *format,
                  gdouble      d)
 {
-#ifdef HAVE_USELOCALE
+#ifdef USE_XLOCALE
   locale_t old_locale;
 
   old_locale = uselocale (get_C_locale ());
-  _g_snprintf (buffer, buf_len, format, d);
+   _g_snprintf (buffer, buf_len, format, d);
   uselocale (old_locale);
 
   return buffer;
 #else
+#ifndef __BIONIC__
   struct lconv *locale_data;
+#endif
   const char *decimal_point;
   int decimal_point_len;
   gchar *p;
@@ -930,9 +950,14 @@ g_ascii_formatd (gchar       *buffer,
 
   _g_snprintf (buffer, buf_len, format, d);
 
+#ifndef __BIONIC__
   locale_data = localeconv ();
   decimal_point = locale_data->decimal_point;
   decimal_point_len = strlen (decimal_point);
+#else
+  decimal_point = ".";
+  decimal_point_len = 1;
+#endif
 
   g_assert (decimal_point_len != 0);
 
@@ -966,6 +991,7 @@ g_ascii_formatd (gchar       *buffer,
   return buffer;
 #endif
 }
+#pragma GCC diagnostic pop
 
 #define ISSPACE(c)              ((c) == ' ' || (c) == '\f' || (c) == '\n' || \
                                  (c) == '\r' || (c) == '\t' || (c) == '\v')
@@ -975,7 +1001,7 @@ g_ascii_formatd (gchar       *buffer,
 #define TOUPPER(c)              (ISLOWER (c) ? (c) - 'a' + 'A' : (c))
 #define TOLOWER(c)              (ISUPPER (c) ? (c) - 'A' + 'a' : (c))
 
-#if !defined(HAVE_STRTOLL_L) || !defined(HAVE_STRTOULL_L)
+#ifndef USE_XLOCALE
 
 static guint64
 g_parse_long_long (const gchar  *nptr,
@@ -1100,7 +1126,7 @@ g_parse_long_long (const gchar  *nptr,
     }
   return 0;
 }
-#endif
+#endif /* !USE_XLOCALE */
 
 /**
  * g_ascii_strtoull:
@@ -1136,7 +1162,7 @@ g_ascii_strtoull (const gchar *nptr,
                   gchar      **endptr,
                   guint        base)
 {
-#ifdef HAVE_STRTOULL_L
+#ifdef USE_XLOCALE
   return strtoull_l (nptr, endptr, base, get_C_locale ());
 #else
   gboolean negative;
@@ -1183,7 +1209,7 @@ g_ascii_strtoll (const gchar *nptr,
                  gchar      **endptr,
                  guint        base)
 {
-#ifdef HAVE_STRTOLL_L
+#ifdef USE_XLOCALE
   return strtoll_l (nptr, endptr, base, get_C_locale ());
 #else
   gboolean negative;
@@ -1851,9 +1877,10 @@ g_strcasecmp (const gchar *s1,
  * it doesn't work on many encodings at all, including UTF-8, EUC-JP,
  * etc.
  *
- * There are therefore two replacement functions: g_ascii_strncasecmp(),
+ * There are therefore two replacement techniques: g_ascii_strncasecmp(),
  * which only works on ASCII and is not locale-sensitive, and
- * g_utf8_casefold(), which is good for case-insensitive sorting of UTF-8.
+ * g_utf8_casefold() followed by strcmp() on the resulting strings, which is
+ * good for case-insensitive sorting of UTF-8.
  **/
 gint
 g_strncasecmp (const gchar *s1,

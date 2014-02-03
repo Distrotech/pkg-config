@@ -19,6 +19,8 @@
  * Author: Colin Walters <walters@verbum.org>
  */
 
+#include "config.h"
+
 #include "glib-private.h"
 
 /**
@@ -38,7 +40,13 @@ glib__private__ (void)
     g_wakeup_signal,
     g_wakeup_acknowledge,
 
-    g_get_worker_context
+    g_get_worker_context,
+
+    g_check_setuid,
+    g_main_context_new_with_next_id,
+
+    g_dir_open_with_errno,
+    g_dir_new_from_dirp
   };
 
   return &table;

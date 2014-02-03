@@ -115,15 +115,15 @@
 
 struct _GDateTime
 {
-  /* 1 is 0001-01-01 in Proleptic Gregorian */
-  gint32 days;
-
   /* Microsecond timekeeping within Day */
   guint64 usec;
 
   /* TimeZone information */
   GTimeZone *tz;
   gint interval;
+
+  /* 1 is 0001-01-01 in Proleptic Gregorian */
+  gint32 days;
 
   volatile gint ref_count;
 };
@@ -948,6 +948,14 @@ g_date_time_new (GTimeZone *tz,
   GDateTime *datetime;
   gint64 full_time;
 
+  if (year < 1 || year > 9999 ||
+      month < 1 || month > 12 ||
+      day < 1 || day > 31 ||
+      hour < 0 || hour > 23 ||
+      minute < 0 || minute > 59 ||
+      seconds < 0.0 || seconds >= 60.0)
+    return NULL;
+
   datetime = g_date_time_alloc (tz);
   datetime->days = ymd_to_days (year, month, day);
   datetime->usec = (hour   * USEC_PER_HOUR)
@@ -989,7 +997,7 @@ g_date_time_new (GTimeZone *tz,
  *
  * Returns: a #GDateTime, or %NULL
  *
- * Since: 2.26.
+ * Since: 2.26
  **/
 GDateTime *
 g_date_time_new_local (gint    year,
@@ -1026,7 +1034,7 @@ g_date_time_new_local (gint    year,
  *
  * Returns: a #GDateTime, or %NULL
  *
- * Since: 2.26.
+ * Since: 2.26
  **/
 GDateTime *
 g_date_time_new_utc (gint    year,
@@ -1390,7 +1398,7 @@ g_date_time_compare (gconstpointer dt1,
  *
  * Calculates the difference in time between @end and @begin.  The
  * #GTimeSpan that is returned is effectively @end - @begin (ie:
- * positive if the first simparameter is larger).
+ * positive if the first parameter is larger).
  *
  * Return value: the difference between the two #GDateTime, as a time
  *   span expressed in microseconds.
@@ -2082,6 +2090,59 @@ g_date_time_to_utc (GDateTime *datetime)
 
 /* Format {{{1 */
 
+static gboolean
+format_z (GString *outstr,
+          gint     offset,
+          guint    colons)
+{
+  gint hours;
+  gint minutes;
+  gint seconds;
+
+  hours = offset / 3600;
+  minutes = ABS (offset) / 60 % 60;
+  seconds = ABS (offset) % 60;
+
+  switch (colons)
+    {
+    case 0:
+      g_string_append_printf (outstr, "%+03d%02d",
+                              hours,
+                              minutes);
+      break;
+
+    case 1:
+      g_string_append_printf (outstr, "%+03d:%02d",
+                              hours,
+                              minutes);
+      break;
+
+    case 2:
+      g_string_append_printf (outstr, "%+03d:%02d:%02d",
+                              hours,
+                              minutes,
+                              seconds);
+      break;
+
+    case 3:
+      g_string_append_printf (outstr, "%+03d", hours);
+
+      if (minutes != 0 || seconds != 0)
+        {
+          g_string_append_printf (outstr, ":%02d", minutes);
+
+          if (seconds != 0)
+            g_string_append_printf (outstr, ":%02d", seconds);
+        }
+      break;
+
+    default:
+      return FALSE;
+    }
+
+  return TRUE;
+}
+
 static void
 format_number (GString  *str,
                gboolean  use_alt_digits,
@@ -2177,6 +2238,7 @@ g_date_time_format_locale (GDateTime   *datetime,
 			   gboolean     locale_is_utf8)
 {
   guint     len;
+  guint     colons;
   gchar    *tmp;
   gunichar  c;
   gboolean  alt_digits = FALSE;
@@ -2211,6 +2273,7 @@ g_date_time_format_locale (GDateTime   *datetime,
       if (!*format)
 	break;
 
+      colons = 0;
       alt_digits = FALSE;
       pad_set = FALSE;
 
@@ -2302,7 +2365,7 @@ g_date_time_format_locale (GDateTime   *datetime,
 	  alt_digits = TRUE;
 	  goto next_mod;
 	case 'p':
-	  ampm = GET_AMPM (datetime);
+	  ampm = (gchar *) GET_AMPM (datetime);
 	  if (!locale_is_utf8)
 	    {
 	      ampm = tmp = g_locale_to_utf8 (ampm, -1, NULL, NULL, NULL);
@@ -2323,7 +2386,7 @@ g_date_time_format_locale (GDateTime   *datetime,
 	  g_free (ampm);
 	  break;
 	case 'P':
-	  ampm = GET_AMPM (datetime);
+	  ampm = (gchar *) GET_AMPM (datetime);
 	  if (!locale_is_utf8)
 	    {
 	      ampm = tmp = g_locale_to_utf8 (ampm, -1, NULL, NULL, NULL);
@@ -2406,17 +2469,15 @@ g_date_time_format_locale (GDateTime   *datetime,
 			 g_date_time_get_year (datetime));
 	  break;
 	case 'z':
-	  if (datetime->tz != NULL)
-	    {
-	      gint64 offset = g_date_time_get_utc_offset (datetime)
-		/ USEC_PER_SECOND;
-
-	      g_string_append_printf (outstr, "%+03d%02d",
-				      (int) offset / 3600,
-				      (int) abs(offset) / 60 % 60);
-	    }
-	  else
-	    g_string_append (outstr, "+0000");
+	  {
+	    gint64 offset;
+	    if (datetime->tz != NULL)
+	      offset = g_date_time_get_utc_offset (datetime) / USEC_PER_SECOND;
+	    else
+	      offset = 0;
+	    if (!format_z (outstr, (int) offset, colons))
+	      return FALSE;
+	  }
 	  break;
 	case 'Z':
 	  tz = g_date_time_get_timezone_abbreviation (datetime);
@@ -2444,6 +2505,12 @@ g_date_time_format_locale (GDateTime   *datetime,
 	case '0':
 	  pad_set = TRUE;
 	  pad = "0";
+	  goto next_mod;
+	case ':':
+	  /* Colons are only allowed before 'z' */
+	  if (*format && *format != 'z' && *format != ':')
+	    return FALSE;
+	  colons++;
 	  goto next_mod;
 	default:
 	  return FALSE;
@@ -2666,7 +2733,23 @@ g_date_time_format_locale (GDateTime   *datetime,
  *  <varlistentry><term>
  *    <literal>\%z</literal>:
  *   </term><listitem><simpara>
- *    the time-zone as hour offset from UTC
+ *    the time zone as an offset from UTC (+hhmm)
+ *  </simpara></listitem></varlistentry>
+ *  <varlistentry><term>
+ *    <literal>\%:z</literal>:
+ *   </term><listitem><simpara>
+ *    the time zone as an offset from UTC (+hh:mm). This is a gnulib strftime extension. Since: 2.38
+ *  </simpara></listitem></varlistentry>
+ *  <varlistentry><term>
+ *    <literal>\%::z</literal>:
+ *   </term><listitem><simpara>
+ *    the time zone as an offset from UTC (+hh:mm:ss). This is a gnulib strftime extension. Since: 2.38
+ *  </simpara></listitem></varlistentry>
+ *  <varlistentry><term>
+ *    <literal>\%:::z</literal>:
+ *   </term><listitem><simpara>
+ *    the time zone as an offset from UTC, with : to necessary precision
+ *    (e.g., -04, +05:30). This is a gnulib strftime extension. Since: 2.38
  *  </simpara></listitem></varlistentry>
  *  <varlistentry><term>
  *    <literal>\%Z</literal>:

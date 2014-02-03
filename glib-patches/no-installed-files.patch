@@ -1,8 +1,8 @@
 diff --git a/glib/glib/Makefile.am b/glib/glib/Makefile.am
-index 6fb3a34..1cf80a2 100644
+index 07b0141..c16051d 100644
 --- a/glib/glib/Makefile.am
 +++ b/glib/glib/Makefile.am
-@@ -16,7 +16,7 @@ CLEANFILES =
+@@ -12,7 +12,7 @@ include $(top_srcdir)/glib.mk
  DISTCLEANFILES += glibconfig-stamp glibconfig.h
  BUILT_SOURCES += glibconfig-stamp
  configexecincludedir = $(libdir)/glib-2.0/include
@@ -11,7 +11,7 @@ index 6fb3a34..1cf80a2 100644
  glibconfig-stamp: ../config.status
  	$(AM_V_GEN) cd $(top_builddir) && \
  	  $(SHELL) ./config.status glib/glibconfig.h
-@@ -74,18 +74,15 @@ EXTRA_DIST += 			\
+@@ -60,18 +60,15 @@ EXTRA_DIST += 			\
  	gregex.c		\
  	gregex.h		\
  	win_iconv.c		\
@@ -20,10 +20,10 @@ index 6fb3a34..1cf80a2 100644
  	gconstructor.h		\
  	$(MIRRORING_TAB_SOURCE)
  
--CLEANFILES= libglib-gdb.py
+-CLEANFILES += libglib-gdb.py
 -
  # These may be in the builddir too
- BUILT_EXTRA_DIST = 		\
+ BUILT_EXTRA_DIST += 		\
  	glib.rc
  
 -lib_LTLIBRARIES = libglib-2.0.la
@@ -31,7 +31,7 @@ index 6fb3a34..1cf80a2 100644
  
  if OS_WIN32_AND_DLL_COMPILATION
  if MS_LIB_AVAILABLE
-@@ -228,13 +225,13 @@ EXTRA_libglib_2_0_la_SOURCES = \
+@@ -220,13 +217,13 @@ EXTRA_libglib_2_0_la_SOURCES = \
  	gwin32.c
  
  glibincludedir=$(includedir)/glib-2.0
@@ -47,7 +47,7 @@ index 6fb3a34..1cf80a2 100644
  	deprecated/gallocator.h		\
  	deprecated/gcache.h		\
  	deprecated/gcompletion.h	\
-@@ -243,7 +240,7 @@ deprecatedinclude_HEADERS = \
+@@ -235,7 +232,7 @@ deprecatedinclude_HEADERS = \
  	deprecated/gthread.h
  
  glibsubincludedir=$(includedir)/glib-2.0/glib
@@ -56,35 +56,35 @@ index 6fb3a34..1cf80a2 100644
  	galloca.h	\
  	garray.h	\
  	gasyncqueue.h	\
-@@ -325,15 +322,6 @@ CLEANFILES += glib-public-headers.txt
+@@ -317,15 +314,6 @@ CLEANFILES += glib-public-headers.txt
  
  all-local: glib-public-headers.txt
  
--install-data-local: install-ms-lib install-def-file
+-install-data-local: install-ms-lib
 -	@if test -f $(glibincludedir)/glist.h ; then					\
 -	  echo "*** Old headers found in $(glibincludedir). You should remove the" ;	\
 -	  echo "*** contents of this directory and type 'make install' again." ;	\
 -	  false ;									\
 -	fi
 -
--uninstall-local: uninstall-ms-lib uninstall-def-file uninstall-gdb
+-uninstall-local: uninstall-ms-lib uninstall-gdb
 -
  if PLATFORM_WIN32
  no_undefined = -no-undefined
  endif
-@@ -371,11 +359,8 @@ libglib_2_0_la_DEPENDENCIES = libcharset/libcharset.la $(printf_la) @GIO@ @GSPAW
+@@ -349,11 +337,8 @@ libglib_2_0_la_DEPENDENCIES = libcharset/libcharset.la $(printf_la) @GIO@ @GSPAW
  
  libglib_2_0_la_LDFLAGS = $(GLIB_LINK_FLAGS) \
  	 $(glib_win32_res_ldflag) \
 -	-version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE) \
- 	-export-dynamic $(no_undefined) $(export_symbols)
+ 	-export-dynamic $(no_undefined)
  
 -INSTALL_PROGS=
 -
  gspawn-win32-helper-console.c:
  	echo '#define HELPER_CONSOLE' >$@
  	echo '#include "gspawn-win32-helper.c"' >>$@
-@@ -388,50 +373,17 @@ gspawn-win64-helper-console.c:
+@@ -366,50 +351,17 @@ gspawn-win64-helper-console.c:
  	echo '#include "gspawn-win32-helper.c"' >>$@
  
  
@@ -126,7 +126,7 @@ index 6fb3a34..1cf80a2 100644
 -	  mv -f "$(DESTDIR)$(bindir)/$$sf" "$(DESTDIR)$(bindir)/$$sf".tmp \
 -	  && sed < "$(DESTDIR)$(bindir)/$$sf".tmp > "$(DESTDIR)$(bindir)/$$sf" \
 -	    -e '1,24s|^ *#@PKGINSTALL_CONFIGVARS_IN24LINES@|  ${CONFIGVARS}|' \
--	    -e '1,1s|#! /usr/bin/env python\([0-9]\+\(\.[0-9]\+\)\?\)\?|#!${PYTHON}|' \
+-	    -e '1,1s|#! /usr/bin/env python.*|#!${PYTHON}|' \
 -	  || exit $$? ; \
 -	  chmod a+x $(DESTDIR)$(bindir)/$$sf ; \
 -	  rm -f "$(DESTDIR)$(bindir)/$$sf".tmp ; \
@@ -135,7 +135,7 @@ index 6fb3a34..1cf80a2 100644
  endif
  
  glib-2.0.lib: libglib-2.0.la glib.def
-@@ -478,25 +430,3 @@ dist-hook: $(BUILT_EXTRA_DIST)
+@@ -456,25 +408,3 @@ dist-hook: $(BUILT_EXTRA_DIST)
  	done >libglib.vs10.sourcefiles.filters
  	$(CPP) -P - <$(top_srcdir)/build/win32/vs10/glib.vcxproj.filtersin >$@	
  	rm libglib.vs10.sourcefiles.filters
@@ -162,10 +162,10 @@ index 6fb3a34..1cf80a2 100644
 -uninstall-gdb:
 -	-rm -r $(DESTDIR)$(datadir)/gdb
 diff --git a/glib/glib/libcharset/Makefile.am b/glib/glib/libcharset/Makefile.am
-index f5362df..f45e498 100644
+index 642f75c..abf32cb 100644
 --- a/glib/glib/libcharset/Makefile.am
 +++ b/glib/glib/libcharset/Makefile.am
-@@ -24,31 +24,6 @@ EXTRA_DIST += 			\
+@@ -26,31 +26,6 @@ EXTRA_DIST += 			\
  
  charset_alias = $(DESTDIR)$(libdir)/charset.alias
  charset_tmp = $(DESTDIR)$(libdir)/charset.tmp
@@ -198,7 +198,7 @@ index f5362df..f45e498 100644
  charset.alias: config.charset
  	$(AM_V_GEN) $(SHELL) $(srcdir)/config.charset '@host@' > t-$@
 diff --git a/glib/m4macros/Makefile.am b/glib/m4macros/Makefile.am
-index 75a9ca0..10a2f5f 100644
+index 971871c..0e6164c 100644
 --- a/glib/m4macros/Makefile.am
 +++ b/glib/m4macros/Makefile.am
 @@ -5,4 +5,4 @@ installed_m4= glib-2.0.m4 glib-gettext.m4 gsettings.m4

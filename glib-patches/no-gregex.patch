@@ -1,8 +1,8 @@
 diff --git a/glib/configure.ac b/glib/configure.ac
-index 8970f2c..41780cd 100644
+index 8e45480..4653090 100644
 --- a/glib/configure.ac
 +++ b/glib/configure.ac
-@@ -2431,64 +2431,6 @@ AC_RUN_IFELSE([AC_LANG_SOURCE([[
+@@ -2444,64 +2444,6 @@ AC_RUN_IFELSE([AC_LANG_SOURCE([[
    [broken_poll="no (cross compiling)"])
  AC_MSG_RESULT($broken_poll)
  
@@ -10,16 +10,16 @@ index 8970f2c..41780cd 100644
 -dnl *** GRegex checks ***
 -dnl *********************
 -
--PCRE_REQUIRED_VERSION=8.11
+-PCRE_REQUIRED_VERSION=8.13
 -
 -# Check if we should use the internal or the system-supplied pcre
 -AC_ARG_WITH(pcre,
--            [AC_HELP_STRING([--with-pcre=@<:@internal/system@:>@],
+-            [AS_HELP_STRING([--with-pcre=@<:@internal/system@:>@],
 -                            [whether to use system PCRE [default=internal]])])
 -
 -AM_CONDITIONAL(USE_SYSTEM_PCRE, [test "x$with_pcre" = xsystem])
 -
--if test "x$with_pcre" = xsystem; then
+-AS_IF([ test "x$with_pcre" = xsystem], [
 -  PKG_CHECK_MODULES(PCRE,
 -                    libpcre >= $PCRE_REQUIRED_VERSION)
 -  AC_CACHE_CHECK([for Unicode support in PCRE],glib_cv_pcre_has_unicode,[
@@ -51,23 +51,23 @@ index 8970f2c..41780cd 100644
 -  AC_DEFINE(USE_SYSTEM_PCRE, [], [using the system-supplied PCRE library])
 -  PCRE_REQUIRES=libpcre
 -  AC_SUBST(PCRE_REQUIRES)
--else
+-], [
 -  # If using gcc 4 pass -Wno-pointer-sign when compiling the internal PCRE
--  if test x"$GCC" = xyes; then
+-  AS_IF([ test x"$GCC" = xyes], [
 -    AC_MSG_CHECKING([whether compiler understands -Wno-pointer-sign])
 -    save_CFLAGS="$CFLAGS"
 -    CFLAGS="$CFLAGS -Wno-pointer-sign"
 -    AC_TRY_COMPILE([],[],[PCRE_WARN_CFLAGS="$PCRE_WARN_CFLAGS -Wno-pointer-sign"
 -                          AC_MSG_RESULT(yes)],[AC_MSG_RESULT(no)])
 -    CFLAGS="$save_CFLAGS"
--  fi
--fi
+-  ])
+-])
 -AC_SUBST(PCRE_WARN_CFLAGS)
 -
  dnl **********************
  dnl *** Win32 API libs ***
  dnl **********************
-@@ -3446,8 +3388,6 @@ Makefile
+@@ -3473,8 +3415,6 @@ Makefile
  glib/Makefile
  glib/libcharset/Makefile
  glib/gnulib/Makefile
@@ -77,10 +77,10 @@ index 8970f2c..41780cd 100644
  ])
  
 diff --git a/glib/glib/Makefile.am b/glib/glib/Makefile.am
-index e0ace06..005b9b2 100644
+index c16051d..d46e39b 100644
 --- a/glib/glib/Makefile.am
 +++ b/glib/glib/Makefile.am
-@@ -30,14 +30,9 @@ PRINTF_SUBDIR = gnulib
+@@ -26,13 +26,8 @@ PRINTF_SUBDIR = gnulib
  printf_la = gnulib/libgnulib.la
  endif 
  
@@ -90,14 +90,13 @@ index e0ace06..005b9b2 100644
 -endif
 -
 -SUBDIRS = libcharset $(PRINTF_SUBDIR) $(MAYBE_PCRE) update-pcre .
-+SUBDIRS = libcharset $(PRINTF_SUBDIR) .
- 
 -DIST_SUBDIRS = libcharset gnulib pcre update-pcre
++SUBDIRS = libcharset $(PRINTF_SUBDIR) .
 +DIST_SUBDIRS = libcharset gnulib
  
  AM_CPPFLAGS = 				\
  	$(glib_INCLUDES) 		\
-@@ -62,8 +57,6 @@ MIRRORING_TAB_SOURCE = 				\
+@@ -50,15 +45,11 @@ MIRRORING_TAB_SOURCE = 				\
  	glib-mirroring-tab/packtab.h		\
  	glib-mirroring-tab/packtab.c
  
@@ -106,24 +105,22 @@ index e0ace06..005b9b2 100644
  EXTRA_DIST += 			\
  	glib.rc.in		\
  	gen-iswide-table.py	\
-@@ -71,8 +64,6 @@ EXTRA_DIST += 			\
+ 	gen-unicode-tables.pl	\
  	gen-script-table.pl	\
- 	abicheck.sh		\
- 	glib.symbols		\
 -	gregex.c		\
 -	gregex.h		\
  	win_iconv.c		\
- 	libglib-gdb.py.in	\
  	docs.c			\
-@@ -162,7 +153,6 @@ libglib_2_0_la_SOURCES = 	\
- 	gqsort.c		\
+ 	gconstructor.h		\
+@@ -148,7 +139,6 @@ libglib_2_0_la_SOURCES = 	\
+ 	gquark.c		\
  	gqueue.c		\
  	grand.c			\
 -	gregex.c		\
  	gscanner.c		\
  	gscripttable.h		\
  	gsequence.c		\
-@@ -288,7 +278,6 @@ noinst_HEADERS += \
+@@ -277,7 +267,6 @@ noinst_HEADERS += \
  	gquark.h	\
  	gqueue.h	\
  	grand.h		\
@@ -131,8 +128,8 @@ index e0ace06..005b9b2 100644
  	gscanner.h	\
  	gsequence.h	\
  	gshell.h	\
-@@ -349,14 +338,6 @@ uninstall-def-file:
- export_symbols = $(LIBTOOL_EXPORT_OPTIONS)
+@@ -323,14 +312,6 @@ glib_win32_res = glib-win32-res.o
+ glib_win32_res_ldflag = -Wl,$(glib_win32_res)
  endif
  
 -if USE_SYSTEM_PCRE
@@ -143,11 +140,11 @@ index e0ace06..005b9b2 100644
 -pcre_inc =
 -endif
 -
+ libglib_2_0_la_CFLAGS = $(AM_CFLAGS) $(GLIB_HIDDEN_VISIBILITY_CFLAGS)
  libglib_2_0_la_LIBADD = libcharset/libcharset.la $(printf_la) @GIO@ @GSPAWN@ @PLATFORMDEP@ @ICONV_LIBS@ @G_LIBS_EXTRA@ $(pcre_lib) $(G_THREAD_LIBS_EXTRA) $(G_THREAD_LIBS_FOR_GTHREAD)
  libglib_2_0_la_DEPENDENCIES = libcharset/libcharset.la $(printf_la) @GIO@ @GSPAWN@ @PLATFORMDEP@ $(glib_win32_res) $(glib_def)
- 
 diff --git a/glib/glib/glib.h b/glib/glib/glib.h
-index 77abf23..1ba1f47 100644
+index ce7447e..6f53fcd 100644
 --- a/glib/glib/glib.h
 +++ b/glib/glib/glib.h
 @@ -71,7 +71,6 @@

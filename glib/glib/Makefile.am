@@ -1,9 +1,5 @@
 ## Process this file with automake to produce Makefile.in
-include $(top_srcdir)/Makefile.decl
-
-BUILT_SOURCES =
-DISTCLEANFILES =
-CLEANFILES =
+include $(top_srcdir)/glib.mk
 
 #
 # Generate glibconfig.h
@@ -31,7 +27,6 @@ printf_la = gnulib/libgnulib.la
 endif 
 
 SUBDIRS = libcharset $(PRINTF_SUBDIR) .
-
 DIST_SUBDIRS = libcharset gnulib
 
 AM_CPPFLAGS = 				\
@@ -42,14 +37,7 @@ AM_CPPFLAGS = 				\
 	-DGLIB_COMPILATION 		\
 	-DPCRE_STATIC
 
-glib.def: glib.symbols
-	$(AM_V_GEN) (echo EXPORTS; $(CPP) -P -DG_OS_WIN32 - <$(srcdir)/glib.symbols | sed -e '/^$$/d' -e 's/^/	/') > $(builddir)/glib.def
-
-if OS_LINUX
-if HAVE_GNUC_VISIBILITY
-TESTS_ENVIRONMENT = GLIB_DEBUG_FLAGS="$(GLIB_DEBUG_FLAGS)"
-endif
-endif
+AM_CFLAGS = $(GLIB_WARN_CFLAGS)
 
 MIRRORING_TAB_SOURCE = 				\
 	glib-mirroring-tab/Makefile 		\
@@ -62,22 +50,20 @@ EXTRA_DIST += 			\
 	gen-iswide-table.py	\
 	gen-unicode-tables.pl	\
 	gen-script-table.pl	\
-	abicheck.sh		\
-	glib.symbols		\
 	win_iconv.c		\
 	docs.c			\
 	gconstructor.h		\
 	$(MIRRORING_TAB_SOURCE)
 
 # These may be in the builddir too
-BUILT_EXTRA_DIST = 		\
+BUILT_EXTRA_DIST += 		\
 	glib.rc
 
 noinst_LTLIBRARIES = libglib-2.0.la
 
 if OS_WIN32_AND_DLL_COMPILATION
 if MS_LIB_AVAILABLE
-noinst_DATA = glib-2.0.lib
+noinst_DATA += glib-2.0.lib
 
 install_ms_lib_cmd = $(INSTALL) glib-2.0.lib $(DESTDIR)$(libdir)
 uninstall_ms_lib_cmd = -rm $(DESTDIR)$(libdir)/glib-2.0.lib
@@ -111,6 +97,7 @@ libglib_2_0_la_SOURCES = 	\
 	gbytes.c		\
 	gbytes.h		\
 	gcharset.c		\
+	gcharsetprivate.h	\
 	gchecksum.c		\
 	gconvert.c		\
 	gdataset.c		\
@@ -141,6 +128,7 @@ libglib_2_0_la_SOURCES = 	\
 	gmarkup.c		\
 	gmem.c			\
 	gmessages.c		\
+	gmessages-private.h	\
 	gmirroringtable.h	\
 	gnode.c			\
 	goption.c		\
@@ -148,6 +136,7 @@ libglib_2_0_la_SOURCES = 	\
 	gpoll.c			\
 	gprimes.c		\
 	gqsort.c		\
+	gquark.c		\
 	gqueue.c		\
 	grand.c			\
 	gscanner.c		\
@@ -195,16 +184,19 @@ libglib_2_0_la_SOURCES = 	\
 	gwakeup.h		\
 	gwakeup.c		\
 	gprintf.c		\
-	gprintfint.h
+	gprintfint.h		\
+	valgrind.h
 
 if OS_UNIX
 libglib_2_0_la_SOURCES += glib-unix.c
 endif
 
-if OS_WIN32
+if THREADS_WIN32
 libglib_2_0_la_SOURCES += gthread-win32.c
 else
+if THREADS_POSIX
 libglib_2_0_la_SOURCES += gthread-posix.c
+endif
 endif
 
 EXTRA_libglib_2_0_la_SOURCES = \
@@ -316,31 +308,17 @@ no_undefined = -no-undefined
 endif
 
 if OS_WIN32_AND_DLL_COMPILATION
-export_symbols = -export-symbols $(builddir)/glib.def
-
 glib_win32_res = glib-win32-res.o
 glib_win32_res_ldflag = -Wl,$(glib_win32_res)
-
-glib_def = glib.def
-
-install-def-file:
-	$(INSTALL) $(builddir)/glib.def $(DESTDIR)$(libdir)/glib-2.0.def
-
-uninstall-def-file:
-	-rm $(DESTDIR)$(libdir)/glib-2.0.def
-else
-install-def-file:
-uninstall-def-file:
-
-export_symbols = $(LIBTOOL_EXPORT_OPTIONS)
 endif
 
+libglib_2_0_la_CFLAGS = $(AM_CFLAGS) $(GLIB_HIDDEN_VISIBILITY_CFLAGS)
 libglib_2_0_la_LIBADD = libcharset/libcharset.la $(printf_la) @GIO@ @GSPAWN@ @PLATFORMDEP@ @ICONV_LIBS@ @G_LIBS_EXTRA@ $(pcre_lib) $(G_THREAD_LIBS_EXTRA) $(G_THREAD_LIBS_FOR_GTHREAD)
 libglib_2_0_la_DEPENDENCIES = libcharset/libcharset.la $(printf_la) @GIO@ @GSPAWN@ @PLATFORMDEP@ $(glib_win32_res) $(glib_def)
 
 libglib_2_0_la_LDFLAGS = $(GLIB_LINK_FLAGS) \
 	 $(glib_win32_res_ldflag) \
-	-export-dynamic $(no_undefined) $(export_symbols)
+	-export-dynamic $(no_undefined)
 
 gspawn-win32-helper-console.c:
 	echo '#define HELPER_CONSOLE' >$@

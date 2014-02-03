@@ -344,8 +344,18 @@ g_base64_decode_step (const gchar  *in,
   /* convert 4 base64 bytes to 3 normal bytes */
   v=*save;
   i=*state;
-  inptr = (const guchar *)in;
+
   last[0] = last[1] = 0;
+
+  /* we use the sign in the state to determine if we got a padding character
+     in the previous sequence */
+  if (i < 0)
+    {
+      i = -i;
+      last[0] = '=';
+    }
+
+  inptr = (const guchar *)in;
   while (inptr < inend)
     {
       c = *inptr++;
@@ -369,7 +379,7 @@ g_base64_decode_step (const gchar  *in,
     }
 
   *save = v;
-  *state = i;
+  *state = last[0] == '=' ? -i : i;
 
   return outptr - out;
 }
@@ -379,7 +389,9 @@ g_base64_decode_step (const gchar  *in,
  * @text: zero-terminated string with base64 text to decode
  * @out_len: (out): The length of the decoded data is written here
  *
- * Decode a sequence of Base-64 encoded text into binary data
+ * Decode a sequence of Base-64 encoded text into binary data.  Note
+ * that the returned binary data is not necessarily zero-terminated,
+ * so it should not be used as a character string.
  *
  * Return value: (transfer full) (array length=out_len) (element-type guint8):
  *               newly allocated buffer containing the binary data

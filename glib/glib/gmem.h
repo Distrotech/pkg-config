@@ -24,12 +24,12 @@
  * GLib at ftp://ftp.gtk.org/pub/gtk/.
  */
 
+#ifndef __G_MEM_H__
+#define __G_MEM_H__
+
 #if !defined (__GLIB_H_INSIDE__) && !defined (GLIB_COMPILATION)
 #error "Only <glib.h> can be included directly."
 #endif
-
-#ifndef __G_MEM_H__
-#define __G_MEM_H__
 
 #include <glib/gtypes.h>
 
@@ -67,32 +67,66 @@ typedef struct _GMemVTable GMemVTable;
 /* Memory allocation functions
  */
 
+GLIB_AVAILABLE_IN_ALL
 void	 g_free	          (gpointer	 mem);
 
+GLIB_AVAILABLE_IN_2_34
+void     g_clear_pointer  (gpointer      *pp,
+                           GDestroyNotify destroy);
+
+GLIB_AVAILABLE_IN_ALL
 gpointer g_malloc         (gsize	 n_bytes) G_GNUC_MALLOC G_GNUC_ALLOC_SIZE(1);
+GLIB_AVAILABLE_IN_ALL
 gpointer g_malloc0        (gsize	 n_bytes) G_GNUC_MALLOC G_GNUC_ALLOC_SIZE(1);
+GLIB_AVAILABLE_IN_ALL
 gpointer g_realloc        (gpointer	 mem,
 			   gsize	 n_bytes) G_GNUC_WARN_UNUSED_RESULT;
+GLIB_AVAILABLE_IN_ALL
 gpointer g_try_malloc     (gsize	 n_bytes) G_GNUC_MALLOC G_GNUC_ALLOC_SIZE(1);
+GLIB_AVAILABLE_IN_ALL
 gpointer g_try_malloc0    (gsize	 n_bytes) G_GNUC_MALLOC G_GNUC_ALLOC_SIZE(1);
+GLIB_AVAILABLE_IN_ALL
 gpointer g_try_realloc    (gpointer	 mem,
 			   gsize	 n_bytes) G_GNUC_WARN_UNUSED_RESULT;
 
+GLIB_AVAILABLE_IN_ALL
 gpointer g_malloc_n       (gsize	 n_blocks,
 			   gsize	 n_block_bytes) G_GNUC_MALLOC G_GNUC_ALLOC_SIZE2(1,2);
+GLIB_AVAILABLE_IN_ALL
 gpointer g_malloc0_n      (gsize	 n_blocks,
 			   gsize	 n_block_bytes) G_GNUC_MALLOC G_GNUC_ALLOC_SIZE2(1,2);
+GLIB_AVAILABLE_IN_ALL
 gpointer g_realloc_n      (gpointer	 mem,
 			   gsize	 n_blocks,
 			   gsize	 n_block_bytes) G_GNUC_WARN_UNUSED_RESULT;
+GLIB_AVAILABLE_IN_ALL
 gpointer g_try_malloc_n   (gsize	 n_blocks,
 			   gsize	 n_block_bytes) G_GNUC_MALLOC G_GNUC_ALLOC_SIZE2(1,2);
+GLIB_AVAILABLE_IN_ALL
 gpointer g_try_malloc0_n  (gsize	 n_blocks,
 			   gsize	 n_block_bytes) G_GNUC_MALLOC G_GNUC_ALLOC_SIZE2(1,2);
+GLIB_AVAILABLE_IN_ALL
 gpointer g_try_realloc_n  (gpointer	 mem,
 			   gsize	 n_blocks,
 			   gsize	 n_block_bytes) G_GNUC_WARN_UNUSED_RESULT;
 
+#define g_clear_pointer(pp, destroy) \
+  G_STMT_START {                                                               \
+    G_STATIC_ASSERT (sizeof *(pp) == sizeof (gpointer));                       \
+    /* Only one access, please */                                              \
+    gpointer *_pp = (gpointer *) (pp);                                         \
+    gpointer _p;                                                               \
+    /* This assignment is needed to avoid a gcc warning */                     \
+    GDestroyNotify _destroy = (GDestroyNotify) (destroy);                      \
+                                                                               \
+    (void) (0 ? (gpointer) *(pp) : 0);                                         \
+    do                                                                         \
+      _p = g_atomic_pointer_get (_pp);                                         \
+    while G_UNLIKELY (!g_atomic_pointer_compare_and_exchange (_pp, _p, NULL)); \
+                                                                               \
+    if (_p)                                                                    \
+      _destroy (_p);                                                           \
+  } G_STMT_END
 
 /* Optimise: avoid the call to the (slower) _n function if we can
  * determine at compile-time that no overflow happens.
@@ -249,7 +283,9 @@ struct _GMemVTable {
   gpointer (*try_realloc) (gpointer mem,
 			   gsize    n_bytes);
 };
+GLIB_AVAILABLE_IN_ALL
 void	 g_mem_set_vtable (GMemVTable	*vtable);
+GLIB_AVAILABLE_IN_ALL
 gboolean g_mem_is_system_malloc (void);
 
 GLIB_VAR gboolean g_mem_gc_friendly;
@@ -257,6 +293,7 @@ GLIB_VAR gboolean g_mem_gc_friendly;
 /* Memory profiler and checker, has to be enabled via g_mem_set_vtable()
  */
 GLIB_VAR GMemVTable	*glib_mem_profiler_table;
+GLIB_AVAILABLE_IN_ALL
 void	g_mem_profile	(void);
 
 G_END_DECLS

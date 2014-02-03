@@ -135,10 +135,10 @@
  *     library function.
  * @G_FILE_ERROR_PIPE: Broken pipe; there is no process reading from the
  *     other end of a pipe. Every library function that returns this
- *     error code also generates a `SIGPIPE' signal; this signal
+ *     error code also generates a 'SIGPIPE' signal; this signal
  *     terminates the program if not handled or blocked. Thus, your
  *     program will never actually see this code unless it has handled
- *     or blocked `SIGPIPE'.
+ *     or blocked 'SIGPIPE'.
  * @G_FILE_ERROR_AGAIN: Resource temporarily unavailable; the call might
  *     work if you try again later.
  * @G_FILE_ERROR_INTR: Interrupted function call; an asynchronous signal
@@ -459,11 +459,7 @@ g_file_test (const gchar *filename,
 #endif
 }
 
-GQuark
-g_file_error_quark (void)
-{
-  return g_quark_from_static_string ("g-file-error-quark");
-}
+G_DEFINE_QUARK (g-file-error-quark, g_file_error)
 
 /**
  * g_file_error_from_errno:
@@ -672,7 +668,7 @@ get_contents_stdio (const gchar  *display_filename,
               g_set_error (error,
                            G_FILE_ERROR,
                            G_FILE_ERROR_NOMEM,
-                           _("Could not allocate %lu bytes to read file \"%s\""),
+                           g_dngettext (GETTEXT_PACKAGE, "Could not allocate %lu byte to read file \"%s\"", "Could not allocate %lu bytes to read file \"%s\"", (gulong)total_allocated),
                            (gulong) total_allocated,
 			   display_filename);
 
@@ -760,7 +756,7 @@ get_contents_regfile (const gchar  *display_filename,
       g_set_error (error,
                    G_FILE_ERROR,
                    G_FILE_ERROR_NOMEM,
-                   _("Could not allocate %lu bytes to read file \"%s\""),
+                           g_dngettext (GETTEXT_PACKAGE, "Could not allocate %lu byte to read file \"%s\"", "Could not allocate %lu bytes to read file \"%s\"", (gulong)alloc_size),
                    (gulong) alloc_size, 
 		   display_filename);
 
@@ -1008,6 +1004,49 @@ rename_file (const char  *old_name,
   return TRUE;
 }
 
+static char *
+format_error_message (const gchar  *filename,
+                      const gchar  *format_string) G_GNUC_FORMAT(2);
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wformat-nonliteral"
+
+static char *
+format_error_message (const gchar  *filename,
+                      const gchar  *format_string)
+{
+  gint saved_errno = errno;
+  gchar *display_name;
+  gchar *msg;
+
+  display_name = g_filename_display_name (filename);
+  msg = g_strdup_printf (format_string, display_name, g_strerror (saved_errno));
+  g_free (display_name);
+
+  return msg;
+}
+
+#pragma GCC diagnostic pop
+
+/* format string must have two '%s':
+ *
+ *   - the place for the filename
+ *   - the place for the strerror
+ */
+static void
+set_file_error (GError      **error,
+                const gchar  *filename,
+                const gchar  *format_string)
+                      
+{
+  int saved_errno = errno;
+  char *msg = format_error_message (filename, format_string);
+
+  g_set_error_literal (error, G_FILE_ERROR, g_file_error_from_errno (saved_errno),
+                       msg);
+  g_free (msg);
+}
+
 static gchar *
 write_to_temp_file (const gchar  *contents,
 		    gssize        length,
@@ -1015,93 +1054,53 @@ write_to_temp_file (const gchar  *contents,
 		    GError      **err)
 {
   gchar *tmp_name;
-  gchar *display_name;
   gchar *retval;
-  FILE *file;
   gint fd;
-  int save_errno;
 
   retval = NULL;
-  
+
   tmp_name = g_strdup_printf ("%s.XXXXXX", dest_file);
 
   errno = 0;
   fd = g_mkstemp_full (tmp_name, O_RDWR | O_BINARY, 0666);
-  save_errno = errno;
 
-  display_name = g_filename_display_name (tmp_name);
-      
   if (fd == -1)
     {
-      g_set_error (err,
-		   G_FILE_ERROR,
-		   g_file_error_from_errno (save_errno),
-		   _("Failed to create file '%s': %s"),
-		   display_name, g_strerror (save_errno));
-      
+      set_file_error (err, tmp_name, _("Failed to create file '%s': %s"));
       goto out;
     }
 
-  errno = 0;
-  file = fdopen (fd, "wb");
-  if (!file)
-    {
-      save_errno = errno;
-      g_set_error (err,
-		   G_FILE_ERROR,
-		   g_file_error_from_errno (save_errno),
-		   _("Failed to open file '%s' for writing: fdopen() failed: %s"),
-		   display_name,
-		   g_strerror (save_errno));
-
-      close (fd);
-      g_unlink (tmp_name);
-      
-      goto out;
-    }
-
+#ifdef HAVE_FALLOCATE
   if (length > 0)
     {
-      gsize n_written;
-      
-      errno = 0;
-
-      n_written = fwrite (contents, 1, length, file);
-
-      if (n_written < length)
-	{
-	  save_errno = errno;
-      
- 	  g_set_error (err,
-		       G_FILE_ERROR,
-		       g_file_error_from_errno (save_errno),
-		       _("Failed to write file '%s': fwrite() failed: %s"),
-		       display_name,
-		       g_strerror (save_errno));
-
-	  fclose (file);
-	  g_unlink (tmp_name);
-	  
-	  goto out;
-	}
+      /* We do this on a 'best effort' basis... It may not be supported
+       * on the underlying filesystem.
+       */
+      (void) fallocate (fd, 0, 0, length);
     }
+#endif
+  while (length > 0)
+    {
+      gssize s;
 
-  errno = 0;
-  if (fflush (file) != 0)
-    { 
-      save_errno = errno;
-      
-      g_set_error (err,
-		   G_FILE_ERROR,
-		   g_file_error_from_errno (save_errno),
-		   _("Failed to write file '%s': fflush() failed: %s"),
-		   display_name, 
-		   g_strerror (save_errno));
+      s = write (fd, contents, length);
 
-      fclose (file);
-      g_unlink (tmp_name);
-      
-      goto out;
+      if (s < 0)
+        {
+          if (errno == EINTR)
+            continue;
+
+          set_file_error (err, tmp_name, _("Failed to write file '%s': write() failed: %s"));
+          close (fd);
+          g_unlink (tmp_name);
+
+          goto out;
+        }
+
+      g_assert (s <= length);
+
+      contents += s;
+      length -= s;
     }
 
 #ifdef BTRFS_SUPER_MAGIC
@@ -1117,7 +1116,7 @@ write_to_temp_file (const gchar  *contents,
       goto no_fsync;
   }
 #endif
-  
+
 #ifdef HAVE_FSYNC
   {
     struct stat statbuf;
@@ -1129,23 +1128,13 @@ write_to_temp_file (const gchar  *contents,
      * the new and the old file on some filesystems. (I.E. those that don't
      * guarantee the data is written to the disk before the metadata.)
      */
-    if (g_lstat (dest_file, &statbuf) == 0 &&
-	statbuf.st_size > 0 &&
-	fsync (fileno (file)) != 0)
+    if (g_lstat (dest_file, &statbuf) == 0 && statbuf.st_size > 0 && fsync (fd) != 0)
       {
-	save_errno = errno;
+        set_file_error (err, tmp_name, _("Failed to write file '%s': fsync() failed: %s"));
+        close (fd);
+        g_unlink (tmp_name);
 
-	g_set_error (err,
-		     G_FILE_ERROR,
-		     g_file_error_from_errno (save_errno),
-		     _("Failed to write file '%s': fsync() failed: %s"),
-		     display_name,
-		     g_strerror (save_errno));
-
-        fclose (file);
-	g_unlink (tmp_name);
-
-	goto out;
+        goto out;
       }
   }
 #endif
@@ -1153,30 +1142,20 @@ write_to_temp_file (const gchar  *contents,
 #ifdef BTRFS_SUPER_MAGIC
  no_fsync:
 #endif
-  
-  errno = 0;
-  if (fclose (file) == EOF)
-    { 
-      save_errno = errno;
-      
-      g_set_error (err,
-		   G_FILE_ERROR,
-		   g_file_error_from_errno (save_errno),
-		   _("Failed to close file '%s': fclose() failed: %s"),
-		   display_name, 
-		   g_strerror (save_errno));
 
+  errno = 0;
+  if (!g_close (fd, err))
+    {
       g_unlink (tmp_name);
-      
+
       goto out;
     }
 
   retval = g_strdup (tmp_name);
-  
+
  out:
   g_free (tmp_name);
-  g_free (display_name);
-  
+
   return retval;
 }
 
@@ -1314,7 +1293,7 @@ g_file_set_contents (const gchar  *filename,
  * get_tmp_file based on the mkstemp implementation from the GNU C library.
  * Copyright (C) 1991,92,93,94,95,96,97,98,99 Free Software Foundation, Inc.
  */
-typedef gint (*GTmpFileCallback) (gchar *, gint, gint);
+typedef gint (*GTmpFileCallback) (const gchar *, gint, gint);
 
 static gint
 get_tmp_file (gchar            *tmpl,
@@ -1379,13 +1358,27 @@ get_tmp_file (gchar            *tmpl,
   return -1;
 }
 
+/* Some GTmpFileCallback implementations.
+ *
+ * Note: we cannot use open() or g_open() directly because even though
+ * they appear compatible, they may be vararg functions and calling
+ * varargs functions through a non-varargs type is undefined.
+ */
 static gint
-wrap_mkdir (gchar *tmpl,
-            int    flags G_GNUC_UNUSED,
-            int    mode)
+wrap_g_mkdir (const gchar *filename,
+              int          flags G_GNUC_UNUSED,
+              int          mode)
 {
   /* tmpl is in UTF-8 on Windows, thus use g_mkdir() */
-  return g_mkdir (tmpl, mode);
+  return g_mkdir (filename, mode);
+}
+
+static gint
+wrap_g_open (const gchar *filename,
+                int          flags,
+                int          mode)
+{
+  return g_open (filename, flags, mode);
 }
 
 /**
@@ -1415,7 +1408,7 @@ gchar *
 g_mkdtemp_full (gchar *tmpl,
                 gint   mode)
 {
-  if (get_tmp_file (tmpl, wrap_mkdir, 0, mode) == -1)
+  if (get_tmp_file (tmpl, wrap_g_mkdir, 0, mode) == -1)
     return NULL;
   else
     return tmpl;
@@ -1481,7 +1474,7 @@ g_mkstemp_full (gchar *tmpl,
                 gint   mode)
 {
   /* tmpl is in UTF-8 on Windows, thus use g_open() */
-  return get_tmp_file (tmpl, (GTmpFileCallback) g_open,
+  return get_tmp_file (tmpl, wrap_g_open,
                        flags | O_CREAT | O_EXCL, mode);
 }
 
@@ -1631,7 +1624,7 @@ g_file_open_tmp (const gchar  *tmpl,
   gint result;
 
   result = g_get_tmp_name (tmpl, &fulltemplate,
-                           (GTmpFileCallback) g_open,
+                           wrap_g_open,
                            O_CREAT | O_EXCL | O_RDWR | O_BINARY,
                            0600,
                            error);
@@ -1677,7 +1670,7 @@ g_dir_make_tmp (const gchar  *tmpl,
 {
   gchar *fulltemplate;
 
-  if (g_get_tmp_name (tmpl, &fulltemplate, wrap_mkdir, 0, 0700, error) == -1)
+  if (g_get_tmp_name (tmpl, &fulltemplate, wrap_g_mkdir, 0, 0700, error) == -1)
     return NULL;
   else
     return fulltemplate;
@@ -2601,13 +2594,21 @@ g_file_get_contents (const gchar  *filename,
 
 #undef g_mkstemp
 
+static gint
+wrap_libc_open (const gchar *filename,
+                int          flags,
+                int          mode)
+{
+  return open (filename, flags, mode);
+}
+
 gint
 g_mkstemp (gchar *tmpl)
 {
   /* This is the backward compatibility system codepage version,
    * thus use normal open().
    */
-  return get_tmp_file (tmpl, (GTmpFileCallback) open,
+  return get_tmp_file (tmpl, wrap_libc_open,
 		       O_RDWR | O_CREAT | O_EXCL, 0600);
 }
 

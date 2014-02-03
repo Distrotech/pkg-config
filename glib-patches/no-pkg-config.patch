@@ -1,8 +1,8 @@
 diff --git a/glib/configure.ac b/glib/configure.ac
-index 99de9f7..e582232 100644
+index 4653090..8fc86ed 100644
 --- a/glib/configure.ac
 +++ b/glib/configure.ac
-@@ -294,8 +294,6 @@ AC_PROG_INSTALL
+@@ -293,8 +293,6 @@ AC_PROG_INSTALL
  
  AC_SYS_LARGEFILE
  
@@ -11,72 +11,3 @@ index 99de9f7..e582232 100644
  if test "x$enable_debug" = "xyes"; then
    if test x$cflags_set != xset ; then
        case " $CFLAGS " in
-@@ -454,23 +452,6 @@ AC_MSG_RESULT($enable_iconv_cache)
- 
- 
- dnl
--dnl zlib support
--dnl
--PKG_CHECK_MODULES([ZLIB], [zlib], [found_zlib=yes], [found_zlib=no])
--if test "x$found_zlib" = "xno" ; then
--  AC_CHECK_LIB(z, inflate, [AC_CHECK_HEADER(zlib.h, found_zlib=yes)])
--  if test "x$found_zlib" = "xno" ; then
--    AC_MSG_ERROR([*** Working zlib library and headers not found ***])
--  fi
--  ZLIB_LIBS='-lz'
--  AC_SUBST(ZLIB_LIBS)
--fi
--
--PKG_CHECK_MODULES(LIBFFI, [libffi >= 3.0.0])
--AC_SUBST(LIBFFI_CFLAGS)
--AC_SUBST(LIBFFI_LIBS)
--
--dnl
- dnl gettext support
- dnl
- 
-@@ -1779,30 +1760,6 @@ dnl   failure. try libattr
- fi
- AC_SUBST(XATTR_LIBS)
- 
--dnl ************************
--dnl *** check for libelf ***
--dnl ************************
--
--PKG_CHECK_MODULES([LIBELF], [libelf >= 0.8.12], [have_libelf=yes], [have_libelf=maybe])
--
--if test $have_libelf = maybe; then
--  glib_save_LIBS=$LIBS
--  AC_CHECK_LIB([elf], [elf_begin], , [have_libelf=no])
--  AC_CHECK_LIB([elf], [elf_getshdrstrndx], , [have_libelf=no])
--  AC_CHECK_LIB([elf], [elf_getshdrnum], , [have_libelf=no])
--  AC_CHECK_HEADER([libelf.h], , [have_libelf=no])
--  LIBS=$glib_save_LIBS
--
--  if test $have_libelf != no; then
--    LIBELF_LIBS=-lelf
--    have_libelf=yes
--  fi
--fi
--
--if test $have_libelf = yes; then
--  AC_DEFINE(HAVE_LIBELF, 1, [Define if libelf is available])
--fi
--
- dnl ****************************************
- dnl *** platform dependent source checks ***
- dnl ****************************************
-@@ -3280,12 +3237,7 @@ AC_CHECK_ALIGNOF([unsigned long])
- # Check for libdbus1 - Optional - is only used in the GDBus test cases
- #
- # 1.2.14 required for dbus_message_set_serial
--PKG_CHECK_MODULES(DBUS1,
--                  dbus-1 >= 1.2.14,
--                  [AC_DEFINE(HAVE_DBUS1, 1, [Define if dbus-1 is available]) have_dbus1=yes],
--                  have_dbus1=no)
--AC_SUBST(DBUS1_CFLAGS)
--AC_SUBST(DBUS1_LIBS)
-+have_dbus1=no
- AM_CONDITIONAL(HAVE_DBUS1, [test "x$have_dbus1" = "xyes"])
- 
- dnl

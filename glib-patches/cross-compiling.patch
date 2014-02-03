@@ -1,8 +1,8 @@
 diff --git a/glib/configure.ac b/glib/configure.ac
-index 27a4a23..160f57d 100644
+index e73f7f9..e53020c 100644
 --- a/glib/configure.ac
 +++ b/glib/configure.ac
-@@ -2427,30 +2427,6 @@ int error = EILSEQ;
+@@ -2460,30 +2460,6 @@ int error = EILSEQ;
  ], have_eilseq=yes, have_eilseq=no);
  AC_MSG_RESULT($have_eilseq)
  
@@ -13,7 +13,7 @@ index 27a4a23..160f57d 100644
 -
 -AM_CONDITIONAL(CROSS_COMPILING, test $cross_compiling = yes)
 -
--if test $cross_compiling = yes; then
+-AS_IF([ test $cross_compiling = yes ], [
 -  AC_PATH_PROG(GLIB_GENMARSHAL, glib-genmarshal, no)
 -  if test x$GLIB_GENMARSHAL = xno; then
 -    AC_MSG_ERROR(Could not find a glib-genmarshal in your PATH)
@@ -28,7 +28,7 @@ index 27a4a23..160f57d 100644
 -  if test x$GLIB_COMPILE_RESOURCES = xno; then
 -    AC_MSG_ERROR(Could not find a glib-compile-resources in your PATH)
 -  fi
--fi
+-])
 -
  dnl ************************************
  dnl *** Enable lcov coverage reports ***

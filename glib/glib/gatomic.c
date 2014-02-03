@@ -111,7 +111,7 @@
  * Since: 2.4
  **/
 gint
-(g_atomic_int_get) (volatile gint *atomic)
+(g_atomic_int_get) (const volatile gint *atomic)
 {
   return g_atomic_int_get (atomic);
 }
@@ -316,9 +316,9 @@ guint
  * Since: 2.4
  **/
 gpointer
-(g_atomic_pointer_get) (volatile void *atomic)
+(g_atomic_pointer_get) (const volatile void *atomic)
 {
-  return g_atomic_pointer_get ((volatile gpointer *) atomic);
+  return g_atomic_pointer_get ((const volatile gpointer *) atomic);
 }
 
 /**
@@ -467,17 +467,67 @@ gsize
 #elif defined (G_PLATFORM_WIN32)
 
 #include <windows.h>
-#if !defined(_M_AMD64) && !defined (_M_IA64) && !defined(_M_X64)
+#if !defined(_M_AMD64) && !defined (_M_IA64) && !defined(_M_X64) && !(defined _MSC_VER && _MSC_VER <= 1200)
 #define InterlockedAnd _InterlockedAnd
 #define InterlockedOr _InterlockedOr
 #define InterlockedXor _InterlockedXor
+#endif
+
+#if !defined (_MSC_VER) || _MSC_VER <= 1200
+#include "gmessages.h"
+/* Inlined versions for older compiler */
+static LONG
+_gInterlockedAnd (volatile guint *atomic,
+                  guint           val)
+{
+  LONG i, j;
+
+  j = *atomic;
+  do {
+    i = j;
+    j = InterlockedCompareExchange(atomic, i & val, i);
+  } while (i != j);
+
+  return j;
+}
+#define InterlockedAnd(a,b) _gInterlockedAnd(a,b)
+static LONG
+_gInterlockedOr (volatile guint *atomic,
+                 guint           val)
+{
+  LONG i, j;
+
+  j = *atomic;
+  do {
+    i = j;
+    j = InterlockedCompareExchange(atomic, i | val, i);
+  } while (i != j);
+
+  return j;
+}
+#define InterlockedOr(a,b) _gInterlockedOr(a,b)
+static LONG
+_gInterlockedXor (volatile guint *atomic,
+                  guint           val)
+{
+  LONG i, j;
+
+  j = *atomic;
+  do {
+    i = j;
+    j = InterlockedCompareExchange(atomic, i ^ val, i);
+  } while (i != j);
+
+  return j;
+}
+#define InterlockedXor(a,b) _gInterlockedXor(a,b)
 #endif
 
 /*
  * http://msdn.microsoft.com/en-us/library/ms684122(v=vs.85).aspx
  */
 gint
-(g_atomic_int_get) (volatile gint *atomic)
+(g_atomic_int_get) (const volatile gint *atomic)
 {
   MemoryBarrier ();
   return *atomic;
@@ -541,9 +591,9 @@ guint
 
 
 gpointer
-(g_atomic_pointer_get) (volatile void *atomic)
+(g_atomic_pointer_get) (const volatile void *atomic)
 {
-  volatile gpointer *ptr = atomic;
+  const volatile gpointer *ptr = atomic;
 
   MemoryBarrier ();
   return *ptr;
@@ -632,7 +682,7 @@ gsize
 static pthread_mutex_t g_atomic_lock = PTHREAD_MUTEX_INITIALIZER;
 
 gint
-(g_atomic_int_get) (volatile gint *atomic)
+(g_atomic_int_get) (const volatile gint *atomic)
 {
   gint value;
 
@@ -747,9 +797,9 @@ guint
 
 
 gpointer
-(g_atomic_pointer_get) (volatile void *atomic)
+(g_atomic_pointer_get) (const volatile void *atomic)
 {
-  volatile gpointer *ptr = atomic;
+  const volatile gpointer *ptr = atomic;
   gpointer value;
 
   pthread_mutex_lock (&g_atomic_lock);

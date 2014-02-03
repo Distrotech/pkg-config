@@ -689,12 +689,13 @@ g_io_add_watch_full (GIOChannel    *channel,
  * @source: the #GIOChannel event source
  * @condition: the condition which has been satisfied
  * @data: user data set in g_io_add_watch() or g_io_add_watch_full()
- * @Returns: the function should return %FALSE if the event source
- *           should be removed
  *
  * Specifies the type of function passed to g_io_add_watch() or
  * g_io_add_watch_full(), which is called when the requested condition
  * on a #GIOChannel is satisfied.
+ *
+ * Returns: the function should return %FALSE if the event source
+ *          should be removed
  **/
 /**
  * GIOCondition:
@@ -823,8 +824,10 @@ g_io_channel_error_from_errno (gint en)
 #endif
 
 #ifdef EOVERFLOW
+#if EOVERFLOW != EFBIG
     case EOVERFLOW:
       return G_IO_CHANNEL_ERROR_OVERFLOW;
+#endif
 #endif
 
 #ifdef EPIPE
@@ -878,10 +881,10 @@ g_io_channel_get_buffer_size (GIOChannel *channel)
 /**
  * g_io_channel_set_line_term:
  * @channel: a #GIOChannel
- * @line_term: The line termination string. Use %NULL for autodetect.
- *             Autodetection breaks on "\n", "\r\n", "\r", "\0", and
- *             the Unicode paragraph separator. Autodetection should
- *             not be used for anything other than file-based channels.
+ * @line_term: (allow-none): The line termination string. Use %NULL for
+ *             autodetect.  Autodetection breaks on "\n", "\r\n", "\r", "\0",
+ *             and the Unicode paragraph separator. Autodetection should not be
+ *             used for anything other than file-based channels.
  * @length: The length of the termination string. If -1 is passed, the
  *          string is assumed to be nul-terminated. This option allows
  *          termination strings with embedded nuls.
@@ -1282,7 +1285,7 @@ g_io_channel_get_buffered (GIOChannel *channel)
 /**
  * g_io_channel_set_encoding:
  * @channel: a #GIOChannel
- * @encoding: the encoding type
+ * @encoding: (allow-none): the encoding type
  * @error: location to store an error of type #GConvertError
  *
  * Sets the encoding for the input/output of the channel. 
@@ -1649,12 +1652,12 @@ reencode:
 /**
  * g_io_channel_read_line:
  * @channel: a #GIOChannel
- * @str_return: The line read from the #GIOChannel, including the
+ * @str_return: (out): The line read from the #GIOChannel, including the
  *              line terminator. This data should be freed with g_free()
  *              when no longer needed. This is a nul-terminated string. 
  *              If a @length of zero is returned, this will be %NULL instead.
- * @length: (allow-none): location to store length of the read data, or %NULL
- * @terminator_pos: (allow-none): location to store position of line terminator, or %NULL
+ * @length: (allow-none) (out): location to store length of the read data, or %NULL
+ * @terminator_pos: (allow-none) (out): location to store position of line terminator, or %NULL
  * @error: A location to return an error of type #GConvertError
  *         or #GIOChannelError
  *
@@ -1913,12 +1916,12 @@ done:
 /**
  * g_io_channel_read_to_end:
  * @channel: a #GIOChannel
- * @str_return: Location to store a pointer to a string holding
- *              the remaining data in the #GIOChannel. This data should
- *              be freed with g_free() when no longer needed. This
- *              data is terminated by an extra nul character, but there 
- *              may be other nuls in the intervening data.
- * @length: location to store length of the data
+ * @str_return:  (out) (array length=length) (element-type guint8): Location to
+ *              store a pointer to a string holding the remaining data in the
+ *              #GIOChannel. This data should be freed with g_free() when no
+ *              longer needed. This data is terminated by an extra nul
+ *              character, but there may be other nuls in the intervening data.
+ * @length: (out): location to store length of the data
  * @error: location to return an error of type #GConvertError
  *         or #GIOChannelError
  *
@@ -1994,11 +1997,12 @@ g_io_channel_read_to_end (GIOChannel  *channel,
 /**
  * g_io_channel_read_chars:
  * @channel: a #GIOChannel
- * @buf: a buffer to read data into
- * @count: the size of the buffer. Note that the buffer may not be
+ * @buf: (out caller-allocates) (array length=count) (element-type guint8):
+ *     a buffer to read data into
+ * @count: (in): the size of the buffer. Note that the buffer may not be
  *     complelely filled even if there is data in the buffer if the
  *     remaining data is not a complete character.
- * @bytes_read: (allow-none): The number of bytes read. This may be
+ * @bytes_read: (allow-none) (out): The number of bytes read. This may be
  *     zero even on success if count < 6 and the channel's encoding
  *     is non-%NULL. This indicates that the next UTF-8 character is
  *     too wide for the buffer.
@@ -2113,7 +2117,7 @@ g_io_channel_read_chars (GIOChannel  *channel,
 /**
  * g_io_channel_read_unichar:
  * @channel: a #GIOChannel
- * @thechar: a location to return a character
+ * @thechar: (out): a location to return a character
  * @error: a location to return an error of type #GConvertError
  *         or #GIOChannelError
  *
@@ -2174,10 +2178,10 @@ g_io_channel_read_unichar (GIOChannel  *channel,
 /**
  * g_io_channel_write_chars:
  * @channel: a #GIOChannel
- * @buf: a buffer to write data from
+ * @buf: (array) (element-type guint8): a buffer to write data from
  * @count: the size of the buffer. If -1, the buffer
  *         is taken to be a nul-terminated string.
- * @bytes_written: The number of bytes written. This can be nonzero
+ * @bytes_written: (out): The number of bytes written. This can be nonzero
  *                 even if the return value is not %G_IO_STATUS_NORMAL.
  *                 If the return value is %G_IO_STATUS_NORMAL and the
  *                 channel is blocking, this will always be equal
@@ -2580,8 +2584,5 @@ g_io_channel_write_unichar (GIOChannel  *channel,
  *
  * Error codes returned by #GIOChannel operations.
  **/
-GQuark
-g_io_channel_error_quark (void)
-{
-  return g_quark_from_static_string ("g-io-channel-error-quark");
-}
+
+G_DEFINE_QUARK (g-io-channel-error-quark, g_io_channel_error)

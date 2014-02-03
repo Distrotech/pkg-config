@@ -33,6 +33,7 @@
 #include "gvariant.h"
 #include "gvarianttype.h"
 #include "gslice.h"
+#include "gthread.h"
 
 /*
  * two-pass algorithm
@@ -70,22 +71,14 @@
  *
  * Error codes returned by parsing text-format GVariants.
  **/
-GQuark
-g_variant_parser_get_error_quark (void)
-{
-  static GQuark the_quark;
-
-  if (the_quark == 0)
-    the_quark = g_quark_from_static_string ("g-variant-parse-error-quark");
-
-  return the_quark;
-}
+G_DEFINE_QUARK (g-variant-parse-error-quark, g_variant_parser_get_error)
 
 typedef struct
 {
   gint start, end;
 } SourceRef;
 
+G_GNUC_PRINTF(5, 0)
 static void
 parser_set_error_va (GError      **error,
                      SourceRef    *location,
@@ -113,6 +106,7 @@ parser_set_error_va (GError      **error,
   g_string_free (msg, TRUE);
 }
 
+G_GNUC_PRINTF(5, 6)
 static void
 parser_set_error (GError      **error,
                   SourceRef    *location,
@@ -138,6 +132,7 @@ typedef struct
 } TokenStream;
 
 
+G_GNUC_PRINTF(5, 6)
 static void
 token_stream_set_error (TokenStream  *stream,
                         GError      **error,
@@ -228,10 +223,11 @@ token_stream_prepare (TokenStream *stream)
     case '@': case '%':
       /* stop at the first space, comma, colon or unmatched bracket.
        * deals nicely with cases like (%i, %i) or {%i: %i}.
+       * Also: ] and > are never in format strings.
        */
       for (end = stream->stream + 1;
            end != stream->end && *end != ',' &&
-           *end != ':' && *end != '>' && !g_ascii_isspace (*end);
+           *end != ':' && *end != '>' && *end != ']' && !g_ascii_isspace (*end);
            end++)
 
         if (*end == '(' || *end == '{')
@@ -336,7 +332,7 @@ token_stream_require (TokenStream  *stream,
     {
       token_stream_set_error (stream, error, FALSE,
                               G_VARIANT_PARSE_ERROR_UNEXPECTED_TOKEN,
-                              "expected `%s'%s", token, purpose);
+                              "expected '%s'%s", token, purpose);
       return FALSE;
     }
 
@@ -533,6 +529,7 @@ ast_free (AST *ast)
   ast->class->free (ast);
 }
 
+G_GNUC_PRINTF(5, 6)
 static void
 ast_set_error (AST          *ast,
                GError      **error,
@@ -561,7 +558,7 @@ ast_type_error (AST                 *ast,
   typestr = g_variant_type_dup_string (type);
   ast_set_error (ast, error, NULL,
                  G_VARIANT_PARSE_ERROR_TYPE_ERROR,
-                 "can not parse as value of type `%s'",
+                 "can not parse as value of type '%s'",
                  typestr);
   g_free (typestr);
 
@@ -947,7 +944,7 @@ array_parse (TokenStream  *stream,
 
       if (need_comma &&
           !token_stream_require (stream, ",",
-                                 " or `]' to follow array element",
+                                 " or ']' to follow array element",
                                  error))
         goto error;
 
@@ -1086,7 +1083,7 @@ tuple_parse (TokenStream  *stream,
 
       if (need_comma &&
           !token_stream_require (stream, ",",
-                                 " or `)' to follow tuple element",
+                                 " or ')' to follow tuple element",
                                  error))
         goto error;
 
@@ -1146,7 +1143,9 @@ variant_get_value (AST                 *ast,
   Variant *variant = (Variant *) ast;
   GVariant *child;
 
-  g_assert (g_variant_type_equal (type, G_VARIANT_TYPE_VARIANT));
+  if (!g_variant_type_equal (type, G_VARIANT_TYPE_VARIANT))
+    return ast_type_error (ast, type, error);
+
   child = ast_resolve (variant->value, error);
 
   if (child == NULL)
@@ -1387,7 +1386,7 @@ dictionary_parse (TokenStream  *stream,
   only_one = token_stream_consume (stream, ",");
   if (!only_one &&
       !token_stream_require (stream, ":",
-                             " or `,' to follow dictionary entry key",
+                             " or ',' to follow dictionary entry key",
                              error))
     goto error;
 
@@ -1413,7 +1412,7 @@ dictionary_parse (TokenStream  *stream,
       AST *child;
 
       if (!token_stream_require (stream, ",",
-                                 " or `}' to follow dictionary entry", error))
+                                 " or '}' to follow dictionary entry", error))
         goto error;
 
       child = parse (stream, app, error);
@@ -1660,7 +1659,8 @@ bytestring_get_value (AST                 *ast,
 {
   ByteString *string = (ByteString *) ast;
 
-  g_assert (g_variant_type_equal (type, G_VARIANT_TYPE_BYTESTRING));
+  if (!g_variant_type_equal (type, G_VARIANT_TYPE_BYTESTRING))
+    return ast_type_error (ast, type, error);
 
   return g_variant_new_bytestring (string->string);
 }
@@ -1793,7 +1793,7 @@ number_overflow (AST                 *ast,
 {
   ast_set_error (ast, error, NULL,
                  G_VARIANT_PARSE_ERROR_NUMBER_OUT_OF_RANGE,
-                 "number out of range for type `%c'",
+                 "number out of range for type '%c'",
                  g_variant_type_peek_string (type)[0]);
   return NULL;
 }
@@ -2311,7 +2311,6 @@ parse (TokenStream  *stream,
  * @limit: (allow-none): a pointer to the end of @text, or %NULL
  * @endptr: (allow-none): a location to store the end pointer, or %NULL
  * @error: (allow-none): a pointer to a %NULL #GError pointer, or %NULL
- * @Returns: a reference to a #GVariant, or %NULL
  *
  * Parses a #GVariant from a text representation.
  *
@@ -2343,6 +2342,8 @@ parse (TokenStream  *stream,
  *
  * Officially, the language understood by the parser is "any string
  * produced by g_variant_print()".
+ *
+ * Returns: a reference to a #GVariant, or %NULL
  **/
 GVariant *
 g_variant_parse (const GVariantType  *type,

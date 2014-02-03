@@ -86,11 +86,12 @@
 /**
  * GCompletionFunc:
  * @Param1: the completion item.
- * @Returns: the string corresponding to the item.
  *
  * Specifies the type of the function passed to g_completion_new(). It
  * should return the string corresponding to the given target item.
  * This is used when you use data structures as #GCompletion items.
+ *
+ * Returns: the string corresponding to the item.
  **/
 
 /**
@@ -98,14 +99,15 @@
  * @s1: string to compare with @s2.
  * @s2: string to compare with @s1.
  * @n: maximal number of bytes to compare.
- * @Returns: an integer less than, equal to, or greater than zero if
- *           the first @n bytes of @s1 is found, respectively, to be
- *           less than, to match, or to be greater than the first @n
- *           bytes of @s2.
  *
  * Specifies the type of the function passed to
  * g_completion_set_compare(). This is used when you use strings as
  * #GCompletion items.
+ *
+ * Returns: an integer less than, equal to, or greater than zero if
+ *          the first @n bytes of @s1 is found, respectively, to be
+ *          less than, to match, or to be greater than the first @n
+ *          bytes of @s2.
  **/
 
 static void completion_check_cache (GCompletion* cmp,
@@ -116,9 +118,10 @@ static void completion_check_cache (GCompletion* cmp,
  * @func: the function to be called to return the string representing
  *        an item in the #GCompletion, or %NULL if strings are going to
  *        be used as the #GCompletion items.
- * @Returns: the new #GCompletion.
  *
  * Creates a new #GCompletion.
+ *
+ * Returns: the new #GCompletion.
  **/
 GCompletion* 
 g_completion_new (GCompletionFunc func)
@@ -138,7 +141,7 @@ g_completion_new (GCompletionFunc func)
 /**
  * g_completion_add_items:
  * @cmp: the #GCompletion.
- * @items: the list of items to add.
+ * @items: (transfer none): the list of items to add.
  *
  * Adds items to the #GCompletion.
  *
@@ -176,9 +179,11 @@ g_completion_add_items (GCompletion* cmp,
 /**
  * g_completion_remove_items:
  * @cmp: the #GCompletion.
- * @items: the items to remove.
+ * @items: (transfer none): the items to remove.
  *
- * Removes items from a #GCompletion.
+ * Removes items from a #GCompletion. The items are not freed, so if the memory
+ * was dynamically allocated, free @items with g_list_free_full() after calling
+ * this function.
  *
  * Deprecated: 2.26: Rarely used API
  **/
@@ -209,7 +214,9 @@ g_completion_remove_items (GCompletion* cmp,
  * g_completion_clear_items:
  * @cmp: the #GCompletion.
  *
- * Removes all items from the #GCompletion.
+ * Removes all items from the #GCompletion. The items are not freed, so if the
+ * memory was dynamically allocated, it should be freed after calling this
+ * function.
  *
  * Deprecated: 2.26: Rarely used API
  **/
@@ -332,11 +339,12 @@ g_completion_complete_utf8 (GCompletion  *cmp,
  *              common to all items that matched @prefix, or %NULL if
  *              no items matched @prefix.  This string should be freed
  *              when no longer needed.
- * @Returns: the list of items whose strings begin with @prefix. This
- *           should not be changed.
  *
  * Attempts to complete the string @prefix using the #GCompletion
  * target items.
+ *
+ * Returns: (transfer none): the list of items whose strings begin with
+ *          @prefix. This should not be changed.
  *
  * Deprecated: 2.26: Rarely used API
  **/
@@ -406,7 +414,9 @@ g_completion_complete (GCompletion* cmp,
  * g_completion_free:
  * @cmp: the #GCompletion.
  *
- * Frees all memory used by the #GCompletion.
+ * Frees all memory used by the #GCompletion. The items are not freed, so if
+ * the memory was dynamically allocated, it should be freed after calling this
+ * function.
  *
  * Deprecated: 2.26: Rarely used API
  **/

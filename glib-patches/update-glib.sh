@@ -4,7 +4,7 @@ GIT=${GIT-git}
 PATCH=${PATCH-patch}
 SED=${SED-sed}
 repo=
-tag=2.32.4
+tag=2.38.2
 commit=n
 
 usage()
@@ -83,14 +83,21 @@ rm -f \
     glib/INSTALL.in \
     glib/README.commits \
     glib/HACKING \
+    glib/NEWS \
     glib/NEWS.pre-1-3 \
     glib/README.win32 \
+    glib/.dir-locals.el \
+    glib/check-abis.sh \
     glib/config.h.win32.in \
+    glib/glib-gettextize.in \
+    glib/glib-tap.mk \
     glib/glib-zip.in \
     glib/sanity_check \
+    glib/tap-test \
     glib/glib/glib.stp \
     glib/glib/glib_probes.d \
     glib/glib/glibconfig.h.win32.in \
+    glib/glib/gregex.[ch] \
     glib/msvc_recommended_pragmas.h \
     glib/win32-fixup.pl \
     glib/glib/libglib-gdb.py.in
