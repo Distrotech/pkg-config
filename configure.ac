@@ -7,8 +7,20 @@ AC_INIT([pkg-config],
 AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_SRCDIR([main.c])
 
-dnl Initialize automake and libtool
-AM_INIT_AUTOMAKE([1.11])
+dnl Initialize automake. Sadly, we have to kludge around the automake
+dnl test driver here. We need to use the serial driver (for now), but
+dnl the parallel driver is the default in 1.13. So, we want to specify
+dnl the serial driver. Unfortunately, the option to specify that driver
+dnl didn't exist until 1.12.
+m4_define([automake_version],
+    [m4_esyscmd([${AUTOMAKE-automake} --version |
+                 awk '/^automake/{print $NF}'])])
+m4_define([automake_serial_tests],
+    [m4_if(m4_version_compare(automake_version, [1.12]), [-1],
+                               [], [serial-tests])])
+AM_INIT_AUTOMAKE([1.11 ]automake_serial_tests)
+
+dnl Initialize libtool
 LT_PREREQ([2.2])
 LT_INIT
 
