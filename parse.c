@@ -990,9 +990,6 @@ parse_line (Package *pkg, const char *untrimmed, const char *path,
       ++p;
       while (*p && isspace ((guchar)*p))
         ++p;
-      
-      if (pkg->vars == NULL)
-        pkg->vars = g_hash_table_new (g_str_hash, g_str_equal);
 
       if (define_prefix && strcmp (tag, prefix_variable) == 0)
 	{
@@ -1114,7 +1111,13 @@ parse_package_file (const char *path, gboolean ignore_requires,
       debug_spew ("No pcfiledir determined for package\n");
       pkg->pcfiledir = g_strdup ("???????");
     }
-  
+
+  if (pkg->vars == NULL)
+    pkg->vars = g_hash_table_new (g_str_hash, g_str_equal);
+
+  /* Variable storing directory of pc file */
+  g_hash_table_insert (pkg->vars, "pcfiledir", pkg->pcfiledir);
+
   str = g_string_new ("");
 
   while (read_one_line (f, str))

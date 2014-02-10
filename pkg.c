@@ -1028,10 +1028,6 @@ package_get_var (Package *pkg,
   if (varval == NULL && pkg->vars)
     varval = g_strdup (g_hash_table_lookup (pkg->vars, var));
 
-  /* Magic "pcfiledir" variable */
-  if (varval == NULL && pkg->pcfiledir && strcmp (var, "pcfiledir") == 0)
-    varval = g_strdup (pkg->pcfiledir);
-
   return varval;
 }
 
