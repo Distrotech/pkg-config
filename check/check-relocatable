@@ -3,17 +3,26 @@
 set -e
 . ${srcdir}/common
 
-# Test if pcfiledir metadata variable is substituted correctly
-RESULT="-I${srcdir}/include -L${srcdir}/lib -lfoo"
-run_test --cflags --libs pcfiledir
-
-# Convert abs_top_srcdir to Windows format if necessary.
+# Convert absolute directories to Windows format if necessary.
 if [ "$native_win32" = yes ]; then
     # Assume we have cmd to do the conversion, except we have to escape
     # the command switch on MSYS.
     [ "$OSTYPE" = msys ] && opt="\\/C" || opt="/C"
     abs_top_srcdir=$($WINE cmd $opt echo "$abs_top_srcdir")
+    abs_srcdir=$($WINE cmd $opt echo "$abs_srcdir")
 fi
+
+# See if the pcfiledir variable is defined. First, with the path
+# built from the relative PKG_CONFIG_LIBDIR. Second, with the path
+# built from the full path to the pc file.
+RESULT=$srcdir
+run_test --variable=pcfiledir pcfiledir
+RESULT=$abs_srcdir
+run_test --variable=pcfiledir "$abs_srcdir/pcfiledir.pc"
+
+# Test if pcfiledir metadata variable is substituted correctly
+RESULT="-I${srcdir}/include -L${srcdir}/lib -lfoo"
+run_test --cflags --libs pcfiledir
 
 # Test prefix redefinition for .pc files in pkgconfig directory. Try .pc
 # files with both unexpanded and expanded variables. Use the absolute
