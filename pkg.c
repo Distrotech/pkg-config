@@ -222,6 +222,7 @@ static Package *
 add_virtual_pkgconfig_package (void)
 {
   Package *pkg = NULL;
+  gchar *path_quoted;
 
   pkg = g_new0 (Package, 1);
 
@@ -234,7 +235,8 @@ add_virtual_pkgconfig_package (void)
 
   if (pkg->vars == NULL)
     pkg->vars = g_hash_table_new (g_str_hash, g_str_equal);
-  g_hash_table_insert (pkg->vars, "pc_path", pkg_config_pc_path);
+  path_quoted = g_shell_quote (pkg_config_pc_path);
+  g_hash_table_insert (pkg->vars, "pc_path", path_quoted);
 
   debug_spew ("Adding virtual 'pkg-config' package to list of known packages\n");
   g_hash_table_insert (packages, pkg->key, pkg);
