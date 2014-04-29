@@ -917,7 +917,6 @@ verify_package (Package *pkg)
             }
           system_dir_iter = system_dir_iter->next;
         }
-      iter = iter->next;
     }
   g_list_free (system_directories);
 
