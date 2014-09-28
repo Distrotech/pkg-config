@@ -665,7 +665,9 @@ static void _do_parse_libs (Package *pkg, int argc, char **argv)
           flag->arg = g_strconcat (L_flag, p, NULL);
           pkg->libs = g_list_prepend (pkg->libs, flag);
 	}
-      else if (strcmp("-framework",p) == 0 && i+1 < argc)
+      else if ((strcmp("-framework", p) == 0 ||
+                strcmp("-Wl,-framework", p) == 0) &&
+               i+1 < argc)
         {
           /* Mac OS X has a -framework Foo which is really one option,
            * so we join those to avoid having -framework Foo
