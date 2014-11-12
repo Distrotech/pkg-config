@@ -160,16 +160,17 @@ scan_dir (char *dirname)
 #endif
   dir = opendir (dirname_copy);
   g_free (dirname_copy);
+
+  scanned_dir_count += 1;
+
   if (!dir)
     {
-      debug_spew ("Cannot open directory '%s' in package search path: %s\n",
-                  dirname, g_strerror (errno));
+      debug_spew ("Cannot open directory #%i '%s' in package search path: %s\n",
+                  scanned_dir_count, dirname, g_strerror (errno));
       return;
     }
 
-  debug_spew ("Scanning directory '%s'\n", dirname);
-
-  scanned_dir_count += 1;
+  debug_spew ("Scanning directory #%i '%s'\n", scanned_dir_count, dirname);
   
   while ((dent = readdir (dir)))
     {
