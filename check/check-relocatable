@@ -8,8 +8,8 @@ if [ "$native_win32" = yes ]; then
     # Assume we have cmd to do the conversion, except we have to escape
     # the command switch on MSYS.
     [ "$OSTYPE" = msys ] && opt="\\/C" || opt="/C"
-    abs_top_srcdir=$($WINE cmd $opt echo "$abs_top_srcdir")
-    abs_srcdir=$($WINE cmd $opt echo "$abs_srcdir")
+    abs_top_srcdir=$($WINE cmd $opt echo "$abs_top_srcdir" | tr -d '\r')
+    abs_srcdir=$($WINE cmd $opt echo "$abs_srcdir" | tr -d '\r')
 fi
 
 # See if the pcfiledir variable is defined. First, with the path
