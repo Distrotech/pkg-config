@@ -16,10 +16,10 @@ RESULT="pcfiledir"
 run_test --print-variables no-variables
 
 RESULT="exec_prefix
-prefix
-libdir
 includedir
-pcfiledir"
+libdir
+pcfiledir
+prefix"
 run_test --print-variables simple
 
 # --print-provides

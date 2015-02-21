@@ -281,11 +281,10 @@ pkg_uninstalled (Package *pkg)
 }
 
 void
-print_hashtable_key (gpointer key,
-                     gpointer value,
-                     gpointer user_data)
+print_list_data (gpointer data,
+                 gpointer user_data)
 {
-  printf("%s\n", (gchar*)key);
+  g_print ("%s\n", (gchar *)data);
 }
 
 static void
@@ -700,9 +699,13 @@ main (int argc, char **argv)
         {
           Package *pkg = tmp->data;
           if (pkg->vars != NULL)
-            g_hash_table_foreach(pkg->vars,
-                                 &print_hashtable_key,
-                                 NULL);
+            {
+              /* Sort variables for consistent output */
+              GList *keys = g_hash_table_get_keys (pkg->vars);
+              keys = g_list_sort (keys, (GCompareFunc)g_strcmp0);
+              g_list_foreach (keys, print_list_data, NULL);
+              g_list_free (keys);
+            }
           tmp = g_list_next (tmp);
           if (tmp) printf ("\n");
         }
