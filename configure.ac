@@ -29,6 +29,9 @@ dnl by either passing --disable-silent-rules to configure or passing V=1
 dnl to make
 m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
 
+dnl Enable large file support
+AC_SYS_LARGEFILE
+
 dnl Check for programs
 AC_PROG_CC
 AC_CHECK_PROG([LN], [ln], [ln], [cp -Rp])
