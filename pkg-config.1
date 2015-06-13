@@ -338,6 +338,13 @@ Replaces the default
 .I pkg-config
 search directory, usually
 .IR /usr/lib/pkgconfig : /usr/share/pkgconfig .
+.TP
+.I "PKG_CONFIG_$PACKAGE_$VARIABLE"
+Overrides the variable VARIABLE in the package PACKAGE. The environment
+variable should have the package name and package variable upper cased
+with non-alphanumeric characters converted to underscores. For example,
+setting PKG_CONFIG_GLADEUI_2_0_CATALOGDIR will override the variable
+"catalogdir" in the "gladeui-2.0" package.
 .\"
 .SH PKG-CONFIG DERIVED VARIABLES
 .I pkg-config

@@ -1021,6 +1021,24 @@ define_global_variable (const char *varname,
 }
 
 char *
+var_to_env_var (const char *pkg, const char *var)
+{
+  char *new = g_strconcat ("PKG_CONFIG_", pkg, "_", var, NULL);
+  char *p;
+  for (p = new; *p != 0; p++)
+    {
+      char c = g_ascii_toupper (*p);
+
+      if (!g_ascii_isalnum (c))
+        c = '_';
+
+      *p = c;
+    }
+
+  return new;
+}
+
+char *
 package_get_var (Package *pkg,
                  const char *var)
 {
@@ -1028,7 +1046,23 @@ package_get_var (Package *pkg,
 
   if (globals)
     varval = g_strdup (g_hash_table_lookup (globals, var));
-  
+
+  /* Allow overriding specific variables using an environment variable of the
+   * form PKG_CONFIG_$PACKAGENAME_$VARIABLE
+   */
+  if (pkg->key)
+    {
+      char *env_var = var_to_env_var (pkg->key, var);
+      const char *env_var_content = g_getenv (env_var);
+      g_free (env_var);
+      if (env_var_content)
+        {
+          debug_spew ("Overriding variable '%s' from environment\n", var);
+          return g_strdup (env_var_content);
+        }
+    }
+
+
   if (varval == NULL && pkg->vars)
     varval = g_strdup (g_hash_table_lookup (pkg->vars, var));
 

@@ -26,7 +26,9 @@ TESTS = \
 	check-debug \
 	check-gtk \
 	check-tilde \
-	check-relocatable
+	check-relocatable \
+	check-variable-override \
+	$(NULL)
 
 EXTRA_DIST = \
 	$(TESTS) \
