@@ -1079,9 +1079,10 @@ parse_line (Package *pkg, const char *untrimmed, const char *path,
 }
 
 Package*
-parse_package_file (const char *path, gboolean ignore_requires,
-		    gboolean ignore_private_libs,
-		    gboolean ignore_requires_private)
+parse_package_file (const char *key, const char *path,
+                    gboolean ignore_requires,
+                    gboolean ignore_private_libs,
+                    gboolean ignore_requires_private)
 {
   FILE *f;
   Package *pkg;
@@ -1101,6 +1102,7 @@ parse_package_file (const char *path, gboolean ignore_requires,
   debug_spew ("Parsing package file '%s'\n", path);
   
   pkg = g_new0 (Package, 1);
+  pkg->key = g_strdup (key);
 
   if (path)
     {

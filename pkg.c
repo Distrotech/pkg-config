@@ -267,6 +267,7 @@ static Package *
 internal_get_package (const char *name, gboolean warn)
 {
   Package *pkg = NULL;
+  char *key;
   const char *location;
   GList *iter;
   
@@ -318,21 +319,8 @@ internal_get_package (const char *name, gboolean warn)
       return NULL;
     }
 
-  debug_spew ("Reading '%s' from file '%s'\n", name, location);
-  pkg = parse_package_file (location, ignore_requires, ignore_private_libs, 
-			    ignore_requires_private);
-  
-  if (pkg == NULL)
-    {
-      debug_spew ("Failed to parse '%s'\n", location);
-      return NULL;
-    }
-  
-  if (strstr (location, "uninstalled.pc"))
-    pkg->uninstalled = TRUE;
-  
   if (location != name)
-    pkg->key = g_strdup (name);
+    key = g_strdup (name);
   else
     {
       /* need to strip package name out of the filename */
@@ -344,9 +332,23 @@ internal_get_package (const char *name, gboolean warn)
         --start;
 
       g_assert (end >= start);
-      
-      pkg->key = g_strndup (start, end - start);
+
+      key = g_strndup (start, end - start);
     }
+
+  debug_spew ("Reading '%s' from file '%s'\n", name, location);
+  pkg = parse_package_file (key, location, ignore_requires,
+                            ignore_private_libs, ignore_requires_private);
+  g_free (key);
+
+  if (pkg == NULL)
+    {
+      debug_spew ("Failed to parse '%s'\n", location);
+      return NULL;
+    }
+
+  if (strstr (location, "uninstalled.pc"))
+    pkg->uninstalled = TRUE;
 
   pkg->path_position =
     GPOINTER_TO_INT (g_hash_table_lookup (path_positions, pkg->key));
