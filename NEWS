@@ -1,3 +1,39 @@
+pkg-config 0.29
+===
+
+- Fixed a regression from 0.28 in system -L flag handling. If the pc
+  file has multiple system -L flags, every other flag will be left as
+  is. Thanks to Andrew Oakley for the fix. (#78077)
+- Quoting of variables queried through --variable is removed so that the
+  output can be used verbatim in subsequent shell commands. Thanks to
+  Marek Kasik for the fix. (#67904)
+- Fixed a regression from 0.28 in -L flag handling on Windows. A .libs
+  suffix was inadvertantly being added to the library path.
+- Added a --validate option to check pc file syntax. This works just
+  like --exists, but package dependencies are disabled. (#7000)
+- Added the PKG_PREREQ autoconf macro. Whereas PKG_PROG_PKG_CONFIG is
+  used to check the version of the pkg-config tool, this is used to
+  check the version of the pkg-config autoconf macros in use.
+- Added the PKG_CHECK_MODULES_STATIC autoconf macro. This will
+  temporarily add --static to the pkg-config calls while invoking
+  PKG_CHECK_MODULES. (#19541)
+- Many fixes to the testsuite for Windows. It should now pass for a
+  MinGW, Cygwin, and cross-compiled MinGW using Wine for test execution.
+  (#66939)
+- More consistent handling of prefix redefinition. On Windows, the
+  prefix was always being redefined based on the pc file path. This
+  feature can now be enabled or disabled at runtime on all platforms
+  using the --define-prefix and --dont-define-prefix options. (#63602)
+- Continue listing packages with --list-all even if there are errors in
+  pc files. (#26615)
+- Various documentation improvements. (#62018, #62374, #66155)
+- Fixed a bug when multiple -isystem arguments are used. (#72584)
+- pkg-config is now built with largefile support to ensure that it works
+  correctly on filesystems with 64 bit inodes. Thanks to Peter Jones for
+  the fix. (#90078)
+- Bugs fixed: 7000, 19541, 26615, 62018, 62374, 63602, 66155, 66939,
+  67904, 70690, 72584, 78077, 80378, 80380, 89267, 90078, 90437, 92002.
+
 pkg-config 0.28
 ===
 - Fixed a pair of long-standing and intertwined bugs involving unwanted
