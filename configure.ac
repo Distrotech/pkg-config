@@ -195,7 +195,7 @@ dnl g_win32_get_package_installation_directory_of_module().
 dnl
 dnl Pull in pkg-config macros to find external glib.
 dnl
-m4_include([pkg.m4])
+m4_include([pkg.m4.in])
 m4_define([glib_module], [glib-2.0 >= 2.16])
 AC_ARG_WITH([internal-glib],
   [AS_HELP_STRING([--with-internal-glib], [use internal glib])],
@@ -255,6 +255,7 @@ AM_CONDITIONAL([HOST_TOOL], [test "x$enable_host_tool" = xyes])
 
 AC_CONFIG_FILES([
 Makefile
+pkg.m4
 check/Makefile
 check/config.sh
 ])

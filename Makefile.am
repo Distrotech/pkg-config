@@ -48,7 +48,7 @@ endif
 
 # Various data files
 m4dir = $(datadir)/aclocal
-dist_m4_DATA = pkg.m4
+m4_DATA = pkg.m4
 dist_doc_DATA = pkg-config-guide.html
 dist_man_MANS = pkg-config.1
 EXTRA_DIST = README.win32
