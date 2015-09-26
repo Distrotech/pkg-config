@@ -423,6 +423,12 @@ VARIABLE-PREFIX will simply use the _LIBS and _CFLAGS variables set from
 the previous usage without calling \fIpkg-config\fP again.
 .\"
 .TP
+.I "PKG_PREREQ(MIN-VERSION)"
+Checks that the version of the pkg-config autoconf macros in use is at
+least MIN-VERSION. This can be used to ensure a particular pkg-config
+macro will be available.
+.\"
+.TP
 .I "PKG_PROG_PKG_CONFIG([MIN-VERSION])"
 
 Defines the PKG_CONFIG variable to the best pkg-config available,
