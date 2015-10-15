@@ -31,7 +31,6 @@
 #endif
 
 #include <sys/types.h>
-#include <dirent.h>
 #include <string.h>
 #include <errno.h>
 #include <stdio.h>
@@ -129,8 +128,9 @@ name_ends_in_uninstalled (const char *str)
 static void
 scan_dir (char *dirname)
 {
-  DIR *dir;
-  struct dirent *dent;
+  GDir *dir;
+  const gchar *d_name;
+
   int dirnamelen = strlen (dirname);
   /* Use a copy of dirname cause Win32 opendir doesn't like
    * superfluous trailing (back)slashes in the directory name.
@@ -158,7 +158,7 @@ scan_dir (char *dirname)
         }
     }
 #endif
-  dir = opendir (dirname_copy);
+  dir = g_dir_open (dirname_copy, 0 , NULL);
   g_free (dirname_copy);
 
   scanned_dir_count += 1;
@@ -172,22 +172,22 @@ scan_dir (char *dirname)
 
   debug_spew ("Scanning directory #%i '%s'\n", scanned_dir_count, dirname);
   
-  while ((dent = readdir (dir)))
+  while ((d_name = g_dir_read_name(dir)))
     {
-      int len = strlen (dent->d_name);
+      int len = strlen (d_name);
 
-      if (ends_in_dotpc (dent->d_name))
+      if (ends_in_dotpc (d_name))
         {
           char *pkgname = g_malloc (len - EXT_LEN + 1);
 
-          debug_spew ("File '%s' appears to be a .pc file\n", dent->d_name);
+          debug_spew ("File '%s' appears to be a .pc file\n", d_name);
           
-	  strncpy (pkgname, dent->d_name, len - EXT_LEN);
+          strncpy (pkgname, d_name, len - EXT_LEN);
           pkgname[len-EXT_LEN] = '\0';
 
           if (g_hash_table_lookup (locations, pkgname))
             {
-              debug_spew ("File '%s' ignored, we already know about package '%s'\n", dent->d_name, pkgname);
+              debug_spew ("File '%s' ignored, we already know about package '%s'\n", d_name, pkgname);
               g_free (pkgname);
             }
           else
@@ -195,7 +195,7 @@ scan_dir (char *dirname)
               char *filename = g_malloc (dirnamelen + 1 + len + 1);
               strncpy (filename, dirname, dirnamelen);
               filename[dirnamelen] = G_DIR_SEPARATOR;
-              strcpy (filename + dirnamelen + 1, dent->d_name);
+              strcpy (filename + dirnamelen + 1, d_name);
               
 	      if (g_file_test(filename, G_FILE_TEST_IS_REGULAR) == TRUE) {
 		  g_hash_table_insert (locations, pkgname, filename);
@@ -212,10 +212,10 @@ scan_dir (char *dirname)
       else
         {
           debug_spew ("Ignoring file '%s' in search directory; not a .pc file\n",
-                      dent->d_name);
+                      d_name);
         }
     }
-  closedir(dir);
+  g_dir_close (dir);
 }
 
 static Package *
