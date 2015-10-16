@@ -29,14 +29,8 @@ AM_CFLAGS = \
 
 bin_PROGRAMS = pkg-config
 pkg_config_LDADD = $(GLIB_LIBS)
-pkg_config_SOURCES= \
-	pkg.h \
-	pkg.c \
-	parse.h \
-	parse.c \
-	rpmvercmp.c \
-	rpmvercmp.h \
-	main.c
+
+include Makefile.sources
 
 if HOST_TOOL
 host_tool = $(host)-pkg-config$(EXEEXT)
