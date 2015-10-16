@@ -258,5 +258,6 @@ Makefile
 pkg.m4
 check/Makefile
 check/config.sh
+config.h.win32
 ])
 AC_OUTPUT
