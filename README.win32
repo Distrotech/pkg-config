@@ -25,3 +25,22 @@ In order to use the output of pkg-config with MSVC, the option
 --msvc-syntax can be used to convert UNIX style library output to
 arguments that work with MSVC. This means -Lfoo will be converted to
 /libpath:foo, and -lfoo will be converted to foo.lib.
+
+Building pkg-config is now supported on Visual Studio/MSVC as well.  To
+build it, you will need to have a glib installation.  Note that MSVC
+builds of glib does not have a build-time dependency on pkg-config,
+unlike the normal autotools builds.  The headers and libs either need to
+be found in your default %INCLUDE% and %LIB% respectively, or they need
+to be found in $(GLIB_PREFIX)\include and $(GLIB_PREFIX)\lib respectively;
+please see Makefile.vc for adjusting $(GLIB_PREFIX) to suit your needs.
+To build pkg-config with MSVC, run in a Visual Studio command prompt:
+
+"nmake /f Makefile.vc CFG=release" (release builds) -or-
+"nmake /f Makefile.vc CFG=debug" (debug builds)
+
+The resulting pkg-config.exe will be found in [release|debug]\[win32|x64];
+a 'clean' target is supported to clean up the build.  MSVC 2008
+through 2015 is supported; older versions may work as well but is not
+tested.  Note that building with the glib bundled with this source
+distribution is not currently supported-the glib DLL and all of its
+dependent DLLs are required at runtime.
