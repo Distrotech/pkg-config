@@ -28,6 +28,7 @@ TESTS = \
 	check-tilde \
 	check-relocatable \
 	check-variable-override \
+	check-variables \
 	$(NULL)
 
 EXTRA_DIST = \
@@ -99,4 +100,6 @@ EXTRA_DIST = \
 	tilde.pc \
 	pkgconfig/prefixdef.pc \
 	pkgconfig/prefixdef-expanded.pc \
-	pcfiledir.pc
+	pcfiledir.pc \
+	variables.pc \
+	$(NULL)

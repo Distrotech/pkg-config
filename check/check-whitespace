@@ -4,6 +4,11 @@ set -e
 
 . ${srcdir}/common
 
+# variables come out unquoted. In 0.28 and earlier, this would also
+# contain the ""s quoting the variable.
+RESULT='/usr/white space/include'
+run_test --variable=includedir whitespace
+
 # expect cflags from whitespace
 RESULT='-Dlala=misc -I/usr/white\ space/include -I$(top_builddir) -Iinclude\ dir -Iother\ include\ dir'
 run_test --cflags whitespace
