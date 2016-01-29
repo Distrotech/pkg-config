@@ -29,6 +29,8 @@ Package *parse_package_file (const char *key, const char *path,
 
 GList   *parse_module_list (Package *pkg, const char *str, const char *path);
 
+char    *parse_package_variable (Package *pkg, const char *variable);
+
 #endif
 
 

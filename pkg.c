@@ -1070,40 +1070,33 @@ package_get_var (Package *pkg,
 }
 
 char *
-packages_get_var (GList     *pkgs,
+packages_get_var (GList      *pkgs,
                   const char *varname)
 {
   GList *tmp;
   GString *str;
-  char *retval;
-  
-  str = g_string_new ("");
-  
+
+  str = g_string_new (NULL);
+
   tmp = pkgs;
   while (tmp != NULL)
     {
       Package *pkg = tmp->data;
       char *var;
 
-      var = package_get_var (pkg, varname);
-      
+      var = parse_package_variable (pkg, varname);
       if (var)
         {
+          if (str->len > 0)
+            g_string_append_c (str, ' ');
           g_string_append (str, var);
-          g_string_append_c (str, ' ');                
           g_free (var);
         }
 
       tmp = g_list_next (tmp);
     }
 
-  /* chop last space */
-  if (str->len > 0)
-      str->str[str->len - 1] = '\0';
-  retval = str->str;
-  g_string_free (str, FALSE);
-
-  return retval;
+  return g_string_free (str, FALSE);
 }
 
 int

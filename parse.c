@@ -1145,3 +1145,39 @@ parse_package_file (const char *key, const char *path,
   
   return pkg;
 }
+
+/* Parse a package variable. When the value appears to be quoted,
+ * unquote it so it can be more easily used in a shell. Otherwise,
+ * return the raw value.
+ */
+char *
+parse_package_variable (Package *pkg, const char *variable)
+{
+  char *value;
+  char *unquoted;
+  GError *error = NULL;
+
+  value = package_get_var (pkg, variable);
+  if (!value)
+    return NULL;
+
+  if (*value != '"' && *value != '\'')
+    /* Not quoted, return raw value */
+    return value;
+
+  /* Maybe too naive, but assume a fully quoted variable */
+  unquoted = g_shell_unquote (value, &error);
+  if (unquoted)
+    {
+      g_free (value);
+      return unquoted;
+    }
+  else
+    {
+      /* Note the issue, but just return the raw value */
+      debug_spew ("Couldn't unquote value of \"%s\": %s\n",
+                  variable, error ? error->message : "unknown");
+      g_clear_error (&error);
+      return value;
+    }
+}
