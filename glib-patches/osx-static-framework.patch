@@ -1,0 +1,31 @@
+glib's configure changed to using the single form -Wl,-framework,Foo
+format, but that means that libtool won't include the flags in the .la
+file and won't get used when linking pkg-config. That breaks use of the
+static internal glib on OSX.
+
+Upstream this was handled by adding those flags to glib's .pc file. We
+can't use that while bootstrapping pkg-config, so just revert to the
+previous format downstream.
+
+https://bugs.freedesktop.org/show_bug.cgi?id=92902
+https://bugzilla.gnome.org/show_bug.cgi?id=566994
+
+diff --git a/glib/configure.ac b/glib/configure.ac
+index ffa7869..4ace471 100644
+--- a/glib/configure.ac
++++ b/glib/configure.ac
+@@ -224,12 +224,12 @@ AM_CONDITIONAL(MS_LIB_AVAILABLE, [test x$ms_librarian = xyes])
+ 
+ AS_IF([test "x$glib_have_carbon" = "xyes"], [
+   AC_DEFINE(HAVE_CARBON, 1, [define to 1 if Carbon is available])
+-  LDFLAGS="$LDFLAGS -Wl,-framework,Carbon"
++  LDFLAGS="$LDFLAGS -framework Carbon"
+ ])
+ 
+ if test "x$glib_have_cocoa" = "xyes"; then
+   AC_DEFINE(HAVE_COCOA, 1, [define to 1 if Cocoa is available])
+-  LDFLAGS="$LDFLAGS -Wl,-framework,Foundation"
++  LDFLAGS="$LDFLAGS -framework Foundation"
+ fi
+ 
+ dnl declare --enable-* args and collect ac_help strings

@@ -224,12 +224,12 @@ AM_CONDITIONAL(MS_LIB_AVAILABLE, [test x$ms_librarian = xyes])
 
 AS_IF([test "x$glib_have_carbon" = "xyes"], [
   AC_DEFINE(HAVE_CARBON, 1, [define to 1 if Carbon is available])
-  LDFLAGS="$LDFLAGS -Wl,-framework,Carbon"
+  LDFLAGS="$LDFLAGS -framework Carbon"
 ])
 
 if test "x$glib_have_cocoa" = "xyes"; then
   AC_DEFINE(HAVE_COCOA, 1, [define to 1 if Cocoa is available])
-  LDFLAGS="$LDFLAGS -Wl,-framework,Foundation"
+  LDFLAGS="$LDFLAGS -framework Foundation"
 fi
 
 dnl declare --enable-* args and collect ac_help strings

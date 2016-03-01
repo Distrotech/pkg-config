@@ -7,3 +7,4 @@ no-gettext.patch
 cross-compiling.patch
 static-only.patch
 win32-static-init.patch
+osx-static-framework.patch
