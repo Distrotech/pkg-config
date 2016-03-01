@@ -1,3 +1,22 @@
+pkg-config 0.29.1
+=================
+
+- Fixed a regression from 0.29 with unquoting values queried with
+  --variable. In some cases, this would cause shell special characters to
+  be escaped in ways they weren't before. Instead, the unquoting only
+  occurs if the value appears to be quoted. (#93284)
+- Add support for building pkg-config with Microsoft Visual Studio.
+  Thanks to Chun-wei Fan for the fix. (#92489)
+- Allow overriding pkg-config variables with environment variables. By
+  setting an environment variable of the form
+  PKG_CONFIG_$PACKAGE_$VARIABLE, a pkg-config variable can be set
+  globally without always having to pass --define-variable. Thanks to
+  Alex Larsson for the fix. (#90917)
+- Honor -Wl,-framework in addition to -framework so that multiple
+  frameworks are handled on OSX. (#1278)
+- Fix the OSX build using --with-internal-glib. Thanks to Rudá Moura for
+  the initial fix and Adam Mercer for testing the final patch. (#92902)
+
 pkg-config 0.29
 ===
 
